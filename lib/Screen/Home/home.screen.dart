@@ -167,7 +167,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ],
                 ),
               ),
-          
+
               //List BH
               Container(
                 padding: EdgeInsets.only(right: 20, left: 20),
@@ -236,7 +236,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                           ),
                                         ),
                                         Text(
-                                          'Sandoval, Narra, Palawan', // Subtitle
+                                          'Sandoval, Narra, Palawan',
+                                          // Subtitle
                                           style: TextStyle(
                                             color: Colors.white70,
                                             fontSize: 12,
@@ -305,65 +306,63 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Container(
-                              height: 130,
-                              decoration: BoxDecoration(
-                                color: Colors.red,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [],
-                              ),
-                              child: Stack(
-                                children: [
-                                  // Positioned Text: Title and Subtitle
-                                  Positioned(
-                                    left: 12,
-                                    bottom: 12,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Sample', // Title
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                          ),
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [],
+                                ),
+                                child: Row(
+                                  children: [
+                                    Container(
+                                      width: 80,
+                                      height: 90,
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(10),
+                                        image: DecorationImage(
+                                          image: NetworkImage(
+                                            'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                          ), // Replace with your own image URL
+                                          fit: BoxFit.cover,
                                         ),
-                                        Text(
-                                          'Sandoval, Narra, Palawan', // Subtitle
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ],
+                                        boxShadow: [],
+                                      ),
                                     ),
-                                  ),
-                                  // Positioned Rating and Star Icon
-                                  Positioned(
-                                    right: 12,
-                                    bottom: 12,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '4.8', // Rating
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                          size: 20,
-                                        ),
-                                      ],
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Container(
+                                        color: Colors.white,
+                                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
+                                          Row(children: ['Boarding House'.text.bold.size(15).make(),],),
+                                          Row(children: ['404m near you'.text.light.color(Colors.grey).make(),],),
+                                        ],),
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                    Container(
+                                      padding:
+                                          EdgeInsets.only(left: 10, right: 0),
+                                      child: Row(
+                                        children: [
+
+                                          Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 20,
+                                          ),
+                                          SizedBox(width: 4),
+                                          Text(
+                                            '4.8', // Rating
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 12,
+                                            ),
+                                          ),
+
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                )),
                           );
                         },
                       ),
