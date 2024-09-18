@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'BH Finder',
-      home: const RoomScreen(),
+      home: const HomeScreen(),
       debugShowCheckedModeBanner: false,
       routes: {
         '/HomeScreen': (context) => HomeScreen(),

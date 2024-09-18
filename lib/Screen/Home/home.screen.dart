@@ -1,7 +1,11 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../BHouse/bh.screen.dart';
+
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -11,6 +15,7 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -204,71 +209,80 @@ class _HomeScreenState extends State<HomeScreen> {
                         itemBuilder: (context, index) {
                           return Padding(
                             padding: const EdgeInsets.only(right: 10),
-                            child: Container(
-                              width: 280,
-                              height: 230,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(10),
-                                image: DecorationImage(
-                                  image: NetworkImage(
-                                    'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
-                                  ), // Replace with your own image URL
-                                  fit: BoxFit.cover,
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  _toBhouseScreen(),
+                                  (Route<dynamic> route) =>
+                                      false,
+                                );
+                              },
+                              child: Container(
+                                width: 280,
+                                height: 230,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(10),
+                                  image: DecorationImage(
+                                    image: NetworkImage(
+                                      'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                    ), // Replace with your own image URL
+                                    fit: BoxFit.cover,
+                                  ),
+                                  boxShadow: [],
                                 ),
-                                boxShadow: [],
-                              ),
-                              child: Stack(
-                                children: [
-                                  // Positioned Text: Title and Subtitle
-                                  Positioned(
-                                    left: 12,
-                                    bottom: 12,
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Sample', // Title
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
+                                child: Stack(
+                                  children: [
+                                    // Positioned Text: Title and Subtitle
+                                    Positioned(
+                                      left: 12,
+                                      bottom: 12,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            'Sample', // Title
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
-                                        ),
-                                        Text(
-                                          'Sandoval, Narra, Palawan',
-                                          // Subtitle
-                                          style: TextStyle(
-                                            color: Colors.white70,
-                                            fontSize: 12,
+                                          Text(
+                                            'Sandoval, Narra, Palawan',
+                                            // Subtitle
+                                            style: TextStyle(
+                                              color: Colors.white70,
+                                              fontSize: 12,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                  // Positioned Rating and Star Icon
-                                  Positioned(
-                                    right: 12,
-                                    bottom: 12,
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          '4.8', // Rating
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontSize: 12,
+                                    // Positioned Rating and Star Icon
+                                    Positioned(
+                                      right: 12,
+                                      bottom: 12,
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            '4.8', // Rating
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
                                           ),
-                                        ),
-                                        SizedBox(width: 4),
-                                        Icon(
-                                          Icons.star,
-                                          color: Colors.amber,
-                                          size: 20,
-                                        ),
-                                      ],
+                                          SizedBox(width: 4),
+                                          Icon(
+                                            Icons.star,
+                                            color: Colors.amber,
+                                            size: 20,
+                                          ),
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
                           );
@@ -332,10 +346,30 @@ class _HomeScreenState extends State<HomeScreen> {
                                     Expanded(
                                       child: Container(
                                         color: Colors.white,
-                                        child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-                                          Row(children: ['Boarding House'.text.bold.size(15).make(),],),
-                                          Row(children: ['404m near you'.text.light.color(Colors.grey).make(),],),
-                                        ],),
+                                        child: Column(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          children: [
+                                            Row(
+                                              children: [
+                                                'Boarding House'
+                                                    .text
+                                                    .bold
+                                                    .size(15)
+                                                    .make(),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                '404m near you'
+                                                    .text
+                                                    .light
+                                                    .color(Colors.grey)
+                                                    .make(),
+                                              ],
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                     Container(
@@ -343,7 +377,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                           EdgeInsets.only(left: 10, right: 0),
                                       child: Row(
                                         children: [
-
                                           Icon(
                                             Icons.star,
                                             color: Colors.amber,
@@ -357,7 +390,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                               fontSize: 12,
                                             ),
                                           ),
-
                                         ],
                                       ),
                                     ),
@@ -374,6 +406,25 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  Route _toBhouseScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) => BHouseScreen(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: BHouseScreen());
+      },
     );
   }
 }
