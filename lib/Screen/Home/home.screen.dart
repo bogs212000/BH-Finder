@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../BHouse/bh.screen.dart';
-
+import '../Map/nearme.map.dart';
+import '../notification/notification.screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -15,81 +16,115 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
+  TextEditingController _searchText = TextEditingController();
+  bool searchActive = false;
+  FocusNode _focusNode = FocusNode();
 
+  @override
+  void initState() {
+    super.initState();
+    _focusNode.addListener(() {
+      setState(() {
+        searchActive = _focusNode.hasFocus;
+      });
+    });
+  }
+
+  @override
+  void dispose() {
+    _focusNode.dispose();
+    super.dispose();
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: Container(
-          padding: EdgeInsets.only(left: 5, right: 5),
-          height: 35,
-          width: 150,
-          decoration: BoxDecoration(
-            color: Colors.white,
-            border: Border.all(color: Colors.grey, width: 0.3),
-            borderRadius: BorderRadius.circular(20),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.grey.withOpacity(0.2),
-                // Shadow color with opacity
-                spreadRadius: 1,
-                // Spread radius
-                blurRadius: 1,
-                // Blur radius
-                offset: Offset(
-                    0, 1), // Position of the shadow (horizontal, vertical)
-              ),
-            ],
-          ),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  Icon(
-                    Icons.pin_drop_outlined,
-                    color: Colors.grey.withOpacity(0.8),
-                  ),
-                  SizedBox(width: 5),
-                  'Street'
-                      .text
-                      .color(Colors.grey.withOpacity(0.8))
-                      .size(12)
-                      .bold
-                      .make()
-                ],
-              ),
-            ],
-          ),
+        title:  GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushAndRemoveUntil(
+              _toNearMeMapScreen(),
+              (Route<dynamic> route) => false,
+            );
+          },
+          child: searchActive == false ? Container(
+            padding: EdgeInsets.only(left: 5, right: 5),
+            height: 35,
+            width: 150,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              border: Border.all(color: Colors.grey, width: 0.3),
+              borderRadius: BorderRadius.circular(20),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.grey.withOpacity(0.2),
+                  // Shadow color with opacity
+                  spreadRadius: 1,
+                  // Spread radius
+                  blurRadius: 1,
+                  // Blur radius
+                  offset: Offset(
+                      0, 1), // Position of the shadow (horizontal, vertical)
+                ),
+              ],
+            ),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Row(
+                  children: [
+                    Icon(
+                      Icons.pin_drop_outlined,
+                      color: Colors.grey.withOpacity(0.8),
+                    ),
+                    SizedBox(width: 5),
+                    'Street'
+                        .text
+                        .color(Colors.grey.withOpacity(0.8))
+                        .size(12)
+                        .bold
+                        .make()
+                  ],
+                ),
+              ],
+            ),
+          ) : 'Discover your perfect place to stay'.text.size(12).make(),
         ),
         actions: [
-          Padding(
+          searchActive == false ? Padding(
             padding: EdgeInsets.only(right: 20),
-            child: Container(
-              height: 35,
-              width: 35,
-              decoration: BoxDecoration(
-                color: Colors.white,
-                border: Border.all(color: Colors.grey, width: 0.3),
-                borderRadius: BorderRadius.circular(20),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.grey.withOpacity(0.2),
-                    spreadRadius: 1,
-                    blurRadius: 1,
-                    offset: Offset(0, 1),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.of(context).pushAndRemoveUntil(
+                  _toNotificationScreen(),
+                  (Route<dynamic> route) => false,
+                );
+              },
+              child: Container(
+                height: 35,
+                width: 35,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey, width: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 1,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.notifications_active_outlined,
+                    color: Colors.grey.withOpacity(0.8),
                   ),
-                ],
-              ),
-              child: Center(
-                child: Icon(
-                  Icons.notifications_active_outlined,
-                  color: Colors.grey.withOpacity(0.8),
                 ),
               ),
             ),
-          ),
+          ) : SizedBox(),
         ],
       ),
       body: Container(
@@ -100,81 +135,82 @@ class _HomeScreenState extends State<HomeScreen> {
           child: Column(
             children: [
               Container(
-                padding: EdgeInsets.all(20),
-                color: Colors.white,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        'Discover your'
-                            .text
-                            .light
-                            .color(Colors.grey)
-                            .size(25)
-                            .make(),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        'perfect place to stay'
-                            .text
-                            .bold
-                            .color(Colors.black)
-                            .size(25)
-                            .make(),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Padding(
-                      padding: const EdgeInsets.only(left: 5, right: 5),
-                      child: TextField(
-                        // controller: _emailPhonenumber,
-                        keyboardType: TextInputType.name,
-                        textAlign: TextAlign.left,
-                        style: const TextStyle(
-                          fontSize: 15,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        decoration: InputDecoration(
-                            prefixIcon: Icon(
-                              Icons.search,
-                              color: Colors.black,
-                            ),
-                            suffixIcon: Padding(
-                              padding: const EdgeInsets.only(right: 10),
-                              child: CircleAvatar(
-                                radius: 12,
-                                backgroundColor: Colors.white,
-                                child: Center(
-                                  child: Icon(
-                                    Icons.filter_list,
-                                    color: Colors.grey.withOpacity(0.8),
-                                  ),
-                                ),
+                      padding: searchActive == false ? EdgeInsets.all(20) : EdgeInsets.only(left: 20, right: 20),
+                      color: Colors.white,
+                      width: double.infinity,
+                      child: Column(
+                        children: [
+                          searchActive == false ? Row(
+                            children: [
+                              'Discover your'
+                                  .text
+                                  .light
+                                  .color(Colors.grey)
+                                  .size(25)
+                                  .make(),
+                            ],
+                          ) : SizedBox(),
+                          searchActive == false ? Row(
+                            children: [
+                              'perfect place to stay'
+                                  .text
+                                  .bold
+                                  .color(Colors.black)
+                                  .size(25)
+                                  .make(),
+                            ],
+                          ) : SizedBox(),
+                          SizedBox(height: 20),
+                          Padding(
+                            padding: const EdgeInsets.only(left: 5, right: 5),
+                            child: TextField(
+                              controller: _searchText,
+                              focusNode: _focusNode,
+                              keyboardType: TextInputType.name,
+                              textAlign: TextAlign.left,
+                              style: const TextStyle(
+                                fontSize: 15,
+                                fontWeight: FontWeight.bold,
                               ),
+                              decoration: InputDecoration(
+                                  prefixIcon: Icon(
+                                    Icons.search,
+                                    color: Colors.black,
+                                  ),
+                                  suffixIcon: Padding(
+                                    padding: const EdgeInsets.only(right: 10),
+                                    child: CircleAvatar(
+                                      radius: 12,
+                                      backgroundColor: Colors.white,
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.filter_list,
+                                          color: Colors.grey.withOpacity(0.8),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  filled: true,
+                                  fillColor: Colors.grey.withOpacity(0.1),
+                                  focusedBorder: OutlineInputBorder(
+                                    borderRadius: BorderRadius.circular(20),
+                                    borderSide: BorderSide(color: Colors.white),
+                                  ),
+                                  enabledBorder: OutlineInputBorder(
+                                    borderSide: BorderSide(color: Colors.white),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  labelText: 'Search',
+                                  labelStyle: TextStyle(
+                                      color: Colors.grey.withOpacity(0.8))),
                             ),
-                            filled: true,
-                            fillColor: Colors.grey.withOpacity(0.1),
-                            focusedBorder: OutlineInputBorder(
-                              borderRadius: BorderRadius.circular(20),
-                              borderSide: BorderSide(color: Colors.white),
-                            ),
-                            enabledBorder: OutlineInputBorder(
-                              borderSide: BorderSide(color: Colors.white),
-                              borderRadius: BorderRadius.circular(20),
-                            ),
-                            labelText: 'Search',
-                            labelStyle:
-                                TextStyle(color: Colors.grey.withOpacity(0.8))),
+                          ),
+                        ],
                       ),
                     ),
-                  ],
-                ),
-              ),
 
               //List BH
-              Container(
+              searchActive == false ? Container(
                 padding: EdgeInsets.only(right: 20, left: 20),
                 color: Colors.white,
                 width: double.infinity,
@@ -213,8 +249,7 @@ class _HomeScreenState extends State<HomeScreen> {
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
                                   _toBhouseScreen(),
-                                  (Route<dynamic> route) =>
-                                      false,
+                                  (Route<dynamic> route) => false,
                                 );
                               },
                               child: Container(
@@ -320,88 +355,89 @@ class _HomeScreenState extends State<HomeScreen> {
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: Container(
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
-                                  boxShadow: [],
-                                ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 80,
-                                      height: 90,
-                                      decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                            'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
-                                          ), // Replace with your own image URL
-                                          fit: BoxFit.cover,
-                                        ),
-                                        boxShadow: [],
+                              height: 90,
+                              decoration: BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.circular(10),
+                                boxShadow: [],
+                              ),
+                              child: Row(
+                                children: [
+                                  Container(
+                                    width: 80,
+                                    height: 90,
+                                    decoration: BoxDecoration(
+                                      borderRadius: BorderRadius.circular(10),
+                                      image: DecorationImage(
+                                        image: NetworkImage(
+                                          'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                        ), // Replace with your own image URL
+                                        fit: BoxFit.cover,
                                       ),
+                                      boxShadow: [],
                                     ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Container(
-                                        color: Colors.white,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          children: [
-                                            Row(
-                                              children: [
-                                                'Boarding House'
-                                                    .text
-                                                    .bold
-                                                    .size(15)
-                                                    .make(),
-                                              ],
-                                            ),
-                                            Row(
-                                              children: [
-                                                '404m near you'
-                                                    .text
-                                                    .light
-                                                    .color(Colors.grey)
-                                                    .make(),
-                                              ],
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                    Container(
-                                      padding:
-                                          EdgeInsets.only(left: 10, right: 0),
-                                      child: Row(
+                                  ),
+                                  SizedBox(width: 10),
+                                  Expanded(
+                                    child: Container(
+                                      color: Colors.white,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
-                                          Icon(
-                                            Icons.star,
-                                            color: Colors.amber,
-                                            size: 20,
+                                          Row(
+                                            children: [
+                                              'Boarding House'
+                                                  .text
+                                                  .bold
+                                                  .size(15)
+                                                  .make(),
+                                            ],
                                           ),
-                                          SizedBox(width: 4),
-                                          Text(
-                                            '4.8', // Rating
-                                            style: TextStyle(
-                                              color: Colors.grey,
-                                              fontSize: 12,
-                                            ),
+                                          Row(
+                                            children: [
+                                              '404m near you'
+                                                  .text
+                                                  .light
+                                                  .color(Colors.grey)
+                                                  .make(),
+                                            ],
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ],
-                                )),
+                                  ),
+                                  Container(
+                                    padding:
+                                        EdgeInsets.only(left: 10, right: 0),
+                                    child: Row(
+                                      children: [
+                                        Icon(
+                                          Icons.star,
+                                          color: Colors.amber,
+                                          size: 20,
+                                        ),
+                                        SizedBox(width: 4),
+                                        Text(
+                                          '4.8', // Rating
+                                          style: TextStyle(
+                                            color: Colors.grey,
+                                            fontSize: 12,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
                           );
                         },
                       ),
                     ),
                   ],
                 ),
-              )
+              ) : SizedBox()
             ],
           ),
         ),
@@ -424,6 +460,45 @@ class _HomeScreenState extends State<HomeScreen> {
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
             child: BHouseScreen());
+      },
+    );
+  }
+
+  Route _toNotificationScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) =>
+          NotificationScreen(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: NotificationScreen());
+      },
+    );
+  }
+
+  Route _toNearMeMapScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) => NearMeMapScreen(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: NearMeMapScreen());
       },
     );
   }
