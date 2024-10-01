@@ -38,6 +38,14 @@ dependencies:
   flutter_animate: ^4.5.0
   velocity_x: ^4.2.1
   google_maps_flutter: ^2.9.0
+  cloud_firestore: ^4.1.0
+  firebase_storage: ^11.0.6
+  file_picker: ^8.1.0
+  firebase_core: ^2.32.0
+  dio: ^5.7.0
+  flutter_polyline_points: ^1.0.0
+  firebase_auth: ^4.1.4
+
 #  geolocator: ^9.0.2
 #  geocoding: ^2.0.5
 
