@@ -1,3 +1,4 @@
+import 'package:bh_finder/Screen/Owner/OwnerSignUp/owner.signup.data.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -10,20 +11,87 @@ class OwnerSignupSecond extends StatefulWidget {
 }
 
 class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
+  TextEditingController _boardingHouseName = TextEditingController();
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: 'Building Info'.text.make(),
+        title: 'Supporting Documents'.text.make(),
       ),
       body: Stack(
         children: [
           Container(
+            padding: EdgeInsets.all(20),
             color: Colors.white,
             width: double.infinity,
             height: double.infinity,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                  child: TextField(
+                    controller: _boardingHouseName,
+                    keyboardType: TextInputType.name,
+                    textAlign: TextAlign.left,
+                    style: const TextStyle(
+                      fontSize: 15,
+                      fontWeight: FontWeight.bold,
+                    ),
+                    decoration: InputDecoration(
+                      filled: true,
+                      fillColor: Colors.grey.withOpacity(0.1),
+                      focusedBorder: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(20),
+                        borderSide: BorderSide(color: Colors.white),
+                      ),
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      labelText: 'Boarding House Name',
+                    ),
+                  ),
+                ),
+                Container(
+                  height: 150,
+                  width: double.infinity,
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.all(10.0),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              color: Colors.blue[100],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.camera_alt_rounded,
+                                color: Colors.blue[300],
+                                size: 50,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Container(
+                          width: 100,
+                          decoration: BoxDecoration(
+                            color: Colors.blue[50],
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            ),
           ),
           Container(
             width: double.infinity,
@@ -37,6 +105,10 @@ class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
                     height: 40,
                     child: ElevatedButton(
                       onPressed: () async {
+                        setState(() {
+                          boardingHouseName = _boardingHouseName.text.toString();
+                        });
+                        print('$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber - $boardingHouseName');
                         Navigator.pushNamed(context, '/OwnerSignupThirdScreen');
                       },
                       style: ElevatedButton.styleFrom(

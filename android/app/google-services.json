@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "379107454883",
+    "project_id": "bh-finder-50ccf",
+    "storage_bucket": "bh-finder-50ccf.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:379107454883:android:2ac2e3aeff66e02d8d3416",
+        "android_client_info": {
+          "package_name": "com.example.bh_finder"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDg-xofOuPwN4ZSvD6T4B7X_T1rzT3dE0A"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

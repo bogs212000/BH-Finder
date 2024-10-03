@@ -2,9 +2,12 @@
 
 import 'dart:async';
 import 'package:bh_finder/Screen/Owner/rooms.owner.screen.dart';
+import 'package:bh_finder/cons.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../fetch.dart';
 import '../BHouse/bh.screen.dart';
 import '../Map/nearme.map.dart';
 import '../notification/notification.screen.dart';
@@ -21,8 +24,13 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   bool searchActive = false;
   FocusNode _focusNode = FocusNode();
 
+
   @override
   void initState() {
+    fetchOwnerData(setState);
+    fetchOwnerBhouseData(setState);
+    countAvailableRoom(setState);
+    countAllRoom(setState);
     super.initState();
     _focusNode.addListener(() {
       setState(() {
@@ -79,7 +87,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         actions: [
           searchActive == false
               ? Padding(
-                  padding: EdgeInsets.only(right: 20),
+                  padding: EdgeInsets.only(right: 10),
                   child: GestureDetector(
                     onTap: () {
                       Navigator.of(context).pushAndRemoveUntil(
@@ -113,6 +121,37 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   ),
                 )
               : SizedBox(),
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: () {
+              FirebaseAuth.instance.signOut();
+              },
+              child: Container(
+                height: 35,
+                width: 35,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey, width: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 1,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.login,
+                    color: Colors.grey.withOpacity(0.8),
+                  ),
+                ),
+              ),
+            ),
+          )
         ],
       ),
       body: Container(
@@ -150,12 +189,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                               children: [
                                 Row(
                                   children: [
-                                    'Bhose Name'.text.bold.size(20).make(),
+                                    '$BhouseName'.text.bold.size(20).make(),
                                   ],
                                 ),
                                 Row(
                                   children: [
-                                    'gmailmail@gmail.com'.text.bold.size(10).color(Colors.grey).make(),
+                                    '$currentEmail'.text.bold.size(4).color(Colors.grey).make(),
                                     Spacer(),
                                     Icon(Icons.edit_note, color: Colors.grey, size: 25)
                                   ],
@@ -179,7 +218,13 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         Expanded(
-                          child: '20'
+                          child: allRooms == null ? '0'
+                              .text
+                              .bold
+                              .size(25)
+                              .center
+                              .color(Colors.red[400])
+                              .make(): '$allRooms'
                               .text
                               .bold
                               .size(25)
@@ -189,7 +234,13 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                         ),
                         SizedBox(width: 10),
                         Expanded(
-                          child: '3'
+                          child: roomAvailable == null ? '0'
+                              .text
+                              .bold
+                              .size(25)
+                              .center
+                              .color(Colors.red[400])
+                              .make(): '$roomAvailable'
                               .text
                               .bold
                               .size(25)
@@ -199,7 +250,13 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                         ),
                         SizedBox(width: 10),
                         Expanded(
-                          child: '17'
+                          child: roomUnavailable == null ? '0'
+                              .text
+                              .bold
+                              .size(25)
+                              .center
+                              .color(Colors.red[400])
+                              .make(): '$roomUnavailable'
                               .text
                               .bold
                               .size(25)
@@ -352,18 +409,22 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                       ),
                                     ),
                                   ),
-                                  Container(
-                                    padding:
-                                        EdgeInsets.only(left: 10, right: 0),
-                                    child: Row(
-                                      children: [
-                                        Text(
-                                          'View', // Rating
-                                          style: TextStyle(
-                                            fontSize: 12,
+                                  GestureDetector( onTap: (){
+                                    Navigator.pushNamed(context, '/ViewReservationScreen');
+                                  },
+                                    child: Container(
+                                      padding:
+                                          EdgeInsets.only(left: 10, right: 0),
+                                      child: Row(
+                                        children: [
+                                          Text(
+                                            'View', // Rating
+                                            style: TextStyle(
+                                              fontSize: 12,
+                                            ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ],
