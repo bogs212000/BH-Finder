@@ -3,14 +3,16 @@
 import 'dart:async';
 import 'package:bh_finder/Screen/Owner/rooms.owner.screen.dart';
 import 'package:bh_finder/cons.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../fetch.dart';
 import '../BHouse/bh.screen.dart';
 import '../Map/nearme.map.dart';
 import '../notification/notification.screen.dart';
+import 'Map/location.dart';
 
 class OwnerHomeScreen extends StatefulWidget {
   const OwnerHomeScreen({super.key});
@@ -20,18 +22,22 @@ class OwnerHomeScreen extends StatefulWidget {
 }
 
 class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
+  late Future<DocumentSnapshot> ownersBHouseData;
   TextEditingController _searchText = TextEditingController();
   bool searchActive = false;
   FocusNode _focusNode = FocusNode();
 
-
   @override
   void initState() {
+    super.initState();
+    ownersBHouseData = FirebaseFirestore.instance
+        .collection('BoardingHouses')
+        .doc(currentEmail)
+        .get();
     fetchOwnerData(setState);
-    fetchOwnerBhouseData(setState);
     countAvailableRoom(setState);
     countAllRoom(setState);
-    super.initState();
+    ;
     _focusNode.addListener(() {
       setState(() {
         searchActive = _focusNode.hasFocus;
@@ -53,7 +59,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         title: GestureDetector(
           onTap: () {
             Navigator.of(context).pushAndRemoveUntil(
-              _toNearMeMapScreen(),
+              _toMapScreen(),
               (Route<dynamic> route) => false,
             );
           },
@@ -125,7 +131,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
             padding: EdgeInsets.only(right: 10),
             child: GestureDetector(
               onTap: () {
-              FirebaseAuth.instance.signOut();
+                FirebaseAuth.instance.signOut();
               },
               child: Container(
                 height: 35,
@@ -161,52 +167,81 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              Container(
-                padding: EdgeInsets.all(20),
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
+              FutureBuilder<DocumentSnapshot>(
+                future: ownersBHouseData,
+                builder: (BuildContext context,
+                    AsyncSnapshot<DocumentSnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
+                  if (snapshot.hasError) {
+                    return const Center(child: Text('Error fetching data'));
+                  }
+                  if (!snapshot.hasData || !snapshot.data!.exists) {
+                    return const Center(child: Text('No Reservation found'));
+                  }
+                  Map<String, dynamic> data =
+                      snapshot.data!.data() as Map<String, dynamic>;
+                    addressLat = data['Lat'];
+                    addressLong = data['Long'];
+                  return Container(
+                    padding: EdgeInsets.all(20),
+                    width: double.infinity,
+                    child: Column(
                       children: [
-                        Container(
-                          width: 50,
-                          height: 50,
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(10),
-                            image: DecorationImage(
-                              image: NetworkImage(
-                                'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
-                              ), // Replace with your own image URL
-                              fit: BoxFit.cover,
+                        Row(
+                          children: [
+                            Container(
+                              width: 50,
+                              height: 50,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(10),
+                                image: DecorationImage(
+                                  image: NetworkImage(
+                                    'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                  ), // Replace with your own image URL
+                                  fit: BoxFit.cover,
+                                ),
+                                boxShadow: [],
+                              ),
                             ),
-                            boxShadow: [],
-                          ),
-                        ),
-                        SizedBox(width: 5),
-                        Expanded(
-                          child: Container(
-                            child: Column(
-                              children: [
-                                Row(
+                            SizedBox(width: 5),
+                            Expanded(
+                              child: Container(
+                                child: Column(
                                   children: [
-                                    '$BhouseName'.text.bold.size(20).make(),
+                                    Row(
+                                      children: [
+                                        '${data['BoardingHouseName']}'
+                                            .text
+                                            .bold
+                                            .size(20)
+                                            .make(),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        '${data['Email']}'
+                                            .text
+                                            .bold
+                                            .size(4)
+                                            .color(Colors.grey)
+                                            .make(),
+                                        Spacer(),
+                                        Icon(Icons.edit_note,
+                                            color: Colors.grey, size: 25)
+                                      ],
+                                    ),
                                   ],
                                 ),
-                                Row(
-                                  children: [
-                                    '$currentEmail'.text.bold.size(4).color(Colors.grey).make(),
-                                    Spacer(),
-                                    Icon(Icons.edit_note, color: Colors.grey, size: 25)
-                                  ],
-                                ),
-                              ],
-                            ),
-                          ),
+                              ),
+                            )
+                          ],
                         )
                       ],
-                    )
-                  ],
-                ),
+                    ),
+                  );
+                },
               ),
               Container(
                 padding: EdgeInsets.only(right: 20, left: 20),
@@ -217,52 +252,121 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
-                        Expanded(
-                          child: allRooms == null ? '0'
-                              .text
-                              .bold
-                              .size(25)
-                              .center
-                              .color(Colors.red[400])
-                              .make(): '$allRooms'
-                              .text
-                              .bold
-                              .size(25)
-                              .center
-                              .color(Colors.blue)
-                              .make(),
+                        FutureBuilder<int>(
+                          future: fetchRoomsWithOwnersID(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                  child:
+                                      CircularProgressIndicator()); // Show loading spinner while fetching data
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text(
+                                      'Error fetching data')); // Handle error
+                            } else if (snapshot.hasData) {
+                              final int roomCountAll = snapshot.data ??
+                                  0; // Get the count of rooms with the OwnersID
+
+                              return Expanded(
+                                child: roomCountAll == null
+                                    ? '0'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.red[400])
+                                        .make()
+                                    : '$roomCountAll'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.blue)
+                                        .make(),
+                              );
+                            } else {
+                              return Center(child: Text('No data available'));
+                            }
+                          },
                         ),
                         SizedBox(width: 10),
-                        Expanded(
-                          child: roomAvailable == null ? '0'
-                              .text
-                              .bold
-                              .size(25)
-                              .center
-                              .color(Colors.red[400])
-                              .make(): '$roomAvailable'
-                              .text
-                              .bold
-                              .size(25)
-                              .center
-                              .color(Colors.green[400])
-                              .make(),
+                        FutureBuilder<int>(
+                          future: fetchRoomsAvailable(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                  child:
+                                      CircularProgressIndicator()); // Show loading spinner while fetching data
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text(
+                                      'Error fetching data')); // Handle error
+                            } else if (snapshot.hasData) {
+                              final int roomCountAvailable = snapshot.data ??
+                                  0; // Get the count of rooms with the OwnersID
+
+                              return Expanded(
+                                child: roomCountAvailable == null
+                                    ? '0'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.red[400])
+                                        .make()
+                                    : '$roomCountAvailable'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.blue)
+                                        .make(),
+                              );
+                            } else {
+                              return Center(child: Text('No data available'));
+                            }
+                          },
                         ),
                         SizedBox(width: 10),
-                        Expanded(
-                          child: roomUnavailable == null ? '0'
-                              .text
-                              .bold
-                              .size(25)
-                              .center
-                              .color(Colors.red[400])
-                              .make(): '$roomUnavailable'
-                              .text
-                              .bold
-                              .size(25)
-                              .center
-                              .color(Colors.red[400])
-                              .make(),
+                        FutureBuilder<int>(
+                          future: fetchRoomsUnavailable(),
+                          builder: (context, snapshot) {
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                  child:
+                                      CircularProgressIndicator()); // Show loading spinner while fetching data
+                            } else if (snapshot.hasError) {
+                              return Center(
+                                  child: Text(
+                                      'Error fetching data')); // Handle error
+                            } else if (snapshot.hasData) {
+                              final int roomCount = snapshot.data ??
+                                  0; // Get the count of rooms with the OwnersID
+
+                              return Expanded(
+                                child: roomCount == null
+                                    ? '0'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.red[400])
+                                        .make()
+                                    : '$roomCount'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.blue)
+                                        .make(),
+                              );
+                            } else {
+                              return Center(child: Text('No data available'));
+                            }
+                          },
                         ),
                       ],
                     ),
@@ -356,84 +460,138 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     Container(
                       height: 500,
                       width: double.infinity,
-                      child: ListView.builder(
-                        itemCount: 6,
-                        itemBuilder: (context, index) {
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: Container(
-                              height: 90,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.circular(10),
-                                boxShadow: [
-                                ],
+                      child: StreamBuilder(
+                        stream: FirebaseFirestore.instance
+                            .collection("Reservations")
+                            .where('OwnerId', isEqualTo: OwnerUuId)
+                            .where('read', isEqualTo: true)
+                            .snapshots(),
+                        builder: (BuildContext context,
+                            AsyncSnapshot<QuerySnapshot> snapshot) {
+                          // Check if the snapshot has an error
+                          if (snapshot.hasError) {
+                            return Center(
+                              child: Text(
+                                "Something went wrong!",
+                                style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.redAccent,
+                                ),
                               ),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
+                            );
+                          }
+                          if (snapshot.connectionState ==
+                              ConnectionState.waiting) {
+                            return Center(
+                              child:
+                                  CircularProgressIndicator(color: Colors.red),
+                            );
+                          }
+
+                          if (snapshot.data?.size == 0) {
+                            return Center(
+                              child: Text('Nothing to fetch here.'),
+                            );
+                          }
+
+                          return ListView.builder(
+                            physics: BouncingScrollPhysics(),
+                            itemCount: snapshot.data!.docs.length,
+                            // Use the length of the fetched data
+                            itemBuilder: (context, index) {
+                              Map<String, dynamic> data =
+                                  snapshot.data!.docs[index].data()!
+                                      as Map<String, dynamic>;
+                              String? roomUuId = data['roomDocId'];
+                              Timestamp timestamp = data['createdAt'];
+                              DateTime date = timestamp.toDate();
+                              String formattedDate =
+                                  DateFormat('EEE - MMM d, yyyy').format(date);
+
+                              return GestureDetector(
+                                onTap: () {
+                                  setState(() {
+                                    rBHouseDocId = data['docID'];
+                                  });
+                                  print(rBHouseDocId);
+                                  Navigator.pushNamed(
+                                      context, '/ViewReservationScreen');
+                                },
+                                child: Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: Container(
+                                    height: 90,
+                                    decoration: BoxDecoration(
                                       color: Colors.white,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        children: [
-                                          Row(
-                                            children: [
-                                              'Room 1 reservation'
-                                                  .text
-                                                  .bold
-                                                  .size(15)
-                                                  .make(),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              'Mang Juan reserved room #'
-                                                  .text
-                                                  .color(Colors.grey)
-                                                  .make(),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              'Oct 2, 2024 - Wed - 12:21 PM'
-                                                  .text.size(12)
-                                                  .light
-                                                  .color(Colors.grey)
-                                                  .make(),
-                                            ],
-                                          ),
-                                          Divider(),
-                                        ],
-                                      ),
+                                      borderRadius: BorderRadius.circular(10),
+                                      boxShadow: [],
                                     ),
-                                  ),
-                                  GestureDetector( onTap: (){
-                                    Navigator.pushNamed(context, '/ViewReservationScreen');
-                                  },
-                                    child: Container(
-                                      padding:
-                                          EdgeInsets.only(left: 10, right: 0),
-                                      child: Row(
-                                        children: [
-                                          Text(
-                                            'View', // Rating
-                                            style: TextStyle(
-                                              fontSize: 12,
+                                    child: Row(
+                                      children: [
+                                        Expanded(
+                                          child: Container(
+                                            color: Colors.white,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  children: [
+                                                    '${data['roomNumber']}'
+                                                        .text
+                                                        .bold
+                                                        .size(15)
+                                                        .make(),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    '${data['boardersName']}'
+                                                        .text
+                                                        .color(Colors.grey)
+                                                        .make(),
+                                                  ],
+                                                ),
+                                                Row(
+                                                  children: [
+                                                    '$formattedDate'
+                                                        .text
+                                                        .size(12)
+                                                        .light
+                                                        .color(Colors.grey)
+                                                        .make(),
+                                                  ],
+                                                ),
+                                                Divider(),
+                                              ],
                                             ),
                                           ),
-                                        ],
-                                      ),
+                                        ),
+                                        Container(
+                                          padding: EdgeInsets.only(
+                                              left: 10, right: 0),
+                                          child: Row(
+                                            children: [
+                                              Text(
+                                                'View', // Rating
+                                                style: TextStyle(
+                                                  fontSize: 12,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                ],
-                              ),
-                            ),
+                                ),
+                              );
+                            },
                           );
                         },
                       ),
-                    ),
+                    )
                   ],
                 ),
               ),
@@ -502,9 +660,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     );
   }
 
-  Route _toNearMeMapScreen() {
+  Route _toMapScreen() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => NearMeMapScreen(),
+      pageBuilder: (context, animation, anotherAnimation) => BHouseAddress(),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -516,7 +674,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         return SlideTransition(
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
-            child: NearMeMapScreen());
+            child: BHouseAddress());
       },
     );
   }

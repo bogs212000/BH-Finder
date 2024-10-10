@@ -220,7 +220,7 @@ class _SignInScreenState extends State<SignInScreen> {
                       ),
                       GestureDetector(
                         onTap: () {
-                          Navigator.pushNamed(context, '/my_phone');
+                          Navigator.pushNamed(context, '/SignUpScreen');
                         },
                         child: Text(
                           "Don't have an account?",

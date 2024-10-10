@@ -1,42 +1,31 @@
-import 'dart:io';
-
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/owner.signup.data.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/v1.dart';
+import 'package:uuid/v4.dart';
 import 'package:velocity_x/velocity_x.dart';
 
-import '../../cons.dart';
-
-class AddRoomsScreen extends StatefulWidget {
-  const AddRoomsScreen({super.key});
+class SignUpScreen extends StatefulWidget {
+  const SignUpScreen({super.key});
 
   @override
-  State<AddRoomsScreen> createState() => _AddRoomsScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class _AddRoomsScreenState extends State<AddRoomsScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
+  TextEditingController _email = TextEditingController();
+  TextEditingController _password = TextEditingController();
+  TextEditingController _confirmPassword = TextEditingController();
+  TextEditingController firstName = TextEditingController();
+  TextEditingController middleName = TextEditingController();
+  TextEditingController lastName = TextEditingController();
+  TextEditingController contactNumber = TextEditingController();
+  bool verified = false;
   bool loading = false;
-  final _picker = ImagePicker();
-  File? _image;
-  TextEditingController _roomName = TextEditingController();
-  TextEditingController _roomPrice = TextEditingController();
-
-  Future<void> _openImagePicker() async {
-    final XFile? pickedImage =
-    await _picker.pickImage(source: ImageSource.camera);
-    if (pickedImage != null) {
-      setState(() {
-        _image = File(pickedImage.path);
-      });
-    }
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +35,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
             appBar: AppBar(
               backgroundColor: Colors.white,
               elevation: 0,
-              title: 'Add Rooms'.text.make(),
+              title: 'Create Account'.text.make(),
             ),
             body: Stack(
               children: [
@@ -57,40 +46,11 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                   height: double.infinity,
                   child: Column(
                     children: [
-                      _image == null ? Container(
-                        height: 150,
-                        width: double.infinity,
-                        child: Row(
-                          children: [
-                            GestureDetector( onTap: (){
-                              _openImagePicker();
-                            },
-                              child: Padding(
-                                padding: const EdgeInsets.all(10.0),
-                                child: Container(
-                                  decoration: BoxDecoration(
-                                    color: Colors.blue[100],
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.camera_alt_rounded,
-                                      color: Colors.blue[300],
-                                      size: 50,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        ),
-                      ) : Image.file(_image!,
-                          fit: BoxFit.fill, height: 150),
-                      SizedBox(height: 10),
                       Padding(
-                        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 20),
                         child: TextField(
-                          controller: _roomName,
+                          controller: _email,
                           keyboardType: TextInputType.name,
                           textAlign: TextAlign.left,
                           style: const TextStyle(
@@ -108,14 +68,15 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                               borderSide: BorderSide(color: Colors.white),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            labelText: 'Room Name/Number',
+                            labelText: 'Email',
                           ),
                         ),
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 20),
                         child: TextField(
-                          controller: _roomPrice,
+                          controller: _password,
                           keyboardType: TextInputType.name,
                           textAlign: TextAlign.left,
                           style: const TextStyle(
@@ -133,7 +94,33 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                               borderSide: BorderSide(color: Colors.white),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            labelText: 'Price',
+                            labelText: 'Create Password',
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 20),
+                        child: TextField(
+                          controller: _confirmPassword,
+                          keyboardType: TextInputType.name,
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.withOpacity(0.1),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            labelText: 'Confirm Password',
                           ),
                         ),
                       ),
@@ -156,39 +143,36 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                               setState(() {
                                 loading = true;
                               });
-                              String? roomId = Uuid().v1();
-                              String? imageName = Uuid().v1();
-                              String url;
+                              String uuId = Uuid().v4();
+                              User? user = FirebaseAuth.instance.currentUser;
+                              print('Uuid : $uuId');
                               try {
-                                final ref = FirebaseStorage.instance
-                                    .ref()
-                                    .child('$roomId/$imageName');
-                                await ref.putFile(File(_image!.path));
-                                url = await ref.getDownloadURL();
+                                await FirebaseAuth.instance
+                                    .createUserWithEmailAndPassword(
+                                    email: _email.text.trim(),
+                                    password: _password.text.trim());
 
-                                FirebaseFirestore.instance
-                                    .collection('Rooms')
-                                    .doc(roomId)
+                                await FirebaseFirestore.instance
+                                    .collection('Users')
+                                    .doc(_email.text.trim())
                                     .set({
-                                  'roomDocId': roomId,
+                                  'UuId': uuId,
+                                  'role': 'Border',
                                   'createdAt': DateTime.now(),
-                                  'ownerUid': OwnerUuId,
-                                  'bHouseName': BhouseName,
-                                  'price': _roomPrice.text,
-                                  'roomImage': url,
-                                  'totalToPay': '',
-                                  'boardersName': '',
-                                  'boardersConNumber': '',
-                                  'boardersAddress': '',
-                                  'boardersIn': '',
-                                  'boardersOut': '',
-                                  'roomNameNumber': _roomName.text,
-                                  'contactNumber': OwnerPhone,
-                                  'roomStatus': 'available',
-                                  'descriptions': '',
-                                  'rules': '',
-                                  'rates': ''
+                                  'Email': _email.text.trim(),
+                                  'FirstName': firstName.text,
+                                  'MiddleName': middleName.text,
+                                  'LastName': lastName.text,
+                                  'Birthday': '',
+                                  'Image': '',
+                                  'PhoneNumber': contactNumber.text,
+                                  'verified': true,
                                 });
+                                if (user != null &&
+                                    !user.emailVerified) {
+                                  await user.sendEmailVerification();
+                                }
+                                print("Verification email sent.");
                                 setState(() {
                                   loading = false;
                                 });
@@ -209,7 +193,7 @@ class _AddRoomsScreenState extends State<AddRoomsScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Add",
+                                  "Create Account",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 18,

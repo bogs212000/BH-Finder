@@ -2,7 +2,9 @@
 
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
-
+import 'package:easy_date_timeline/easy_date_timeline.dart';
+import '../../cons.dart';
+import '../../fetch.dart';
 import 'bh.screen.dart';
 
 class RoomScreen extends StatefulWidget {
@@ -13,6 +15,19 @@ class RoomScreen extends StatefulWidget {
 }
 
 class _RoomScreenState extends State<RoomScreen> {
+
+
+  @override
+  void initState() {
+    fetchRoomData(setState);
+    super.initState();
+  }
+
+  @override
+  void dispose() {
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -62,7 +77,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        'Room 1'.text.bold.size(18).make(),
+                                        '$roomNumber'.text.bold.size(18).make(),
                                       ],
                                     ),
                                     Row(
@@ -80,48 +95,70 @@ class _RoomScreenState extends State<RoomScreen> {
                               ),
                             ),
                             Container(
-                              width: 35,
-                              child: Container(
-                                height: 35,
-                                width: 35,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(
-                                      color: Colors.grey, width: 0.3),
-                                  borderRadius: BorderRadius.circular(20),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.2),
-                                      spreadRadius: 1,
-                                      blurRadius: 1,
-                                      offset: Offset(0, 1),
-                                    ),
-                                  ],
-                                ),
-                                child: Center(
-                                  child: Icon(
-                                    Icons.pin_drop_outlined,
-                                    color: Colors.grey.withOpacity(0.5),
+                              width: 100,
+                              child: Column(
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      'Price per Month'.text.size(10).make(),
+                                    ],
                                   ),
-                                ),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.end,
+                                    children: [
+                                      '₱ $roomPrice'.text.size(20).bold.make(),
+                                    ],
+                                  ),
+                                ],
                               ),
-                            ),
-                          ],
-                        ),
+                            )
+                          ],                      ),
                         SizedBox(height: 10),
                         Row(
                           children: [
                             'Description'.text.semiBold.size(16).make(),
                           ],
                         ),
-                        'BH Room means an area that is designed and constructed to be occupied by one or more persons.'
-                            .text
-                            .light
-                            .color(Colors.grey)
-                            .size(13)
-                            .make(),
+                        Padding(
+                          padding: const EdgeInsets.all(8.0),
+                          child: Row(
+                            children: [
+                              Flexible(
+                                child: '$roomDescriptions'
+                                    .text
+                                    .light
+                                    .overflow(TextOverflow.fade)
+                                    .maxLines(3)
+                                    .color(Colors.grey)
+                                    .size(13)
+                                    .make(),
+                              ),
+                            ],
+                          ),
+                        ),
+                        Row(
+                          children: [
+                            'Set a Check-in date'.text.size(18).bold.make(),
+                          ],
+                        ),
+                        EasyDateTimeLine(
+                          initialDate: DateTime.now(),
+                          onDateChange: (newDate) {
+                            setState(() {
+                              selectedDateCheckIn = newDate;
+                            });
+                            print('$selectedDateCheckIn');
+                          },
 
-                        //List rooms
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            'Images'.text.size(18).bold.make(),
+                          ],
+                        ),
+                        SizedBox(height: 10),
                         Container(
                           height: 100,
                           width: double.infinity,
@@ -142,10 +179,10 @@ class _RoomScreenState extends State<RoomScreen> {
                                     children: [
                                       Container(
                                         width: 80,
-                                        height: 80,
+                                        height: 100,
                                         decoration: BoxDecoration(
                                           borderRadius:
-                                              BorderRadius.circular(10),
+                                          BorderRadius.circular(10),
                                           image: DecorationImage(
                                             image: NetworkImage(
                                               'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
@@ -162,7 +199,7 @@ class _RoomScreenState extends State<RoomScreen> {
                               );
                             },
                           ),
-                        )
+                        ),
                       ],
                     ),
                   )
@@ -225,6 +262,51 @@ class _RoomScreenState extends State<RoomScreen> {
                     ),
                   ],
                 ),
+                Spacer(),
+                Container(
+                  width: double.infinity,
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: GestureDetector( onTap: (
+                              ){
+                            Navigator.pushNamed(context, '/BoarderReservationScreen');
+                          },
+                            child: Container(
+                              height: 50,
+                              decoration: BoxDecoration(
+                                  color: Color(0xFF31355C),
+                                  borderRadius: BorderRadius.circular(10)),
+                              child: Center(
+                                  child: 'Reserve Now'
+                                      .text
+                                      .size(20)
+                                      .color(Colors.white)
+                                      .bold
+                                      .make()),
+                            ),
+                          ),
+                        ),
+                        SizedBox(width: 10),
+                        Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                              color: Colors.blue.withOpacity(0.2),
+                              borderRadius: BorderRadius.circular(25)),
+                          child: Center(
+                            child: Icon(
+                              Icons.call,
+                              color: Colors.blueAccent,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                )
               ],
             ),
           )

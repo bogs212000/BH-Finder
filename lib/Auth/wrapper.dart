@@ -3,6 +3,7 @@
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/waiting.verification.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
+import 'package:bh_finder/Screen/SignUp/waiting.screen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -85,6 +86,14 @@ class Wrapper extends StatelessWidget {
               if ((userData.data!['verified'] == true) &
                   (userData.data!['role'] == "Owner")) {
                 return OwnerHomeScreen();
+              } else if ((userData.data!['verified'] == true) &
+                  (userData.data!['role'] == "Border") &
+                  (user != null && !user.emailVerified)) {
+                return WaitEmailVerify();
+              } else if ((userData.data!['verified'] == true) &
+              (userData.data!['role'] == "Border") &
+              (user != null && user.emailVerified)) {
+                return HomeScreen();
               } else if ((userData.data!['verified'] == false) &
                   (userData.data!['role'] == "Owner")) {
                 return WaitingVerificationScreen();

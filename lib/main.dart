@@ -10,11 +10,15 @@ import 'package:flutter/material.dart';
 import 'Auth/auth.wrapper.dart';
 import 'Screen/BHouse/bh.screen.dart';
 import 'Screen/BHouse/room.screen.dart';
+import 'Screen/BordersReservation/boarder.reservation.screen.dart';
+import 'Screen/Chat/chat.list.dart';
+import 'Screen/Chat/chat.owner.dart';
 import 'Screen/Loading/loading.screen.dart';
 import 'Screen/Owner/OwnerSignUp/first.screen.dart';
 import 'Screen/Owner/add.rooms.screen.dart';
 import 'Screen/Owner/owner.home.screen.dart';
 import 'Screen/Owner/reservation/reservation.view.screen.dart';
+import 'Screen/SignUp/signup.screen.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -49,6 +53,10 @@ class MyApp extends StatelessWidget {
         '/OwnerSignupThirdScreen': (context) => OwnerSignupThird(),
         '/AddRoomsScreen': (context) => AddRoomsScreen(),
         '/ViewReservationScreen': (context) => ViewReservationScreen(),
+        '/SignUpScreen': (context) => SignUpScreen(),
+        '/ChatOwner': (context) => ChatOwner(),
+        '/ChatList': (context) => ChatList(),
+        '/BoarderReservationScreen': (context) => BoarderReservationScreen(),
       }
     );
   }

@@ -2,12 +2,13 @@
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION"/>
+    <uses-permission android:name="android.permission.CALL_PHONE"/>
     <application
         android:label="bh_finder"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <meta-data android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAPUQRC6Oy1AAkxmIVpReLfbdu8sFyO1Sw"/>
+            android:value="AIzaSyCBBC2LMJletd3yYjoDF-yTVI6L-0WSmDY"/>
         <activity
             android:name=".MainActivity"
             android:exported="true"
