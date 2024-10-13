@@ -31,10 +31,7 @@ class _BHouseNearMeState extends State<BHouseNearMe> {
         LatLng position = LatLng(data['Lat'], data['Long']);
         String name = data['BoardingHouseName'];
 
-        BitmapDescriptor customIcon = await BitmapDescriptor.fromAssetImage(
-          ImageConfiguration(size: Size(1, 1)), // Icon size
-          'assets/BhouseMapPin.png',
-        );
+        BitmapDescriptor customIcon = await BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueBlue);
 
         // Add marker to the set
         setState(() {

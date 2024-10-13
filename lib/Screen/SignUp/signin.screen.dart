@@ -2,12 +2,16 @@
 
 import 'dart:async';
 
+import 'package:bh_finder/Auth/auth.wrapper.dart';
+import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../../Auth/wrapper.dart';
 import '../Loading/loading.screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -21,28 +25,40 @@ class _SignInScreenState extends State<SignInScreen> {
   TextEditingController _password = TextEditingController();
   TextEditingController _emailPhonenumber = TextEditingController();
   bool _isPasswordVisible = false;
-  bool loading = false;
+  bool loadingLogin = false;
+  String? errors;
 
   @override
-  void initState() {
-    super.initState();
+  void dispose() {
+    // Dispose of the controllers when the widget is removed from the widget tree
+    _password.dispose();
+    _emailPhonenumber.dispose();
+    super.dispose(); // Call the super dispose method
   }
 
   @override
   Widget build(BuildContext context) {
-    return loading
+    return loadingLogin
         ? LoadingScreen()
         : Scaffold(
+            backgroundColor: Colors.white,
             body: Stack(
               children: [
                 Container(
                   padding: EdgeInsets.only(left: 25, right: 25),
-                  color: Colors.white,
                   width: double.infinity,
                   height: double.infinity,
                   child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
+                      SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Image.asset(
+                            'assets/logo.png',
+                            scale: 3,
+                          ),
+                        ],
+                      ),
                       Row(
                         children: [
                           'Discover your'
@@ -173,31 +189,57 @@ class _SignInScreenState extends State<SignInScreen> {
                           height: 40,
                           child: ElevatedButton(
                             onPressed: () async {
-                              if (_password.text.isEmpty ||
+                              if (_password.text.isEmpty &&
                                   _emailPhonenumber.text.isEmpty) {
-                                setState(() {});
+                                setState(() {
+                                  errors =
+                                      'Please input your email and password';
+                                });
+                                _toast();
+                              } else if (_emailPhonenumber.text.isEmpty) {
+                                setState(() {
+                                  errors = 'Please input your email';
+                                });
+                                _toast();
+                              } else if (_password.text.isEmpty) {
+                                setState(() {
+                                  errors = 'Please input your password';
+                                });
+                                _toast();
                               } else {
+                                setState(() {
+                                  loadingLogin = true;
+                                });
                                 try {
-                                  setState(() {
-                                    loading = true;
-                                  });
                                   await FirebaseAuth.instance
                                       .signInWithEmailAndPassword(
-                                          email: _emailPhonenumber.text.trim(),
-                                          password: _password.text.trim());
+                                    email: _emailPhonenumber.text.trim(),
+                                    password: _password.text.trim(),
+                                  );
+                                  print('haha 1');
                                   setState(() {
-                                    loading = false;
+                                    loadingLogin = false;
                                   });
+                                  print('haha 2');
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    MaterialPageRoute(
+                                        builder: (context) => AuthWrapper()),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                  print('haha 3');
                                 } on FirebaseAuthException catch (e) {
                                   setState(() {
-                                    loading = false;
+                                    loadingLogin = false;
+                                    errors = e
+                                        .message; // Show a user-friendly error message
                                   });
-                                  print(e);
+                                  _toast();
+                                  print('Error: $e');
                                 }
                               }
                             },
                             style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF31355C),
+                              backgroundColor: Color.fromRGBO(26, 60, 105, 1.0),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(30),
                               ),
@@ -206,7 +248,7 @@ class _SignInScreenState extends State<SignInScreen> {
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: [
                                 Text(
-                                  "Sign in",
+                                  "Log in",
                                   style: TextStyle(
                                     color: Colors.white,
                                     fontSize: 15,
@@ -222,19 +264,26 @@ class _SignInScreenState extends State<SignInScreen> {
                         onTap: () {
                           Navigator.pushNamed(context, '/SignUpScreen');
                         },
-                        child: Text(
-                          "Don't have an account?",
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            "Don't have an account?  ".text.light.make(),
+                            "Sign up".text.bold.make(),
+                          ],
                         ),
                       ),
-                    ],
-                  ),
-                ),
-                Container(
-                  height: double.infinity,
-                  width: double.infinity,
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
-                    children: [
+                      SizedBox(height: 20),
+                      GestureDetector(
+                        onTap: () {
+                          Navigator.pushNamed(context, '/TermsAndConditions');
+                        },
+                        child: 'Terms and Conditions'
+                            .text
+                            .light
+                            .color(Colors.black)
+                            .make(),
+                      ),
+                      Spacer(),
                       GestureDetector(
                         onTap: () {
                           Navigator.pushNamed(
@@ -242,12 +291,22 @@ class _SignInScreenState extends State<SignInScreen> {
                         },
                         child: 'Boarding House Owner'.text.bold.size(16).make(),
                       ),
-                      SizedBox(height: 40)
+                      SizedBox(height: 30)
                     ],
                   ),
-                )
+                ),
               ],
             ),
           );
+  }
+
+  void _toast() async {
+    print('Showing Toast');
+    await Future.delayed(const Duration(seconds: 1));
+    SmartDialog.showToast(
+        displayTime: Duration(seconds: 3),
+        useAnimation: true,
+        maskColor: Colors.green,
+        '$errors');
   }
 }

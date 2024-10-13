@@ -9,28 +9,27 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../cons.dart';
 import '../../fetch.dart';
-import '../Map/location.map.dart';
-import '../SignUp/guest.screen.dart';
+import '../Screen/Map/location.map.dart';
+import 'admin.home.dart';
 
-class BHouseScreen extends StatefulWidget {
-  const BHouseScreen({super.key});
+class AdminBHouseScreen extends StatefulWidget {
+  const AdminBHouseScreen({super.key});
 
   @override
-  State<BHouseScreen> createState() => _BHouseScreenState();
+  State<AdminBHouseScreen> createState() => _AdminBHouseScreenState();
 }
 
-class _BHouseScreenState extends State<BHouseScreen> {
+class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
   late Future<DocumentSnapshot> bHouseData;
   User? currentUser = FirebaseAuth.instance.currentUser;
   @override
   void initState() {
 
-    fetchBhouseData(setState);
-    countAvailableRoom(setState);
-    countAllRoom(setState);
     super.initState();
     bHouseData = FirebaseFirestore.instance
         .collection('BoardingHouses')
@@ -231,10 +230,6 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                   width: 35,
                                   child: GestureDetector(
                                     onTap: () {
-                                      setState(() {
-                                        bHouseLat = data['Lat'];
-                                        bHouseLong = data['Long'];
-                                      });
                                       Navigator.of(context).pushAndRemoveUntil(
                                         _toLocationScreen(),
                                             (Route<dynamic> route) => false,
@@ -348,10 +343,10 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                               });
                                               print('room ID: $roomId');
 
-                                              Navigator.of(context).pushAndRemoveUntil(
-                                                _toRoomsScreen(),
-                                                    (Route<dynamic> route) => false,
-                                              );
+                                              // Navigator.of(context).pushAndRemoveUntil(
+                                              //   _toRoomsScreen(),
+                                              //       (Route<dynamic> route) => false,
+                                              // );
                                             },
                                             child: Container(
                                               height: 90,
@@ -468,17 +463,10 @@ class _BHouseScreenState extends State<BHouseScreen> {
                           padding: EdgeInsets.only(top: 40, left: 20),
                           child: GestureDetector(
                             onTap: () {
-                            if( currentUser != null) {
                               Navigator.of(context).pushAndRemoveUntil(
                                 _toHomeScreen(),
                                     (Route<dynamic> route) => false,
                               );
-                            }   else {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                _toGuestScreen(),
-                                    (Route<dynamic> route) => false,
-                              );
-                            }
                             },
                             child: Container(
                               height: 35,
@@ -530,6 +518,108 @@ class _BHouseScreenState extends State<BHouseScreen> {
                     ),
                   ],
                 ),
+              ),
+              Container(
+                height: double.infinity,
+                width: double.infinity,
+                child: Column(
+                  children: [
+                    Row(
+                      children: [
+                        Padding(
+                          padding: EdgeInsets.only(top: 40, left: 20),
+                          child: GestureDetector(
+                            onTap: () {
+                              // Navigator.of(context).pushAndRemoveUntil(
+                              //   _toBHouseScreen(),
+                              //       (Route<dynamic> route) => false,
+                              // );
+                            },
+                            child: Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                border: Border.all(color: Colors.grey, width: 0.3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.arrow_back,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                        Spacer(),
+                      ],
+                    ),
+                    Spacer(),
+                   data['verified'] != true ? Container(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.all(20.0),
+                        child: Row(
+                          children: [
+                            Expanded(
+                              child: GestureDetector(
+                                onTap: () {
+
+                                    QuickAlert.show(
+                                      onCancelBtnTap: () {
+                                        Navigator.pop(context);
+                                      },
+                                      onConfirmBtnTap: () async {
+                                       try{
+                                         await FirebaseFirestore.instance.collection('BoardingHouses').doc('${data['Email']}').update({
+                                           'verified': true,
+                                         });
+                                         Navigator.pop(context);
+                                       } on FirebaseAuthException catch(e) {
+                                         print(e);
+                                         Navigator.pop(context);
+                                       }
+                                      },
+                                      context: context,
+                                      type: QuickAlertType.confirm,
+                                      text: 'Verify this Boarding House.',
+                                      titleAlignment: TextAlign.center,
+                                      textAlignment: TextAlign.center,
+                                      confirmBtnText: 'Yes',
+                                      cancelBtnText: 'No',
+                                      confirmBtnColor: Colors.blue,
+                                      backgroundColor: Colors.white,
+                                      headerBackgroundColor: Colors.grey,
+                                      confirmBtnTextStyle: const TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      titleColor: Colors.black,
+                                      textColor: Colors.black,
+                                    );
+                                },
+                                child: Container(
+                                  height: 50,
+                                  decoration: BoxDecoration(
+                                      color: Color.fromRGBO(26, 60, 105, 1.0),
+                                      borderRadius: BorderRadius.circular(10)),
+                                  child: Center(
+                                      child: 'Verify'
+                                          .text
+                                          .size(20)
+                                          .color(Colors.white)
+                                          .bold
+                                          .make()),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ) : SizedBox()
+                  ],
+                ),
               )
             ],
           );
@@ -540,7 +630,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
 
   Route _toHomeScreen() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => HomeScreen(),
+      pageBuilder: (context, animation, anotherAnimation) => AdminHomeScreen(),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -553,27 +643,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
             textDirection: TextDirection.rtl,
-            child: HomeScreen());
-      },
-    );
-  }
-
-  Route _toGuestScreen() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => GuestScreen(),
-      transitionDuration: Duration(milliseconds: 1000),
-      reverseTransitionDuration: Duration(milliseconds: 200),
-      transitionsBuilder: (context, animation, anotherAnimation, child) {
-        animation = CurvedAnimation(
-            parent: animation,
-            reverseCurve: Curves.fastOutSlowIn,
-            curve: Curves.fastLinearToSlowEaseIn);
-
-        return SlideTransition(
-            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-                .animate(animation),
-            textDirection: TextDirection.rtl,
-            child: GuestScreen());
+            child: AdminHomeScreen());
       },
     );
   }
@@ -597,7 +667,6 @@ class _BHouseScreenState extends State<BHouseScreen> {
       },
     );
   }
-
 
   Route _toLocationScreen() {
     return PageRouteBuilder(

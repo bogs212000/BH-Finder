@@ -4,21 +4,30 @@ import 'package:bh_finder/Screen/ForgotPass/forgotpass.screen.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/second.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/third.screen.dart';
+import 'package:bh_finder/Screen/Profile/user.profile.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'Auth/auth.wrapper.dart';
 import 'Screen/BHouse/bh.screen.dart';
 import 'Screen/BHouse/room.screen.dart';
 import 'Screen/BordersReservation/boarder.reservation.screen.dart';
+import 'Screen/Chat/chat.boarders.dart';
 import 'Screen/Chat/chat.list.dart';
 import 'Screen/Chat/chat.owner.dart';
+import 'Screen/Chat/owner.chat.list.dart';
+import 'Screen/Home/guest.home.screen.dart';
 import 'Screen/Loading/loading.screen.dart';
 import 'Screen/Owner/OwnerSignUp/first.screen.dart';
-import 'Screen/Owner/add.rooms.screen.dart';
+import 'Screen/Owner/add.rooms.dart';
+import 'Screen/Owner/list.rooms.screen.dart';
 import 'Screen/Owner/owner.home.screen.dart';
 import 'Screen/Owner/reservation/reservation.view.screen.dart';
+import 'Screen/Receipt/receipt.screen.dart';
 import 'Screen/SignUp/signup.screen.dart';
+import 'Screen/TermsAndConditons/terms.conditions.dart';
 import 'firebase_options.dart';
 
 void main() async {
@@ -26,6 +35,7 @@ void main() async {
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
+  FirebaseStorage storage = FirebaseStorage.instance;
 
   runApp(const MyApp());
 }
@@ -39,9 +49,13 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'BH Finder',
       home: const AuthWrapper(),
+        navigatorObservers: [FlutterSmartDialog.observer],
+        builder: FlutterSmartDialog.init(),
       debugShowCheckedModeBanner: false,
       routes: {
         '/HomeScreen': (context) => HomeScreen(),
+        '/UserProfile': (context) => UserProfile(),
+        '/GuestHomeScreen': (context) => GuestHomeScreen(),
         '/LoadingScreen': (context) => LoadingScreen(),
         '/SignInScreen': (context) => SignInScreen(),
         '/BHScreen': (context) => BHouseScreen(),
@@ -51,12 +65,17 @@ class MyApp extends StatelessWidget {
         '/OwnerSignupFirstScreen': (context) => OwnerSignupFirst(),
         '/OwnerSignupSecondScreen': (context) => OwnerSignupSecond(),
         '/OwnerSignupThirdScreen': (context) => OwnerSignupThird(),
-        '/AddRoomsScreen': (context) => AddRoomsScreen(),
+        '/ListRoomsScreen': (context) => ListRoomsScreen(),
         '/ViewReservationScreen': (context) => ViewReservationScreen(),
         '/SignUpScreen': (context) => SignUpScreen(),
         '/ChatOwner': (context) => ChatOwner(),
         '/ChatList': (context) => ChatList(),
+        '/AddRooms': (context) => AddRooms(),
+        '/OwnerChatList': (context) => OwnerChatList(),
+        '/ChatBoarders': (context) => ChatBoarders(),
         '/BoarderReservationScreen': (context) => BoarderReservationScreen(),
+        '/TermsAndConditions': (context) => TermsAndConditionsScreen(),
+        '/ReceiptScreen': (context) => ReceiptScreen(),
       }
     );
   }

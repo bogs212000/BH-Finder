@@ -43,7 +43,7 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                     padding:
                         const EdgeInsets.only(left: 5, right: 5, bottom: 20),
                     child: TextField(
-                      // controller: _emailPhonenumber,
+                      controller: emailController,
                       keyboardType: TextInputType.name,
                       textAlign: TextAlign.left,
                       style: const TextStyle(
@@ -71,7 +71,14 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                     child: SizedBox(
                       height: 40,
                       child: ElevatedButton(
-                        onPressed: () async {},
+                        onPressed: () async {
+                          try {
+                            await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+                            print("Password reset email sent.");
+                          } catch (e) {
+                            print("Error sending password reset email: $e");
+                          }
+                        },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFF31355C),
                           shape: RoundedRectangleBorder(

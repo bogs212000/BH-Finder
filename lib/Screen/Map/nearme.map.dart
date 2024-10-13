@@ -1,3 +1,4 @@
+import 'package:bh_finder/Auth/wrapper.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -47,10 +48,7 @@ class _NearMeMapScreenState extends State<NearMeMapScreen> {
                       padding: EdgeInsets.only(top: 40, left: 20),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            _toHomeScreen(),
-                                (Route<dynamic> route) => false,
-                          );
+                          Navigator.pop(context);
                         },
                         child: Container(
                           height: 35,
@@ -60,7 +58,7 @@ class _NearMeMapScreenState extends State<NearMeMapScreen> {
                             border: Border.all(color: Colors.grey, width: 0.3),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Center(
+                          child: const Center(
                             child: Icon(
                               Icons.arrow_back,
                               color: Colors.white,
@@ -80,7 +78,7 @@ class _NearMeMapScreenState extends State<NearMeMapScreen> {
                           border: Border.all(color: Colors.grey, width: 0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Icon(
                             Icons.support_agent,
                             size: 20,
@@ -100,7 +98,7 @@ class _NearMeMapScreenState extends State<NearMeMapScreen> {
   }
   Route _toHomeScreen() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => HomeScreen(),
+      pageBuilder: (context, animation, anotherAnimation) => Wrapper(),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -113,7 +111,7 @@ class _NearMeMapScreenState extends State<NearMeMapScreen> {
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
             textDirection: TextDirection.rtl,
-            child: HomeScreen());
+            child: Wrapper());
       },
     );
   }

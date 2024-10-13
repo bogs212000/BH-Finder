@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:bh_finder/Admin/admin.home.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/waiting.verification.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
@@ -10,6 +11,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Screen/Owner/owner.home.screen.dart';
+import '../Screen/SignUp/guest.screen.dart';
+import '../cons.dart';
 
 class Wrapper extends StatelessWidget {
   const Wrapper({Key? key}) : super(key: key);
@@ -83,24 +86,33 @@ class Wrapper extends StatelessWidget {
             builder: (
               context,
             ) {
-              if ((userData.data!['verified'] == true) &
+              if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Owner")) {
                 return OwnerHomeScreen();
-              } else if ((userData.data!['verified'] == true) &
-                  (userData.data!['role'] == "Border") &
+              } else if ((userData.data!['verified'] == true) &&
+                  (userData.data!['role'] == "Boarder") &&
                   (user != null && !user.emailVerified)) {
                 return WaitEmailVerify();
-              } else if ((userData.data!['verified'] == true) &
-              (userData.data!['role'] == "Border") &
+              } else if ((userData.data!['verified'] == true) &&
+              (userData.data!['role'] == "Boarder") &&
               (user != null && user.emailVerified)) {
+                bUuId = userData.data!['UuId'];
+                fName = userData.data!['FirstName'];
+                mName = userData.data!['MiddleName'];
+                lName = userData.data!['LastName'];
+                bPhoneNumber = userData.data!['PhoneNumber'];
                 return HomeScreen();
-              } else if ((userData.data!['verified'] == false) &
+              } else if ((userData.data!['verified'] == true) &&
+                  (userData.data!['role'] == "Admin") &&
+                  (user != null && user.emailVerified)) {
+                return AdminHomeScreen();
+              }else if ((userData.data!['verified'] == false) &&
                   (userData.data!['role'] == "Owner")) {
                 return WaitingVerificationScreen();
               } else if ((userData.data!['role'] == "Client")) {
                 return HomeScreen();
               } else {
-                return SignInScreen();
+                return GuestScreen();
               }
             },
           );

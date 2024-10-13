@@ -40,9 +40,12 @@ String? bAddress;
 //currently boarding data
 String? cBHouseName;
 String? cRoom;
+bool? cPaid;
+String? cDocId;
 
 //reservation view
 String? rBHouse;
+String? rRoomsDocId;
 String? rBHouseDocId;
 DateTime? rCheckIn;
 DateTime? rCheckOut;
@@ -50,3 +53,9 @@ DateTime? rCheckOut;
 //Chat BHouse Owner
 String? ownerEmail;
 String? bHouse;
+
+//Chat Boarders
+String? boardersEmail;
+
+double? bHouseLat;
+double? bHouseLong;

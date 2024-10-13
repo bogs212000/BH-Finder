@@ -94,6 +94,8 @@ void checkUserInRooms() async {
         print("Room Data: $roomData");
         cBHouseName = roomData['bHouseName'];
         cRoom = roomData['roomNameNumber'];
+        cPaid = roomData['paid?'];
+        cDocId = roomData['roomDocId'];
       }
     }
   } else {

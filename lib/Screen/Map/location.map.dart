@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
+import '../../cons.dart';
 import '../BHouse/bh.screen.dart';
 
 class LocationScreen extends StatefulWidget {
@@ -11,12 +14,27 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
-  GoogleMapController? mapController;
+  final Completer<GoogleMapController> _controller = Completer();
+  late LatLng cam;
+  Set<Marker> _markers = {};
 
-  final LatLng _center = const LatLng(37.7749, -122.4194); // San Francisco
+  final LatLng _center = LatLng(bHouseLat!, bHouseLong!); // San Francisco
 
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
+  @override
+  void initState() {
+    super.initState();
+    // Add a marker when the map is initialized
+    _markers.add(
+      Marker(
+        markerId: MarkerId('bHouseMarker'),
+        position: _center, // Pinpointed location
+        infoWindow: const InfoWindow(
+          title: 'BHouse Location',
+          snippet: 'This is the pinpointed location.',
+        ),
+        icon: BitmapDescriptor.defaultMarker, // Default red marker
+      ),
+    );
   }
 
   @override
@@ -28,11 +46,17 @@ class _LocationScreenState extends State<LocationScreen> {
             height: double.infinity,
             width: double.infinity,
             child: GoogleMap(
-              onMapCreated: _onMapCreated,
+              onMapCreated: (GoogleMapController controller) {
+                _controller.complete(controller);
+              },
+              myLocationEnabled: true,
+              zoomControlsEnabled: true,
+              zoomGesturesEnabled: true,
               initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 11.0,
+                target: _center, // Set the camera's initial position
+                zoom: 18.0,
               ),
+              markers: _markers, // Display the markers
             ),
           ),
           Container(

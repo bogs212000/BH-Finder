@@ -3,10 +3,14 @@
 import 'dart:async';
 import 'package:bh_finder/Screen/Owner/rooms.owner.screen.dart';
 import 'package:bh_finder/cons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:intl/intl.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../fetch.dart';
 import '../BHouse/bh.screen.dart';
@@ -127,11 +131,68 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   ),
                 )
               : SizedBox(),
+          searchActive == false
+              ? Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: () {
+                Navigator.pushNamed(context, '/OwnerChatList');
+              },
+              child: Container(
+                height: 35,
+                width: 35,
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  border: Border.all(color: Colors.grey, width: 0.3),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.grey.withOpacity(0.2),
+                      spreadRadius: 1,
+                      blurRadius: 1,
+                      offset: Offset(0, 1),
+                    ),
+                  ],
+                ),
+                child: Center(
+                  child: Icon(
+                    Icons.chat_outlined,
+                    color: Colors.grey.withOpacity(0.8),
+                  ),
+                ),
+              ),
+            ),
+          )
+              : SizedBox(),
           Padding(
             padding: EdgeInsets.only(right: 10),
             child: GestureDetector(
               onTap: () {
-                FirebaseAuth.instance.signOut();
+                QuickAlert.show(
+                  onCancelBtnTap: () {
+                    Navigator.pop(context);
+                  },
+                  onConfirmBtnTap: () {
+                    FirebaseAuth.instance.signOut();
+                    Navigator.pop(context);
+                  },
+                  context: context,
+                  type: QuickAlertType.confirm,
+                  text: 'Going to signing out',
+                  titleAlignment: TextAlign.center,
+                  textAlignment: TextAlign.center,
+                  confirmBtnText: 'Yes',
+                  cancelBtnText: 'No',
+                  confirmBtnColor: Colors.blue,
+                  backgroundColor: Colors.white,
+                  headerBackgroundColor: Colors.grey,
+                  confirmBtnTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  titleColor: Colors.black,
+                  textColor: Colors.black,
+                );
               },
               child: Container(
                 height: 35,
@@ -182,8 +243,11 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   }
                   Map<String, dynamic> data =
                       snapshot.data!.data() as Map<String, dynamic>;
-                    addressLat = data['Lat'];
-                    addressLong = data['Long'];
+                  addressLat = data['Lat'];
+                  addressLong = data['Long'];
+                  bHouse = data['BoardingHouseName'];
+                  OwnerPhone = data['PhoneNumber'];
+
                   return Container(
                     padding: EdgeInsets.all(20),
                     width: double.infinity,
@@ -197,9 +261,9 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                               decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(10),
                                 image: DecorationImage(
-                                  image: NetworkImage(
-                                    'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
-                                  ), // Replace with your own image URL
+                                  image:
+                                      CachedNetworkImageProvider(data['Image']),
+                                  // Replace with your own image URL
                                   fit: BoxFit.cover,
                                 ),
                                 boxShadow: [],
@@ -228,8 +292,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                             .color(Colors.grey)
                                             .make(),
                                         Spacer(),
-                                        Icon(Icons.edit_note,
-                                            color: Colors.grey, size: 25)
+                                        GestureDetector(onTap: (){
+                                          _showToast();
+                                        },
+                                          child: Icon(Icons.edit_note,
+                                              color: Colors.grey, size: 25),
+                                        )
                                       ],
                                     ),
                                   ],
@@ -243,206 +311,164 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   );
                 },
               ),
+              Padding(
+                padding: const EdgeInsets.only(right: 15, left: 15),
+                child: Container(
+                  padding: EdgeInsets.all(20),
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(20),
+                    gradient: LinearGradient(
+                      begin: Alignment.topLeft,
+                      end: Alignment.bottomRight,
+                      colors: [
+                        Colors.blue.shade500,
+                        Colors.green.shade800,
+                      ],
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Column(
+                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                        children: [
+                          FutureBuilder<int>(
+                            future: fetchRoomsWithOwnersID(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child:
+                                    CircularProgressIndicator()); // Show loading spinner while fetching data
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text(
+                                        'Error fetching data')); // Handle error
+                              } else if (snapshot.hasData) {
+                                final int roomCountAll = snapshot.data ??
+                                    0; // Get the count of rooms with the OwnersID
+                                return Row(
+                                  children: [
+                                    roomCountAll == null
+                                        ? '0'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.red[400])
+                                        .make()
+                                        : '$roomCountAll'
+                                        .text
+                                        .semiBold
+                                        .size(20)
+                                        .center
+                                        .color(Colors.white)
+                                        .make(),
+                                    ' - All Rooms'.text.light.white.make(),
+                                    Spacer(),
+                                    GestureDetector(onTap: () {
+                                      Navigator.pushNamed(context, '/ListRoomsScreen');
+                                    }, child: Icon(Icons.arrow_forward_ios, color: Colors.white,))
+                                  ],
+                                );
+                              } else {
+                                return Center(child: Text('No data available'));
+                              }
+                            },
+                          ),
+                          FutureBuilder<int>(
+                            future: fetchRoomsAvailable(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child:
+                                    CircularProgressIndicator()); // Show loading spinner while fetching data
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text(
+                                        'Error fetching data')); // Handle error
+                              } else if (snapshot.hasData) {
+                                final int roomCountAvailable = snapshot.data ??
+                                    0; // Get the count of rooms with the OwnersID
+
+                                return Row(
+                                  children: [
+                                    roomCountAvailable == null
+                                        ? '0'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.red[400])
+                                        .make()
+                                        : '$roomCountAvailable'
+                                        .text
+                                        .semiBold
+                                        .size(20)
+                                        .center
+                                        .color(Colors.white)
+                                        .make(),
+                                    ' - Available Rooms'.text.light.white.make(),
+                                  ],
+                                );
+                              } else {
+                                return Center(child: Text('No data available'));
+                              }
+                            },
+                          ),
+                          FutureBuilder<int>(
+                            future: fetchRoomsUnavailable(),
+                            builder: (context, snapshot) {
+                              if (snapshot.connectionState ==
+                                  ConnectionState.waiting) {
+                                return Center(
+                                    child:
+                                    CircularProgressIndicator()); // Show loading spinner while fetching data
+                              } else if (snapshot.hasError) {
+                                return Center(
+                                    child: Text(
+                                        'Error fetching data')); // Handle error
+                              } else if (snapshot.hasData) {
+                                final int roomCount = snapshot.data ??
+                                    0; // Get the count of rooms with the OwnersID
+
+                                return Row(
+                                  children: [
+                                    roomCount == null
+                                        ? '0'
+                                        .text
+                                        .bold
+                                        .size(25)
+                                        .center
+                                        .color(Colors.red[400])
+                                        .make()
+                                        : '$roomCount'
+                                        .text
+                                        .semiBold
+                                        .size(20)
+                                        .center
+                                        .color(Colors.white)
+                                        .make(),
+                                    ' - Unavailable Rooms'.text.light.white.make(),
+                                  ],
+                                );
+                              } else {
+                                return Center(child: Text('No data available'));
+                              }
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+              ),
               Container(
                 padding: EdgeInsets.only(right: 20, left: 20),
-                color: Colors.white,
                 width: double.infinity,
                 child: Column(
                   children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        FutureBuilder<int>(
-                          future: fetchRoomsWithOwnersID(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                  child:
-                                      CircularProgressIndicator()); // Show loading spinner while fetching data
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text(
-                                      'Error fetching data')); // Handle error
-                            } else if (snapshot.hasData) {
-                              final int roomCountAll = snapshot.data ??
-                                  0; // Get the count of rooms with the OwnersID
-
-                              return Expanded(
-                                child: roomCountAll == null
-                                    ? '0'
-                                        .text
-                                        .bold
-                                        .size(25)
-                                        .center
-                                        .color(Colors.red[400])
-                                        .make()
-                                    : '$roomCountAll'
-                                        .text
-                                        .bold
-                                        .size(25)
-                                        .center
-                                        .color(Colors.blue)
-                                        .make(),
-                              );
-                            } else {
-                              return Center(child: Text('No data available'));
-                            }
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        FutureBuilder<int>(
-                          future: fetchRoomsAvailable(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                  child:
-                                      CircularProgressIndicator()); // Show loading spinner while fetching data
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text(
-                                      'Error fetching data')); // Handle error
-                            } else if (snapshot.hasData) {
-                              final int roomCountAvailable = snapshot.data ??
-                                  0; // Get the count of rooms with the OwnersID
-
-                              return Expanded(
-                                child: roomCountAvailable == null
-                                    ? '0'
-                                        .text
-                                        .bold
-                                        .size(25)
-                                        .center
-                                        .color(Colors.red[400])
-                                        .make()
-                                    : '$roomCountAvailable'
-                                        .text
-                                        .bold
-                                        .size(25)
-                                        .center
-                                        .color(Colors.blue)
-                                        .make(),
-                              );
-                            } else {
-                              return Center(child: Text('No data available'));
-                            }
-                          },
-                        ),
-                        SizedBox(width: 10),
-                        FutureBuilder<int>(
-                          future: fetchRoomsUnavailable(),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState ==
-                                ConnectionState.waiting) {
-                              return Center(
-                                  child:
-                                      CircularProgressIndicator()); // Show loading spinner while fetching data
-                            } else if (snapshot.hasError) {
-                              return Center(
-                                  child: Text(
-                                      'Error fetching data')); // Handle error
-                            } else if (snapshot.hasData) {
-                              final int roomCount = snapshot.data ??
-                                  0; // Get the count of rooms with the OwnersID
-
-                              return Expanded(
-                                child: roomCount == null
-                                    ? '0'
-                                        .text
-                                        .bold
-                                        .size(25)
-                                        .center
-                                        .color(Colors.red[400])
-                                        .make()
-                                    : '$roomCount'
-                                        .text
-                                        .bold
-                                        .size(25)
-                                        .center
-                                        .color(Colors.blue)
-                                        .make(),
-                              );
-                            } else {
-                              return Center(child: Text('No data available'));
-                            }
-                          },
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                      children: [
-                        Expanded(
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                _toRoomsOwnerScreen(),
-                                (Route<dynamic> route) => false,
-                              );
-                            },
-                            child: Container(
-                              child: Container(
-                                padding: EdgeInsets.only(
-                                    left: 20, right: 20, bottom: 5, top: 5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Color(0xFF31355C),
-                                ),
-                                child: 'Rooms'
-                                    .text
-                                    .lg
-                                    .size(11)
-                                    .center
-                                    .color(Colors.white)
-                                    .make(),
-                              ),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Container(
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                  left: 20, right: 20, bottom: 5, top: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Color(0xFF31355C),
-                              ),
-                              child: 'Available'
-                                  .text
-                                  .lg
-                                  .size(11)
-                                  .center
-                                  .color(Colors.white)
-                                  .make(),
-                            ),
-                          ),
-                        ),
-                        SizedBox(width: 10),
-                        Expanded(
-                          child: Container(
-                            child: Container(
-                              padding: EdgeInsets.only(
-                                  left: 10, right: 10, bottom: 5, top: 5),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
-                                color: Color(0xFF31355C),
-                              ),
-                              child: 'Unavailable'
-                                  .text
-                                  .lg
-                                  .size(8)
-                                  .center
-                                  .color(Colors.white)
-                                  .make(),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
                     SizedBox(height: 20),
                     //find nearby
                     Row(
@@ -458,13 +484,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     ),
                     SizedBox(height: 10),
                     Container(
-                      height: 500,
+                      height: 400,
                       width: double.infinity,
                       child: StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection("Reservations")
                             .where('OwnerId', isEqualTo: OwnerUuId)
-                            .where('read', isEqualTo: true)
                             .snapshots(),
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -599,6 +624,20 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
           ),
         ),
       ),
+    );
+  }
+
+  void _showToast() async {
+    print('Showing Toast');  // Debugging
+    SmartDialog.showToast(
+      'This is a test toast message.',
+    );
+  }
+  void _getLocationSuc() async {
+    print('Showing Toast');  // Debugging
+    SmartDialog.showToast(
+      maskColor: Colors.green,
+      'Success fetching location.',
     );
   }
 

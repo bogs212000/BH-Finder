@@ -1,11 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'package:bh_finder/Auth/wrapper.dart';
+import 'package:bh_finder/Screen/Home/guest.home.screen.dart';
+import 'package:bh_finder/Screen/SignUp/guest.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
+import '../Screen/Home/home.screen.dart';
 import '../Screen/SignUp/waiting.screen.dart';
 
 class AuthWrapper extends StatelessWidget {
@@ -28,7 +31,8 @@ class AuthWrapper extends StatelessWidget {
             } else if (snapshot.hasData) {
               return Wrapper();
             } else {
-              return SignInScreen();
+              return GuestScreen();
+
             }
           }),
     );
