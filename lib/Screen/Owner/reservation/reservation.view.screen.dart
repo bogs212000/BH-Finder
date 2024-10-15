@@ -5,12 +5,15 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../../../cons.dart';
+import '../owner.home.screen.dart';
 
 class ViewReservationScreen extends StatefulWidget {
   const ViewReservationScreen({Key? key}) : super(key: key);
@@ -22,7 +25,6 @@ class ViewReservationScreen extends StatefulWidget {
 class _ViewReservationScreenState extends State<ViewReservationScreen> {
   late Future<DocumentSnapshot> reservationData;
 
-
   @override
   void initState() {
     super.initState();
@@ -31,7 +33,6 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
         .doc(rBHouseDocId)
         .get();
   }
-
 
   @override
   Widget build(BuildContext context) {
@@ -151,11 +152,14 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                 children: [
                                   'Boarding House :'.text.size(15).light.make(),
                                   const Spacer(),
-                                  '${data['boardersName']}'
-                                      .text
-                                      .size(15)
-                                      .light
-                                      .make(),
+                                  Flexible(
+                                    child: '${data['boardersName']}'
+                                        .text
+                                        .overflow(TextOverflow.fade)
+                                        .size(15)
+                                        .light
+                                        .make(),
+                                  ),
                                 ],
                               ),
                               Row(
@@ -249,38 +253,88 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                   SizedBox(width: 5),
                                   SizedBox(
                                     height: 40,
-                                    child: ElevatedButton(
+                                    child:ElevatedButton(
                                       onPressed: () async {
+                                        // Show a loading dialog while processing
+                                        QuickAlert.show(
+                                          context: context,
+                                          type: QuickAlertType.loading,
+                                          title: 'Loading',
+                                          text: 'Please Wait...',
+                                        );
+
                                         try {
-                                         await FirebaseFirestore.instance
-                                              .collection('Rooms')
-                                              .doc('${data['roomId']}')
-                                              .update({
+                                          // Update the 'Rooms' collection
+                                          await FirebaseFirestore.instance.collection('Rooms').doc('${data['roomId']}').update({
                                             'boarderID': data['boarderUuId'],
                                             'boardersConNumber': data['boardersConNumber'],
                                             'boardersIn': data['checkIn'],
                                             'boardersOut': data['checkOut'],
                                             'boardersName': data['boardersName'],
                                             'totalToPay': '',
-                                            'roomStatus': 'unavailable'
+                                            'roomStatus': 'unavailable',
+                                            'paid?': false,
                                           });
-                                          await FirebaseFirestore.instance
-                                              .collection('Reservations')
-                                              .doc('${data['docID']}')
-                                              .update({
-                                            'read': false,
 
+                                          // Add a notification in the 'Notifications' collection
+                                          await FirebaseFirestore.instance.collection('Notifications').doc().set({
+                                            'createdAt': DateTime.now(),
+                                            'message': "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you!",
+                                            'boarderID': data['boarderUuId'],
+                                            'status': false,
                                           });
+
+                                          // Update the 'read' field for all reservations where boarderUuId is not equal to the given ID
+                                          QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Reservations').where('boarderUuId', isNotEqualTo: data['boarderUuId']).get();
+
+                                          for (QueryDocumentSnapshot doc in querySnapshot.docs) {
+                                            await doc.reference.update({
+                                              'read': true, // The field and value to update
+                                            });
+                                          }
+
+                                          // Close the loading dialog
+                                          Navigator.pop(context);
+
+                                          // Show a success dialog
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.success,
+                                            title: 'Success!',
+                                            text: 'The reservation has been successfully accepted.',
+                                            onConfirmBtnTap: () {
+                                              Navigator.pop(context); // Close the success dialog
+                                              Navigator.of(context).pushAndRemoveUntil(
+                                                MaterialPageRoute(builder: (context) => OwnerHomeScreen()),
+                                                    (Route<dynamic> route) => false, // Remove all previous routes
+                                              );
+                                            },
+                                          );
                                         } on FirebaseAuthException catch (e) {
-                                          print(e);
+                                          // Handle authentication errors (e.g., user not authenticated)
+                                          Navigator.pop(context); // Close the loading dialog
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.error,
+                                            title: 'Error',
+                                            text: 'Failed to process the reservation. Please try again.',
+                                          );
+                                        } catch (e) {
+                                          // Handle other potential exceptions
+                                          Navigator.pop(context); // Close the loading dialog
+                                          QuickAlert.show(
+                                            context: context,
+                                            type: QuickAlertType.error,
+                                            title: 'Error',
+                                            text: 'An unexpected error occurred: $e',
+                                          );
                                         }
                                       },
                                       style: ElevatedButton.styleFrom(
                                         foregroundColor: Colors.white,
                                         backgroundColor: Colors.green,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
+                                          borderRadius: BorderRadius.circular(20),
                                         ),
                                         elevation: 5,
                                       ),

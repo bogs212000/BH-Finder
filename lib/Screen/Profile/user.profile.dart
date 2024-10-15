@@ -42,7 +42,40 @@ class _UserProfileState extends State<UserProfile> {
     return loading
         ? LoadingScreen()
         : Scaffold(
-            appBar: AppBar(),
+            appBar: AppBar(actions: [Padding(
+              padding: EdgeInsets.only(right: 10),
+              child: GestureDetector(
+                onTap: () {
+                  // Navigator.of(context).pushAndRemoveUntil(
+                  //   _toNotificationScreen(),
+                  //       (Route<dynamic> route) => false,
+                  // );
+                },
+                child: Container(
+                  height: 35,
+                  width: 35,
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    border: Border.all(color: Colors.grey, width: 0.3),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        spreadRadius: 1,
+                        blurRadius: 1,
+                        offset: Offset(0, 1),
+                      ),
+                    ],
+                  ),
+                  child: Center(
+                    child: Icon(
+                      Icons.settings,
+                      color: Colors.grey.withOpacity(0.8),
+                    ),
+                  ),
+                ),
+              ),
+            )],),
             body: FutureBuilder<DocumentSnapshot>(
               future: profile,
               builder: (BuildContext context,
@@ -60,177 +93,190 @@ class _UserProfileState extends State<UserProfile> {
                     snapshot.data!.data() as Map<String, dynamic>;
                 return Padding(
                   padding: const EdgeInsets.only(left: 20, right: 20),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const CircleAvatar(
-                          radius: 50,
-                          child: Center(
-                            child: Icon(
-                              size: 50,
-                              Icons.account_circle_outlined,
-                              color: Colors.grey,
-                            ),
+                  child: Column(
+                    children: [
+                      const CircleAvatar(
+                        radius: 50,
+                        child: Center(
+                          child: Icon(
+                            size: 50,
+                            Icons.account_circle_outlined,
+                            color: Colors.grey,
                           ),
                         ),
-                        SizedBox(height: 20),
-                        Container(
-                          padding: EdgeInsets.all(20),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(0, 0.5),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: ['Profile'.text.bold.size(25).make()],
-                              ),
-                              Divider(),
-                              Row(
-                                children: [
-                                  'Name :'.text.light.size(15).make(),
-                                  Spacer(),
-                                  '${data['FirstName']} ${data['MiddleName']} ${data['LastName']}'
-                                      .text
-                                      .light
-                                      .size(15)
-                                      .make(),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  'Email :'.text.light.size(15).make(),
-                                  Spacer(),
-                                  '${data['Email']}'.text.light.size(15).make(),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  'Contact Number :'.text.light.size(15).make(),
-                                  Spacer(),
-                                  '${data['PhoneNumber']}'
-                                      .text
-                                      .light
-                                      .size(15)
-                                      .make(),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  'Address :'.text.light.size(15).make(),
-                                  Spacer(),
-                                  '${data['Address']}'
-                                      .text
-                                      .light
-                                      .size(15)
-                                      .make(),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UserEditProfile(
-                                        first: data['FirstName'],
-                                        middle: data['MiddleName'],
-                                        last: data['LastName'],
-                                        address: data['Address'],
-                                        email: data['Email'],
-                                        phoneNum: data['PhoneNumber'],
-                                      ),
-                                    ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.green,
-                                  // Custom background color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        25), // Rounded corners
-                                  ),
-                                ),
-                                child: 'Edit Profile'
-                                    .text
-                                    .color(Colors.white)
-                                    .bold // Bold text
-                                    .make(),
-                              ),
-                            ),
-                            SizedBox(width: 10),
-                            SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  QuickAlert.show(
-                                    onCancelBtnTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                    onConfirmBtnTap: () async {
-                                      Navigator.pop(context);
-                                      setState(() {
-                                        loading = true;
-                                      });
-                                      await FirebaseAuth.instance.signOut();
-                                      setState(() {
-                                        loading = false;
-                                      });
-                                    },
-                                    context: context,
-                                    type: QuickAlertType.confirm,
-                                    text: 'Do you want to Log out?',
-                                    titleAlignment: TextAlign.center,
-                                    textAlignment: TextAlign.center,
-                                    confirmBtnText: 'Yes',
-                                    cancelBtnText: 'No',
-                                    confirmBtnColor: Colors.blue,
-                                    backgroundColor: Colors.white,
-                                    headerBackgroundColor: Colors.grey,
-                                    confirmBtnTextStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    titleColor: Colors.black,
-                                    textColor: Colors.black,
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  // Custom background color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        25), // Rounded corners
-                                  ),
-                                ),
-                                child: 'Log out'
-                                    .text
-                                    .color(Colors.white)
-                                    .bold // Bold text
-                                    .make(),
-                              ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        padding: EdgeInsets.all(20),
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(10),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 3,
+                              offset: Offset(0, 0.5),
                             ),
                           ],
-                        )
-                      ],
-                    ),
+                        ),
+                        child: Column(
+                          children: [
+                            Row(
+                              children: ['Profile'.text.bold.size(25).make()],
+                            ),
+                            Divider(),
+                            Row(
+                              children: [
+                                'Name :'.text.light.size(15).make(),
+                                Spacer(),
+                                '${data['FirstName']} ${data['MiddleName']} ${data['LastName']}'
+                                    .text
+                                    .light
+                                    .size(15)
+                                    .make(),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                'Email :'.text.light.size(15).make(),
+                                Spacer(),
+                                '${data['Email']}'.text.light.size(15).make(),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                'Contact Number :'.text.light.size(15).make(),
+                                Spacer(),
+                                '${data['PhoneNumber']}'
+                                    .text
+                                    .light
+                                    .size(15)
+                                    .make(),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                'Address :'.text.light.size(15).make(),
+                                Spacer(),
+                                '${data['address']}'.text.light.size(15).make(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          SizedBox(
+                            height: 40,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => UserEditProfile(
+                                      first: data['FirstName'],
+                                      middle: data['MiddleName'],
+                                      last: data['LastName'],
+                                      address: data['address'],
+                                      email: data['Email'],
+                                      phoneNum: data['PhoneNumber'],
+                                    ),
+                                  ),
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.green,
+                                // Custom background color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      25), // Rounded corners
+                                ),
+                              ),
+                              child: 'Edit Profile'
+                                  .text
+                                  .color(Colors.white)
+                                  .bold // Bold text
+                                  .make(),
+                            ),
+                          ),
+                          SizedBox(width: 10),
+                          SizedBox(
+                            height: 40,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                QuickAlert.show(
+                                  onCancelBtnTap: () {
+                                    Navigator.pop(context);
+                                  },
+                                  onConfirmBtnTap: () async {
+                                    Navigator.pop(context);
+                                    setState(() {
+                                      loading = true;
+                                    });
+                                    await FirebaseAuth.instance.signOut();
+                                    setState(() {
+                                      loading = false;
+                                    });
+                                  },
+                                  context: context,
+                                  type: QuickAlertType.confirm,
+                                  text: 'Do you want to Log out?',
+                                  titleAlignment: TextAlign.center,
+                                  textAlignment: TextAlign.center,
+                                  confirmBtnText: 'Yes',
+                                  cancelBtnText: 'No',
+                                  confirmBtnColor: Colors.blue,
+                                  backgroundColor: Colors.white,
+                                  headerBackgroundColor: Colors.grey,
+                                  confirmBtnTextStyle: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                  titleColor: Colors.black,
+                                  textColor: Colors.black,
+                                );
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.blue,
+                                // Custom background color
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(
+                                      25), // Rounded corners
+                                ),
+                              ),
+                              child: 'Log out'
+                                  .text
+                                  .color(Colors.white)
+                                  .bold // Bold text
+                                  .make(),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Spacer(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/TermsAndConditions');
+                              },
+                              child: 'Terms And Conditions'.text.light.make()),
+                        ],
+                      ),
+                      SizedBox(height: 10),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          'Users Guide'.text.light.make(),
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                    ],
                   ),
                 );
               },

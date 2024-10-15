@@ -28,7 +28,7 @@ class _ChatListState extends State<ChatList> {
           elevation: 0,
           title: Row(
             children: [
-              'Notification'.text.make(),
+              'Chat'.text.make(),
             ],
           ),
         ),

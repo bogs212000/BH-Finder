@@ -289,7 +289,12 @@ class _SignInScreenState extends State<SignInScreen> {
                           Navigator.pushNamed(
                               context, '/OwnerSignupFirstScreen');
                         },
-                        child: 'Boarding House Owner'.text.bold.size(16).make(),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            'Boarding House Owner?'.text.light.size(16).make(),'  Sign up'.text.bold.size(16).make(),
+                          ],
+                        ),
                       ),
                       SizedBox(height: 30)
                     ],

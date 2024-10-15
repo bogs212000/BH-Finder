@@ -299,6 +299,7 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                                                 'createdAt': DateTime.now(),
                                                 'docID': docID,
                                                 'roomNumber': roomNumber,
+                                                'status': false,
                                                 'OwnerId': OwnerUuId,
                                                 'boarderUuId': bUuId,
                                                 'roomId': roomId,

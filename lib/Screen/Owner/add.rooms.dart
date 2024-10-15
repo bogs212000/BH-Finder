@@ -302,7 +302,8 @@ class _AddRoomsState extends State<AddRooms> {
                                       'roomStatus': 'available',
                                       'descriptions': descriptions.text,
                                       'rules': '',
-                                      'rates': ''
+                                      'rates': '',
+                                      'paid?': false,
                                     });
 
                                     setState(() {

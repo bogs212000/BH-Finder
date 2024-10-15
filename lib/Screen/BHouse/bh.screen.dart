@@ -368,7 +368,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                       borderRadius: BorderRadius.circular(10),
                                                       image: DecorationImage(
                                                         image: NetworkImage(
-                                                          data['imageUrl'] ?? 'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                                          data['roomImage'] ?? 'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                                                         ),
                                                         fit: BoxFit.cover,
                                                       ),
@@ -383,7 +383,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                         crossAxisAlignment: CrossAxisAlignment.start,
                                                         children: [
                                                           Text(
-                                                            'Room ${index + 1}',
+                                                            '${data['roomNameNumber']}',
                                                             style: TextStyle(
                                                               fontWeight: FontWeight.bold,
                                                               fontSize: 15,

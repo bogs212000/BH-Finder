@@ -220,7 +220,7 @@ class _UserEditProfileState extends State<UserEditProfile> {
                               borderSide: BorderSide(color: Colors.white),
                               borderRadius: BorderRadius.circular(20),
                             ),
-                            labelText: 'Last Name',
+                            labelText: 'Address',
                           ),
                         ),
                       ),

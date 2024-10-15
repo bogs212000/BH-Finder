@@ -489,7 +489,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                       child: StreamBuilder(
                         stream: FirebaseFirestore.instance
                             .collection("Reservations")
-                            .where('OwnerId', isEqualTo: OwnerUuId)
+                            .where('OwnerId', isEqualTo: OwnerUuId).orderBy('createdAt', descending: true)
                             .snapshots(),
                         builder: (BuildContext context,
                             AsyncSnapshot<QuerySnapshot> snapshot) {

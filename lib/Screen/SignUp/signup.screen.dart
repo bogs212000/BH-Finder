@@ -19,6 +19,10 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class _SignUpScreenState extends State<SignUpScreen> {
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+
   TextEditingController _email = TextEditingController();
   TextEditingController _password = TextEditingController();
   TextEditingController _confirmPassword = TextEditingController();
@@ -301,13 +305,21 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                 } else {
                                   print('haha');
                                     try {
+                                      // Generate a unique identifier for the user
                                       String uuId = Uuid().v4();
-                                      User? user = FirebaseAuth.instance.currentUser;
-                                      print('Uuid : $uuId');
-                                      await FirebaseFirestore.instance
-                                          .collection('Users')
-                                          .doc(_email.text.trim())
-                                          .set({
+                                      print('Generated UUID: $uuId');
+
+                                      // Create user with email and password
+                                      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
+                                        email: _email.text.trim(),
+                                        password: _password.text.trim(),
+                                      );
+
+                                      // Get the user object
+                                      User? user = userCredential.user;
+
+                                      // Store user profile information in Firestore
+                                      await FirebaseFirestore.instance.collection('Users').doc(_email.text.trim()).set({
                                         'UuId': uuId,
                                         'role': 'Boarder',
                                         'createdAt': DateTime.now(),
@@ -317,14 +329,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         'LastName': lastName.text,
                                         'Birthday': '',
                                         'address': address.text,
-                                        'Image': '',
+                                        'Image': '', // Placeholder for user image
                                         'PhoneNumber': contactNumber.text,
                                         'verified': true,
                                       });
-                                      await FirebaseAuth.instance
-                                          .createUserWithEmailAndPassword(
-                                          email: _email.text.trim(),
-                                          password: _password.text.trim());
                                       print("Verification email sent.");
                                       firstName.clear();
                                       middleName.clear();

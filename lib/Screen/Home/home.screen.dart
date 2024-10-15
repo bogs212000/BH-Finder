@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:async';
+import 'package:bh_finder/Screen/Home/tab.widget.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:bh_finder/cons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -18,6 +19,7 @@ import '../Map/nearme.map.dart';
 import '../NearBHouse/bhouse.near.dart';
 import '../notification/notification.screen.dart';
 import 'package:location/location.dart' as loc;
+import 'package:intl/intl.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -40,7 +42,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   void initState() {
-    // fetchBoarderData(setState);
+    fetchBoarderData(setState);
     checkGps();
     checkGPS();
     super.initState();
@@ -260,8 +262,8 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding: EdgeInsets.only(right: 20),
                   child: GestureDetector(
                     onTap: () {
-                     Navigator.pushNamed(context, '/UserProfile');
-                     print('hahaha');
+                      Navigator.pushNamed(context, '/UserProfile');
+                      print('hahaha');
                     },
                     child: Container(
                       height: 35,
@@ -317,7 +319,7 @@ class _HomeScreenState extends State<HomeScreen> {
                         }
                         if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
                           return const Center(
-                              child: Text('No Reservation found'));
+                              child: Text(''));
                         }
 
                         // Use a Column to display the fetched documents instead of ListView
@@ -523,54 +525,403 @@ class _HomeScreenState extends State<HomeScreen> {
                 ),
               ),
               //List BH
-              searchActive == false
-                  ? Container(
-                      padding: EdgeInsets.only(right: 20, left: 20),
-                      color: Colors.white,
-                      width: double.infinity,
-                      child: Column(
-                        children: [
-                          Row(
+              currentUser != null ? Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Container(
+                  height: 500, // Specify height for the tab container
+                  child: DefaultTabController(
+                    length: 2,
+                    child: Column(
+                      children: [
+                        // TabBar
+                        TabBar(
+                          tabs: [
+                            'Boarding Houses'.text.bold.make(),
+                            'Reservations'.text.bold.make(),
+                          ],
+                        ),
+
+                        // Expanded TabBarView to take up remaining space
+                        Expanded(
+                          child: TabBarView(
                             children: [
-                              Container(
-                                width: 150,
-                                padding: EdgeInsets.all(5),
-                                decoration: BoxDecoration(
-                                  borderRadius: BorderRadius.circular(12),
-                                  color: Color(0xFF31355C),
+                              Padding(
+                                padding: const EdgeInsets.only(right: 5, left: 5, top: 10),
+                                child: Container(
+                                  height: 500,
+                                  width: double.infinity,
+                                  child: StreamBuilder<QuerySnapshot>(
+                                    stream: search == null || search == ""
+                                        ? FirebaseFirestore.instance
+                                        .collection("BoardingHouses")
+                                        .where('verified', isEqualTo: true)
+                                        .snapshots()
+                                        : FirebaseFirestore.instance
+                                        .collection("BoardingHouses")
+                                        .where('BoardingHouseName',
+                                        isGreaterThanOrEqualTo: search)
+                                        .snapshots(),
+                                    builder: (context, snapshot) {
+                                      if (snapshot.hasError) {
+                                        return Center(
+                                          child: Text('Error: ${snapshot.error}'),
+                                        );
+                                      }
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.waiting) {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }
+                                      final datas = snapshot.data?.docs ?? [];
+                                      return Scaffold(
+                                        body: Container(
+                                          color: Colors.white,
+                                          width: double.infinity,
+                                          height: double.infinity,
+                                          child: AlignedGridView.count(
+                                            crossAxisCount: 2,
+                                            mainAxisSpacing: 0,
+                                            crossAxisSpacing: 0,
+                                            itemCount: datas.length,
+                                            itemBuilder: (context, index) {
+                                              final data =
+                                              datas[index].data() as Map<String, dynamic>;
+                                              return GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    OwnerUuId = data['OwnerUId'];
+                                                    rBHouseDocId = data['Email'];
+                                                  });
+                                                  Navigator.of(context).pushAndRemoveUntil(
+                                                    _toBhouseScreen(),
+                                                        (Route<dynamic> route) => false,
+                                                  );
+                                                },
+                                                child: Container(
+                                                  width: 150,
+                                                  height: 300,
+                                                  margin: EdgeInsets.all(5),
+                                                  // Add margin for spacing
+                                                  decoration: BoxDecoration(
+                                                      borderRadius: BorderRadius.circular(2),
+                                                      color: Colors.white),
+                                                  child: Column(
+                                                    children: [
+                                                      Stack(
+                                                        children: [
+                                                          Stack(
+                                                            children: [
+                                                              Container(
+                                                                width: double.infinity,
+                                                                height: 220,
+                                                                decoration: BoxDecoration(
+                                                                    color: Colors.white,
+                                                                    borderRadius:
+                                                                    BorderRadius.circular(
+                                                                        5),
+                                                                    boxShadow: [
+                                                                      BoxShadow(
+                                                                        color: Colors.grey
+                                                                            .withOpacity(0.2),
+                                                                        spreadRadius: 1,
+                                                                        blurRadius: 3,
+                                                                        offset:
+                                                                        Offset(0, 0.5),
+                                                                      ),
+                                                                    ]),
+                                                                child: Column(
+                                                                  children: [
+                                                                    Container(
+                                                                      width: double.infinity,
+                                                                      height: 150,
+                                                                      decoration:
+                                                                      BoxDecoration(
+                                                                        borderRadius:
+                                                                        const BorderRadius
+                                                                            .only(
+                                                                          topLeft:
+                                                                          Radius.circular(
+                                                                              5),
+                                                                          topRight:
+                                                                          Radius.circular(
+                                                                              5),
+                                                                        ),
+                                                                        image:
+                                                                        DecorationImage(
+                                                                          image:
+                                                                          CachedNetworkImageProvider(
+                                                                              data[
+                                                                              'Image']),
+                                                                          fit: BoxFit.cover,
+                                                                        ),
+                                                                      ),
+                                                                    ),
+                                                                    Container(
+                                                                      padding:
+                                                                      EdgeInsets.all(5),
+                                                                      width: double.infinity,
+                                                                      height: 70,
+                                                                      decoration:
+                                                                      BoxDecoration(
+                                                                        borderRadius:
+                                                                        const BorderRadius
+                                                                            .only(
+                                                                          bottomLeft:
+                                                                          Radius.circular(
+                                                                              5),
+                                                                          bottomRight:
+                                                                          Radius.circular(
+                                                                              5),
+                                                                        ),
+                                                                      ),
+                                                                      child: Column(
+                                                                        children: [
+                                                                          Row(
+                                                                            children: [
+                                                                              Flexible(
+                                                                                  child: '${data['BoardingHouseName']}'
+                                                                                      .text
+                                                                                      .overflow(
+                                                                                      TextOverflow.ellipsis)
+                                                                                      .light
+                                                                                      .make())
+                                                                            ],
+                                                                          ),
+                                                                          Row(
+                                                                            children: [
+                                                                              Flexible(
+                                                                                  child: '${data['address']}'
+                                                                                      .text
+                                                                                      .overflow(TextOverflow
+                                                                                      .ellipsis)
+                                                                                      .size(
+                                                                                      10)
+                                                                                      .color(Colors
+                                                                                      .grey)
+                                                                                      .make())
+                                                                            ],
+                                                                          ),
+                                                                          Spacer(),
+                                                                          Row(
+                                                                            mainAxisAlignment:
+                                                                            MainAxisAlignment
+                                                                                .end,
+                                                                            children: [
+                                                                              Icon(
+                                                                                Icons.star,
+                                                                                color: Colors
+                                                                                    .amber,
+                                                                                size: 10,
+                                                                              ),
+                                                                              Icon(
+                                                                                Icons.star,
+                                                                                color: Colors
+                                                                                    .amber,
+                                                                                size: 10,
+                                                                              ),
+                                                                              Icon(
+                                                                                Icons.star,
+                                                                                color: Colors
+                                                                                    .amber,
+                                                                                size: 10,
+                                                                              ),
+                                                                              Icon(
+                                                                                Icons.star,
+                                                                                color: Colors
+                                                                                    .amber,
+                                                                                size: 10,
+                                                                              ),
+                                                                              Icon(
+                                                                                Icons.star,
+                                                                                color: Colors
+                                                                                    .amber,
+                                                                                size: 10,
+                                                                              ),
+                                                                              ' 4.5'
+                                                                                  .text
+                                                                                  .size(10)
+                                                                                  .light
+                                                                                  .make(),
+                                                                            ],
+                                                                          ),
+                                                                        ],
+                                                                      ),
+                                                                    ),
+                                                                  ],
+                                                                ),
+                                                              ),
+                                                            ],
+                                                          ),
+                                                          SizedBox(height: 5),
+                                                        ],
+                                                      ),
+                                                      SizedBox(height: 5),
+                                                    ],
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  ),
                                 ),
-                                child: 'Boarding Houses'
-                                    .text
-                                    .lg
-                                    .size(11)
-                                    .center
-                                    .color(Colors.white)
-                                    .make(),
-                              )
+                              ),
+                              StreamBuilder(
+                                stream: FirebaseFirestore.instance
+                                    .collection("Reservations")
+                                    .where('boarderUuId', isEqualTo: bUuId).orderBy('createdAt', descending: true)
+                                    .snapshots(),
+                                builder: (BuildContext context,
+                                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                                  // Check if the snapshot has an error
+                                  if (snapshot.hasError) {
+                                    return Center(
+                                      child: Text(
+                                        "Something went wrong!",
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.redAccent,
+                                        ),
+                                      ),
+                                    );
+                                  }
+                                  if (snapshot.connectionState ==
+                                      ConnectionState.waiting) {
+                                    return Center(
+                                      child:
+                                      CircularProgressIndicator(color: Colors.red),
+                                    );
+                                  }
+
+                                  if (snapshot.data?.size == 0) {
+                                    return Center(
+                                      child: Text('Nothing to fetch here.'),
+                                    );
+                                  }
+
+                                  return ListView.builder(
+                                    physics: BouncingScrollPhysics(),
+                                    itemCount: snapshot.data!.docs.length,
+                                    // Use the length of the fetched data
+                                    itemBuilder: (context, index) {
+                                      Map<String, dynamic> data =
+                                      snapshot.data!.docs[index].data()!
+                                      as Map<String, dynamic>;
+                                      String? roomUuId = data['roomDocId'];
+                                      Timestamp timestamp = data['createdAt'];
+                                      DateTime date = timestamp.toDate();
+                                      String formattedDate =
+                                      DateFormat('EEE - MMM d, yyyy').format(date);
+
+                                      return GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            rBHouseDocId = data['docID'];
+                                          });
+                                          print(rBHouseDocId);
+                                          Navigator.pushNamed(
+                                              context, '/ViewReservationScreen');
+                                        },
+                                        child: Padding(
+                                          padding: const EdgeInsets.only(top: 10),
+                                          child: Container(
+                                            height: 90,
+                                            decoration: BoxDecoration(
+                                              color: Colors.white,
+                                              borderRadius: BorderRadius.circular(10),
+                                              boxShadow: [],
+                                            ),
+                                            child: Row(
+                                              children: [
+                                                Expanded(
+                                                  child: Container(
+                                                    color: Colors.white,
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                      children: [
+                                                        Row(
+                                                          children: [
+                                                            '${data['roomNumber']}'
+                                                                .text
+                                                                .bold
+                                                                .size(15)
+                                                                .make(),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            '${data['boardersName']}'
+                                                                .text
+                                                                .color(Colors.grey)
+                                                                .make(),
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            '$formattedDate'
+                                                                .text
+                                                                .size(12)
+                                                                .light
+                                                                .color(Colors.grey)
+                                                                .make(),
+                                                          ],
+                                                        ),
+                                                        Divider(),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                                Container(
+                                                  padding: EdgeInsets.only(
+                                                      left: 10, right: 0),
+                                                  child: Row(
+                                                    children: [
+                                                      Text(
+                                                        'View', // Rating
+                                                        style: TextStyle(
+                                                          fontSize: 12,
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                        ),
+                                      );
+                                    },
+                                  );
+                                },
+                              ),
                             ],
                           ),
-                          SizedBox(height: 5),
-                        ],
-                      ),
-                    )
-                  : SizedBox(),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 20, left: 20),
+                        )
+                      ],
+                    ),
+                  ),
+                ),
+              ) : Padding(
+                padding: const EdgeInsets.only(right: 20, left: 20, top: 10),
                 child: Container(
                   height: 500,
                   width: double.infinity,
                   child: StreamBuilder<QuerySnapshot>(
                     stream: search == null || search == ""
                         ? FirebaseFirestore.instance
-                            .collection("BoardingHouses")
-                            .where('verified', isEqualTo: true)
-                            .snapshots()
+                        .collection("BoardingHouses")
+                        .where('verified', isEqualTo: true)
+                        .snapshots()
                         : FirebaseFirestore.instance
-                            .collection("BoardingHouses")
-                            .where('BoardingHouseName',
-                                isGreaterThanOrEqualTo: search)
-                            .snapshots(),
+                        .collection("BoardingHouses")
+                        .where('BoardingHouseName',
+                        isGreaterThanOrEqualTo: search)
+                        .snapshots(),
                     builder: (context, snapshot) {
                       if (snapshot.hasError) {
                         return Center(
@@ -596,7 +947,7 @@ class _HomeScreenState extends State<HomeScreen> {
                             itemCount: datas.length,
                             itemBuilder: (context, index) {
                               final data =
-                                  datas[index].data() as Map<String, dynamic>;
+                              datas[index].data() as Map<String, dynamic>;
                               return GestureDetector(
                                 onTap: () {
                                   setState(() {
@@ -605,7 +956,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   });
                                   Navigator.of(context).pushAndRemoveUntil(
                                     _toBhouseScreen(),
-                                    (Route<dynamic> route) => false,
+                                        (Route<dynamic> route) => false,
                                   );
                                 },
                                 child: Container(
@@ -628,8 +979,8 @@ class _HomeScreenState extends State<HomeScreen> {
                                                 decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius.circular(
-                                                            5),
+                                                    BorderRadius.circular(
+                                                        5),
                                                     boxShadow: [
                                                       BoxShadow(
                                                         color: Colors.grey
@@ -637,7 +988,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         spreadRadius: 1,
                                                         blurRadius: 3,
                                                         offset:
-                                                            Offset(0, 0.5),
+                                                        Offset(0, 0.5),
                                                       ),
                                                     ]),
                                                 child: Column(
@@ -646,43 +997,43 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       width: double.infinity,
                                                       height: 150,
                                                       decoration:
-                                                          BoxDecoration(
+                                                      BoxDecoration(
                                                         borderRadius:
-                                                            const BorderRadius
-                                                                .only(
+                                                        const BorderRadius
+                                                            .only(
                                                           topLeft:
-                                                              Radius.circular(
-                                                                  5),
+                                                          Radius.circular(
+                                                              5),
                                                           topRight:
-                                                              Radius.circular(
-                                                                  5),
+                                                          Radius.circular(
+                                                              5),
                                                         ),
                                                         image:
-                                                            DecorationImage(
+                                                        DecorationImage(
                                                           image:
-                                                              CachedNetworkImageProvider(
-                                                                  data[
-                                                                      'Image']),
+                                                          CachedNetworkImageProvider(
+                                                              data[
+                                                              'Image']),
                                                           fit: BoxFit.cover,
                                                         ),
                                                       ),
                                                     ),
                                                     Container(
                                                       padding:
-                                                          EdgeInsets.all(5),
+                                                      EdgeInsets.all(5),
                                                       width: double.infinity,
                                                       height: 70,
                                                       decoration:
-                                                          BoxDecoration(
+                                                      BoxDecoration(
                                                         borderRadius:
-                                                            const BorderRadius
-                                                                .only(
+                                                        const BorderRadius
+                                                            .only(
                                                           bottomLeft:
-                                                              Radius.circular(
-                                                                  5),
+                                                          Radius.circular(
+                                                              5),
                                                           bottomRight:
-                                                              Radius.circular(
-                                                                  5),
+                                                          Radius.circular(
+                                                              5),
                                                         ),
                                                       ),
                                                       child: Column(
@@ -693,7 +1044,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   child: '${data['BoardingHouseName']}'
                                                                       .text
                                                                       .overflow(
-                                                                          TextOverflow.ellipsis)
+                                                                      TextOverflow.ellipsis)
                                                                       .light
                                                                       .make())
                                                             ],
@@ -704,19 +1055,19 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                   child: '${data['address']}'
                                                                       .text
                                                                       .overflow(TextOverflow
-                                                                          .ellipsis)
+                                                                      .ellipsis)
                                                                       .size(
-                                                                          10)
+                                                                      10)
                                                                       .color(Colors
-                                                                          .grey)
+                                                                      .grey)
                                                                       .make())
                                                             ],
                                                           ),
                                                           Spacer(),
                                                           Row(
                                                             mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
+                                                            MainAxisAlignment
+                                                                .end,
                                                             children: [
                                                               Icon(
                                                                 Icons.star,
@@ -778,7 +1129,8 @@ class _HomeScreenState extends State<HomeScreen> {
                     },
                   ),
                 ),
-              )
+              ),
+              //
             ],
           ),
         ),
@@ -827,7 +1179,7 @@ class _HomeScreenState extends State<HomeScreen> {
   Route _toNotificationScreen() {
     return PageRouteBuilder(
       pageBuilder: (context, animation, anotherAnimation) =>
-          NotificationScreen(),
+          NotificationScreen(boardersID: bUuId),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -839,7 +1191,7 @@ class _HomeScreenState extends State<HomeScreen> {
         return SlideTransition(
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
-            child: NotificationScreen());
+            child: NotificationScreen(boardersID: bUuId));
       },
     );
   }

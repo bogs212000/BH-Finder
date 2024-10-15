@@ -21,6 +21,7 @@ class RoomScreen extends StatefulWidget {
 
 class _RoomScreenState extends State<RoomScreen> {
   late Future<DocumentSnapshot> bHouseRoom;
+  User? currentUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -62,8 +63,8 @@ class _RoomScreenState extends State<RoomScreen> {
                 width: double.infinity,
                 decoration: BoxDecoration(
                   image: DecorationImage(
-                    image: NetworkImage(
-                      'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                    image: CachedNetworkImageProvider(
+                      data['roomImage'] ?? 'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                     ), // Replace with your own image URL
                     fit: BoxFit.cover,
                   ),
@@ -208,8 +209,8 @@ class _RoomScreenState extends State<RoomScreen> {
                                               borderRadius:
                                               BorderRadius.circular(10),
                                               image: DecorationImage(
-                                                image: NetworkImage(
-                                                  'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                                image: CachedNetworkImageProvider(
+                                                  data['roomImage'] ?? 'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                                                 ),
                                                 // Replace with your own image URL
                                                 fit: BoxFit.cover,
@@ -265,6 +266,34 @@ class _RoomScreenState extends State<RoomScreen> {
                           ),
                         ),
                         Spacer(),
+                        currentUser != null ? Padding(
+                          padding: EdgeInsets.only(top: 40, right: 20),
+                          child: GestureDetector(onTap: (){
+                            setState(() {
+                              ownerEmail = data['Email'].toString();
+                              bHouse = data['BoardingHouseName'].toString();
+                            });
+                            print('$ownerEmail, $bHouse');
+                            Navigator.pushNamed(context, '/ChatOwner');
+                          },
+                            child: Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                border: Border.all(color: Colors.grey, width: 0.3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.chat_outlined,
+                                  size: 20,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ) : SizedBox(),
                       ],
                     ),
                     Spacer(),
@@ -362,6 +391,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                       BhouseName = data['bHouseName'];
                                       roomPrice = data['price'];
                                       roomNumber = data['roomNameNumber'];
+                                      roomId = data['roomDocId'];
                                     });
                                     Navigator.pushNamed(
                                         context, '/BoarderReservationScreen');
@@ -383,16 +413,20 @@ class _RoomScreenState extends State<RoomScreen> {
                               ),
                             ),
                             SizedBox(width: 10),
-                            Container(
-                              width: 50,
-                              height: 50,
-                              decoration: BoxDecoration(
-                                  color: Colors.blue.withOpacity(0.2),
-                                  borderRadius: BorderRadius.circular(25)),
-                              child: Center(
-                                child: Icon(
-                                  Icons.call,
-                                  color: Colors.blueAccent,
+                            GestureDetector( onTap: (){
+
+                            },
+                              child: Container(
+                                width: 50,
+                                height: 50,
+                                decoration: BoxDecoration(
+                                    color: Colors.blue.withOpacity(0.2),
+                                    borderRadius: BorderRadius.circular(25)),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.chat,
+                                    color: Colors.blueAccent,
+                                  ),
                                 ),
                               ),
                             ),
