@@ -131,19 +131,21 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                       .size(15)
                                       .make(),
                                   Spacer(),
-                                  GestureDetector(
-                                    onTap: () async {
-                                      FlutterPhoneDirectCaller.callNumber(
-                                          '${data['boardersConNumber']}');
-                                    },
-                                    child: const CircleAvatar(
-                                      radius: 15,
-                                      child: Icon(
-                                        Icons.call,
-                                        size: 15,
-                                      ),
-                                    ),
-                                  ),
+                                  userRole == 'Boarder'
+                                      ? SizedBox()
+                                      : GestureDetector(
+                                          onTap: () async {
+                                            FlutterPhoneDirectCaller.callNumber(
+                                                '${data['boardersConNumber']}');
+                                          },
+                                          child: const CircleAvatar(
+                                            radius: 15,
+                                            child: Icon(
+                                              Icons.call,
+                                              size: 15,
+                                            ),
+                                          ),
+                                        ),
                                 ],
                               ),
                               Divider(),
@@ -231,118 +233,382 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                 ],
                               ),
                               SizedBox(height: 15),
-                              Row(
-                                mainAxisAlignment: MainAxisAlignment.end,
-                                children: [
-                                  SizedBox(
-                                    height: 40,
-                                    child: ElevatedButton(
-                                      onPressed: () {},
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor: Colors.red,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                        ),
-                                        elevation: 5,
-                                      ),
-                                      child: 'REJECT'.text.bold.size(15).make(),
-                                    ),
-                                  ),
-                                  SizedBox(width: 5),
-                                  SizedBox(
-                                    height: 40,
-                                    child:ElevatedButton(
-                                      onPressed: () async {
-                                        // Show a loading dialog while processing
-                                        QuickAlert.show(
-                                          context: context,
-                                          type: QuickAlertType.loading,
-                                          title: 'Loading',
-                                          text: 'Please Wait...',
-                                        );
+                              userRole == 'Boarder'
+                                  ? SizedBox()
+                                  : Row(
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: [
+                                        data['status'] == 'rejected'
+                                            ? 'Reservation has been rejected.'
+                                                .text
+                                                .color(Colors.red)
+                                                .make()
+                                            : SizedBox(
+                                                height: 40,
+                                                child: ElevatedButton(
+                                                  onPressed: () async {
+                                                    QuickAlert.show(
+                                                      context: context,
+                                                      type: QuickAlertType
+                                                          .loading,
+                                                      title: 'Loading',
+                                                      text: 'Please Wait...',
+                                                    );
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection(
+                                                            'Reservations')
+                                                        .doc(data['docID'])
+                                                        .update({
+                                                      'status': 'canceled',
+                                                    });
+                                                    //increment notification
+                                                    await FirebaseFirestore.instance.collection('Users').doc(data['boarderEmail']).update({
+                                                      'notification': FieldValue.increment(1),
+                                                    });
 
-                                        try {
-                                          // Update the 'Rooms' collection
-                                          await FirebaseFirestore.instance.collection('Rooms').doc('${data['roomId']}').update({
-                                            'boarderID': data['boarderUuId'],
-                                            'boardersConNumber': data['boardersConNumber'],
-                                            'boardersIn': data['checkIn'],
-                                            'boardersOut': data['checkOut'],
-                                            'boardersName': data['boardersName'],
-                                            'totalToPay': '',
-                                            'roomStatus': 'unavailable',
-                                            'paid?': false,
-                                          });
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection(
+                                                            'Notifications')
+                                                        .doc()
+                                                        .set({
+                                                      'createdAt':
+                                                          DateTime.now(),
+                                                      'message':
+                                                          "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been rejected. If you have any questions or need assistance, please don't hesitate to reach out.",
+                                                      'boarderID':
+                                                          data['boarderUuId'],
+                                                      'status': false,
+                                                    });
 
-                                          // Add a notification in the 'Notifications' collection
-                                          await FirebaseFirestore.instance.collection('Notifications').doc().set({
-                                            'createdAt': DateTime.now(),
-                                            'message': "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you!",
-                                            'boarderID': data['boarderUuId'],
-                                            'status': false,
-                                          });
+                                                    Navigator.pop(context);
 
-                                          // Update the 'read' field for all reservations where boarderUuId is not equal to the given ID
-                                          QuerySnapshot querySnapshot = await FirebaseFirestore.instance.collection('Reservations').where('boarderUuId', isNotEqualTo: data['boarderUuId']).get();
+                                                    // Show a success dialog
+                                                    QuickAlert.show(
+                                                      context: context,
+                                                      type: QuickAlertType
+                                                          .success,
+                                                      title: 'Success!',
+                                                      text:
+                                                          'The reservation has been rejected',
+                                                      onConfirmBtnTap: () {
+                                                        Navigator.pop(
+                                                            context); // Close the success dialog
+                                                        Navigator.of(context)
+                                                            .pushAndRemoveUntil(
+                                                          MaterialPageRoute(
+                                                              builder: (context) =>
+                                                                  OwnerHomeScreen()),
+                                                          (Route<dynamic>
+                                                                  route) =>
+                                                              false, // Remove all previous routes
+                                                        );
+                                                      },
+                                                    );
+                                                  },
+                                                  style:
+                                                      ElevatedButton.styleFrom(
+                                                    foregroundColor:
+                                                        Colors.white,
+                                                    backgroundColor: Colors.red,
+                                                    shape:
+                                                        RoundedRectangleBorder(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    ),
+                                                    elevation: 5,
+                                                  ),
+                                                  child: 'REJECT'
+                                                      .text
+                                                      .bold
+                                                      .size(15)
+                                                      .make(),
+                                                ),
+                                              ),
+                                        SizedBox(width: 5),
+                                        if (data['status'] == 'accepted')
+                                          SizedBox(
+                                            height: 40,
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                // Show a loading dialog while processing
+                                                QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.loading,
+                                                  title: 'Loading',
+                                                  text: 'Please Wait...',
+                                                );
 
-                                          for (QueryDocumentSnapshot doc in querySnapshot.docs) {
-                                            await doc.reference.update({
-                                              'read': true, // The field and value to update
-                                            });
-                                          }
+                                                try {
+                                                  // Update the 'Rooms' collection
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Rooms')
+                                                      .doc('${data['roomId']}')
+                                                      .update({
+                                                    'boarderID': '',
+                                                    'boardersConNumber': '',
+                                                    'boardersIn': '',
+                                                    'boardersOut': '',
+                                                    'boardersName': '',
+                                                    'totalToPay': '',
+                                                    'roomStatus': 'available',
+                                                    'paid?': false,
+                                                  });
 
-                                          // Close the loading dialog
-                                          Navigator.pop(context);
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Reservations')
+                                                      .doc(data['docID'])
+                                                      .update({
+                                                    'status': 'canceled',
+                                                  });
 
-                                          // Show a success dialog
-                                          QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.success,
-                                            title: 'Success!',
-                                            text: 'The reservation has been successfully accepted.',
-                                            onConfirmBtnTap: () {
-                                              Navigator.pop(context); // Close the success dialog
-                                              Navigator.of(context).pushAndRemoveUntil(
-                                                MaterialPageRoute(builder: (context) => OwnerHomeScreen()),
-                                                    (Route<dynamic> route) => false, // Remove all previous routes
-                                              );
-                                            },
-                                          );
-                                        } on FirebaseAuthException catch (e) {
-                                          // Handle authentication errors (e.g., user not authenticated)
-                                          Navigator.pop(context); // Close the loading dialog
-                                          QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.error,
-                                            title: 'Error',
-                                            text: 'Failed to process the reservation. Please try again.',
-                                          );
-                                        } catch (e) {
-                                          // Handle other potential exceptions
-                                          Navigator.pop(context); // Close the loading dialog
-                                          QuickAlert.show(
-                                            context: context,
-                                            type: QuickAlertType.error,
-                                            title: 'Error',
-                                            text: 'An unexpected error occurred: $e',
-                                          );
-                                        }
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        foregroundColor: Colors.white,
-                                        backgroundColor: Colors.green,
-                                        shape: RoundedRectangleBorder(
-                                          borderRadius: BorderRadius.circular(20),
-                                        ),
-                                        elevation: 5,
-                                      ),
-                                      child: 'ACCEPT'.text.bold.size(15).make(),
-                                    ),
-                                  ),
-                                ],
-                              )
+                                                  //increment notification
+                                                  await FirebaseFirestore.instance.collection('Users').doc(data['boarderEmail']).update({
+                                                    'notification': FieldValue.increment(1),
+                                                  });
+
+                                                  // Add a notification in the 'Notifications' collection
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Notifications')
+                                                      .doc()
+                                                      .set({
+                                                    'createdAt': DateTime.now(),
+                                                    'message':
+                                                        "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been canceled. If you have any questions or need assistance, please don't hesitate to reach out.",
+                                                    'boarderID':
+                                                        data['boarderUuId'],
+                                                    'status': false,
+                                                  });
+
+                                                  Navigator.pop(context);
+
+                                                  // Show a success dialog
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type:
+                                                        QuickAlertType.success,
+                                                    title: 'Success!',
+                                                    text:
+                                                        'The reservation has been successfully canceled',
+                                                    onConfirmBtnTap: () {
+                                                      Navigator.pop(
+                                                          context); // Close the success dialog
+                                                      Navigator.of(context)
+                                                          .pushAndRemoveUntil(
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                OwnerHomeScreen()),
+                                                        (Route<dynamic>
+                                                                route) =>
+                                                            false, // Remove all previous routes
+                                                      );
+                                                    },
+                                                  );
+                                                } on FirebaseAuthException catch (e) {
+                                                  // Handle authentication errors (e.g., user not authenticated)
+                                                  Navigator.pop(
+                                                      context); // Close the loading dialog
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type: QuickAlertType.error,
+                                                    title: 'Error',
+                                                    text:
+                                                        'Failed to process the reservation. Please try again.',
+                                                  );
+                                                } catch (e) {
+                                                  // Handle other potential exceptions
+                                                  Navigator.pop(
+                                                      context); // Close the loading dialog
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type: QuickAlertType.error,
+                                                    title: 'Error',
+                                                    text:
+                                                        'An unexpected error occurred: $e',
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                backgroundColor: Colors.green,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                                elevation: 5,
+                                              ),
+                                              child: 'CANCEL'
+                                                  .text
+                                                  .bold
+                                                  .size(15)
+                                                  .make(),
+                                            ),
+                                          ),
+                                        if (data['status'] == 'pending')
+                                          SizedBox(
+                                            height: 40,
+                                            child: ElevatedButton(
+                                              onPressed: () async {
+                                                // Show a loading dialog while processing
+                                                QuickAlert.show(
+                                                  context: context,
+                                                  type: QuickAlertType.loading,
+                                                  title: 'Loading',
+                                                  text: 'Please Wait...',
+                                                );
+
+                                                try {
+                                                  // Update the 'Rooms' collection
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Rooms')
+                                                      .doc('${data['roomId']}')
+                                                      .update({
+                                                    'boarderID':
+                                                        data['boarderUuId'],
+                                                    'boardersConNumber': data[
+                                                        'boardersConNumber'],
+                                                    'boardersIn':
+                                                        data['checkIn'],
+                                                    'boardersOut':
+                                                        data['checkOut'],
+                                                    'boardersName':
+                                                        data['boardersName'],
+                                                    'totalToPay': '',
+                                                    'roomStatus': 'unavailable',
+                                                    'paid?': false,
+                                                    'boarderEmail': data['boarderEmail']
+                                                  });
+
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Reservations')
+                                                      .doc(data['docID'])
+                                                      .update({
+                                                    'status': 'accepted',
+                                                  });
+
+                                                  //increment notification
+                                                  await FirebaseFirestore.instance.collection('Users').doc(data['boarderEmail']).update({
+                                                    'notification': FieldValue.increment(1),
+                                                  });
+
+                                                  // Add a notification in the 'Notifications' collection
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Notifications')
+                                                      .doc()
+                                                      .set({
+                                                    'createdAt': DateTime.now(),
+                                                    'message':
+                                                        "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you!",
+                                                    'boarderID':
+                                                        data['boarderUuId'],
+                                                    'status': false,
+                                                  });
+
+                                                  // Update the 'read' field for all reservations where boarderUuId is not equal to the given ID
+                                                  QuerySnapshot querySnapshot =
+                                                      await FirebaseFirestore
+                                                          .instance
+                                                          .collection(
+                                                              'Reservations')
+                                                          .where('roomId',
+                                                              isEqualTo: data[
+                                                                  'roomId'])
+                                                          .where('boarderUuId',
+                                                              isNotEqualTo: data[
+                                                                  'boarderUuId'])
+                                                          .get();
+
+                                                  for (QueryDocumentSnapshot doc
+                                                      in querySnapshot.docs) {
+                                                    await doc.reference.update({
+                                                      'status': 'rejected',
+                                                      // The field and value to update
+                                                    });
+                                                  }
+
+                                                  // Close the loading dialog
+                                                  Navigator.pop(context);
+
+                                                  // Show a success dialog
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type:
+                                                        QuickAlertType.success,
+                                                    title: 'Success!',
+                                                    text:
+                                                        'The reservation has been successfully accepted.',
+                                                    onConfirmBtnTap: () {
+                                                      Navigator.pop(
+                                                          context); // Close the success dialog
+                                                      Navigator.of(context)
+                                                          .pushAndRemoveUntil(
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                OwnerHomeScreen()),
+                                                        (Route<dynamic>
+                                                                route) =>
+                                                            false, // Remove all previous routes
+                                                      );
+                                                    },
+                                                  );
+                                                } on FirebaseAuthException catch (e) {
+                                                  // Handle authentication errors (e.g., user not authenticated)
+                                                  Navigator.pop(
+                                                      context); // Close the loading dialog
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type: QuickAlertType.error,
+                                                    title: 'Error',
+                                                    text:
+                                                        'Failed to process the reservation. Please try again.',
+                                                  );
+                                                } catch (e) {
+                                                  // Handle other potential exceptions
+                                                  Navigator.pop(
+                                                      context); // Close the loading dialog
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type: QuickAlertType.error,
+                                                    title: 'Error',
+                                                    text:
+                                                        'An unexpected error occurred: $e',
+                                                  );
+                                                }
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                foregroundColor: Colors.white,
+                                                backgroundColor: Colors.green,
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                ),
+                                                elevation: 5,
+                                              ),
+                                              child: 'ACCEPT'
+                                                  .text
+                                                  .bold
+                                                  .size(15)
+                                                  .make(),
+                                            ),
+                                          ),
+                                        if (data['status'] == 'canceled')
+                                          'Reservations has been canceled'
+                                              .text
+                                              .make(),
+                                      ],
+                                    )
                             ],
                           ),
                         ),

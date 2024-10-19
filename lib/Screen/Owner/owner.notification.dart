@@ -5,18 +5,19 @@ import 'package:lottie/lottie.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
+import '../../cons.dart';
 import '../Home/home.screen.dart';
+import 'owner.home.screen.dart';
 
-class NotificationScreen extends StatefulWidget {
-  final String? boardersID;
-  const NotificationScreen({super.key, this.boardersID});
-  
-  
+class OwnerNotificationScreen extends StatefulWidget {
+  const OwnerNotificationScreen({super.key,});
+
+
   @override
-  State<NotificationScreen> createState() => _NotificationScreenState();
+  State<OwnerNotificationScreen> createState() => _OwnerNotificationScreenState();
 }
 
-class _NotificationScreenState extends State<NotificationScreen> {
+class _OwnerNotificationScreenState extends State<OwnerNotificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -73,14 +74,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
               .collection("Notifications")
               .where('boarderID',
               isEqualTo:
-              widget.boardersID.toString()).orderBy('createdAt', descending: true)
+              ownerID.toString()).orderBy('createdAt', descending: true)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return Row(
+              return const Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: const [
+                children: [
                   Text(
                     "Somthing went wrong!",
                     textAlign: TextAlign.center,
@@ -199,7 +200,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
   Route _toHomeScreen() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => HomeScreen(),
+      pageBuilder: (context, animation, anotherAnimation) => OwnerHomeScreen(),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -212,7 +213,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
             // textDirection: TextDirection.rtl,
-            child: HomeScreen());
+            child: OwnerHomeScreen());
       },
     );
   }

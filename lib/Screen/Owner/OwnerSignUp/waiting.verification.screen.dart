@@ -2,8 +2,12 @@
 
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/owner.signup.data.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import '../../../Auth/auth.wrapper.dart';
 
 class WaitingVerificationScreen extends StatefulWidget {
   const WaitingVerificationScreen({super.key});
@@ -17,21 +21,17 @@ class _WaitingVerificationScreenState extends State<WaitingVerificationScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: ''.text.make(),
-      ),
       body: Stack(
         children: [
           Container(
-            padding: EdgeInsets.all(20),
+            padding: EdgeInsets.only(left: 20, right: 20, bottom: 20),
             color: Colors.white,
             width: double.infinity,
             height: double.infinity,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
+                Lottie.asset('assets/lottie/119400-waiting.json', height: 100),
                 'We are currently reviewing your data, which may take 1 to 3 hours. Please check back later.'
                     .text.size(16)
                     .make()
@@ -49,7 +49,16 @@ class _WaitingVerificationScreenState extends State<WaitingVerificationScreen> {
                   child: SizedBox(
                     height: 40,
                     child: ElevatedButton(
-                      onPressed: () async {},
+                      onPressed: () async {
+                        await FirebaseAuth.instance.signOut();
+                        Navigator.of(context).pushAndRemoveUntil(
+                          MaterialPageRoute(
+                            builder: (context) => AuthWrapper(),
+                          ),
+                              (Route<dynamic> route) =>
+                          false, // Removes all previous routes
+                        );
+                      },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color(0xFF31355C),
                         shape: RoundedRectangleBorder(
@@ -60,7 +69,7 @@ class _WaitingVerificationScreenState extends State<WaitingVerificationScreen> {
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [
                           Text(
-                            "Next",
+                            "Back to Log In",
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 18,

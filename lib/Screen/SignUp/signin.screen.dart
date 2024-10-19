@@ -8,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -195,45 +197,73 @@ class _SignInScreenState extends State<SignInScreen> {
                                   errors =
                                       'Please input your email and password';
                                 });
-                                _toast();
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: '$errors',
+                                );
                               } else if (_emailPhonenumber.text.isEmpty) {
                                 setState(() {
                                   errors = 'Please input your email';
                                 });
-                                _toast();
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: '$errors',
+                                );
                               } else if (_password.text.isEmpty) {
                                 setState(() {
                                   errors = 'Please input your password';
                                 });
-                                _toast();
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: '$errors',
+                                );
                               } else {
-                                setState(() {
-                                  loadingLogin = true;
-                                });
+                                QuickAlert.show(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  type: QuickAlertType.loading,
+                                  title: 'Signing in...',
+                                  text: 'Please Wait',
+                                );
                                 try {
                                   await FirebaseAuth.instance
                                       .signInWithEmailAndPassword(
                                     email: _emailPhonenumber.text.trim(),
                                     password: _password.text.trim(),
                                   );
-                                  print('haha 1');
-                                  setState(() {
-                                    loadingLogin = false;
-                                  });
-                                  print('haha 2');
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    MaterialPageRoute(
-                                        builder: (context) => AuthWrapper()),
-                                    (Route<dynamic> route) => false,
+                                  Navigator.pop(context);
+                                  Navigator.of(context).popUntil((route) => route.isFirst);  // Close all pop-ups
+
+                                  // Navigate to HomeScreen after closing pop-ups
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(builder: (context) => Wrapper()),  // Replace with your HomeScreen
                                   );
-                                  print('haha 3');
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: 'Hello!',
+                                    text: 'Welcome to BH Finder app!',
+                                  );
+
                                 } on FirebaseAuthException catch (e) {
+                                  Navigator.pop(context);
                                   setState(() {
-                                    loadingLogin = false;
                                     errors = e
                                         .message; // Show a user-friendly error message
                                   });
-                                  _toast();
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: 'Error',
+                                    text: '$errors',
+                                  );
                                   print('Error: $e');
                                 }
                               }
@@ -297,6 +327,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         ),
                       ),
                       SizedBox(height: 30)
+
                     ],
                   ),
                 ),

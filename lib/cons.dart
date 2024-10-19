@@ -36,6 +36,7 @@ String? lName;
 String? bPhoneNumber;
 String? bUuId;
 String? bAddress;
+String? ownerID;
 
 //currently boarding data
 String? cBHouseName;
@@ -59,3 +60,9 @@ String? boardersEmail;
 
 double? bHouseLat;
 double? bHouseLong;
+
+//chat
+String? chatName;
+String? chatEmail;
+
+bool? reserved = false;

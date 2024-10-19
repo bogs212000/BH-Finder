@@ -7,6 +7,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../cons.dart';
@@ -62,9 +63,40 @@ class _ChatListState extends State<ChatList> {
                 );
               }
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: Lottie.asset('assets/lottie/animation_loading.json',
-                      width: 100, height: 100),
+                return Column(
+                  children: [
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade200,
+                      highlightColor: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade200,
+                      highlightColor: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               }
               if (snapshot.data?.size == 0) {
@@ -92,6 +124,7 @@ class _ChatListState extends State<ChatList> {
                       onTap: () {
                         setState(() {
                           ownerEmail = data['ownerEmail'].toString();
+                          bHouse = data['bHouse'];
                         });
                         Navigator.push(
                           context,

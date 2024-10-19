@@ -5,3 +5,4 @@ String? ownerMiddleName;
 String? ownerLastName;
 String? ownerContactNumber;
 String? boardingHouseName;
+String? boardingHouseAddress;

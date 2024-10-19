@@ -6,10 +6,14 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/v1.dart';
 import 'package:uuid/v4.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+import '../../Auth/auth.wrapper.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -34,6 +38,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
   bool verified = false;
   bool loading = false;
   String? error;
+
+  bool emailExists = false;
+  bool isChecking = false;
+
+  // Function to check if the email exists in Firestore
+  Future<void> checkEmailExists(String email) async {
+    if (email.isEmpty) {
+      setState(() {
+        emailExists = false;
+      });
+      return;
+    }
+
+    setState(() {
+      isChecking = true; // Show loading while checking
+    });
+
+    try {
+      // Reference the collection where the email is stored as document ID
+      DocumentSnapshot emailDoc = await FirebaseFirestore.instance
+          .collection('Users') // Replace with your collection name
+          .doc(email)
+          .get();
+
+      setState(() {
+        emailExists = emailDoc.exists;
+      });
+    } catch (e) {
+      print("Error checking email existence: $e");
+      setState(() {
+        emailExists = false;
+      });
+    } finally {
+      setState(() {
+        isChecking = false; // Stop loading
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -84,6 +126,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               labelText: 'First Name',
                             ),
+                            inputFormatters: [
+                              // Formatter to convert input to uppercase
+                              TextInputFormatter.withFunction(
+                                    (oldValue, newValue) => TextEditingValue(
+                                  text: newValue.text.toUpperCase(),
+                                  selection: newValue.selection,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Padding(
@@ -110,6 +161,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               labelText: 'Middle Name',
                             ),
+                            inputFormatters: [
+                              // Formatter to convert input to uppercase
+                              TextInputFormatter.withFunction(
+                                    (oldValue, newValue) => TextEditingValue(
+                                  text: newValue.text.toUpperCase(),
+                                  selection: newValue.selection,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Padding(
@@ -136,6 +196,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               labelText: 'Last Name',
                             ),
+                            inputFormatters: [
+                              // Formatter to convert input to uppercase
+                              TextInputFormatter.withFunction(
+                                    (oldValue, newValue) => TextEditingValue(
+                                  text: newValue.text.toUpperCase(),
+                                  selection: newValue.selection,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Padding(
@@ -162,6 +231,15 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               labelText: 'Address',
                             ),
+                            inputFormatters: [
+                              // Formatter to convert input to uppercase
+                              TextInputFormatter.withFunction(
+                                    (oldValue, newValue) => TextEditingValue(
+                                  text: newValue.text.toUpperCase(),
+                                  selection: newValue.selection,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                         Padding(
@@ -196,7 +274,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         ),
                         Padding(
                           padding: const EdgeInsets.only(
-                              left: 5, right: 5, bottom: 20),
+                              left: 5, right: 5, bottom: 5),
                           child: TextField(
                             controller: _email,
                             keyboardType: TextInputType.name,
@@ -218,11 +296,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
                               ),
                               labelText: 'Email',
                             ),
+                            onChanged: (email) {
+                              // Perform the check as the user types
+                              checkEmailExists(email.trim());
+                            },
                           ),
                         ),
+                        _email.text.isNotEmpty ? isChecking
+                            ? CircularProgressIndicator() // Show loading while checking
+                            : Text(
+                          emailExists
+                              ? 'This email address is already registered.'
+                              : '',
+                          style: TextStyle(
+                            color: emailExists ? Colors.red : Colors.green,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ) : SizedBox(),
                         Padding(
                           padding: const EdgeInsets.only(
-                              left: 5, right: 5, bottom: 20),
+                              left: 5, right: 5, bottom: 20, top: 15),
                           child: TextField(
                             controller: _password,
                             keyboardType: TextInputType.name,
@@ -279,9 +372,12 @@ class _SignUpScreenState extends State<SignUpScreen> {
                             height: 40,
                             child: ElevatedButton(
                               onPressed: () async {
-                                setState(() {
-                                  loading = true;
-                                });
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.loading,
+                                  title: 'Loading...',
+                                  text: 'Please Wait',
+                                );
                                 if (firstName.text.isEmpty ||
                                     middleName.text.isEmpty ||
                                     lastName.text.isEmpty ||
@@ -290,33 +386,45 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                     _email.text.isEmpty ||
                                     _password.text.isEmpty) {
                                   setState(() {
-                                    loading = false;
                                     error =
                                         'Please complete the required details';
                                   });
-                                  _toast();
+                                  Navigator.pop(context);
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: 'Error',
+                                    text: '$error',
+                                  );
                                 } else if (_password.text !=
                                     _confirmPassword.text) {
                                   setState(() {
-                                    loading = false;
                                     error = 'Password do not match';
                                   });
-                                  _toast();
+                                  Navigator.pop(context);
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: 'Error',
+                                    text: '$error',
+                                  );
+                                } else if (emailExists == true) {
+                                  setState(() {
+                                    error = 'This email is already associated with an account.';
+                                  });
+                                  Navigator.pop(context);
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: 'Error',
+                                    text: '$error',
+                                  );
                                 } else {
                                   print('haha');
                                     try {
                                       // Generate a unique identifier for the user
                                       String uuId = Uuid().v4();
                                       print('Generated UUID: $uuId');
-
-                                      // Create user with email and password
-                                      UserCredential userCredential = await _auth.createUserWithEmailAndPassword(
-                                        email: _email.text.trim(),
-                                        password: _password.text.trim(),
-                                      );
-
-                                      // Get the user object
-                                      User? user = userCredential.user;
 
                                       // Store user profile information in Firestore
                                       await FirebaseFirestore.instance.collection('Users').doc(_email.text.trim()).set({
@@ -331,24 +439,48 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         'address': address.text,
                                         'Image': '', // Placeholder for user image
                                         'PhoneNumber': contactNumber.text,
+                                        'notification': 0,
                                         'verified': true,
                                       });
-                                      print("Verification email sent.");
-                                      firstName.clear();
-                                      middleName.clear();
-                                      lastName.clear();
-                                      address.clear();
-                                      _email.clear();
-                                      _password.clear();
-                                      _confirmPassword.clear();
-                                      contactNumber.clear();
-                                      setState(() {
-                                        loading = false;
-                                      });
+                                      Navigator.of(context);
+                                      QuickAlert.show(
+                                        barrierDismissible: false,
+                                        onConfirmBtnTap: (){
+
+                                          print("Verification email sent.");
+                                          firstName.clear();
+                                          middleName.clear();
+                                          lastName.clear();
+                                          address.clear();
+                                          _email.clear();
+                                          _password.clear();
+                                          _confirmPassword.clear();
+                                          contactNumber.clear();
+                                          Navigator.of(context).pushReplacement(
+                                            MaterialPageRoute(
+                                                builder: (context) =>
+                                                    AuthWrapper()), // Change NextScreen() to your desired screen
+                                          );
+                                        },
+                                        context: context,
+                                        type: QuickAlertType.success,
+                                        title: 'Success!',
+                                        text: 'Please verify your email',
+                                      );
+                                      // Create user with email and password
+                                      await _auth.createUserWithEmailAndPassword(
+                                        email: _email.text.trim(),
+                                        password: _password.text.trim(),
+                                      );
+
                                     } on FirebaseAuthException catch (e) {
-                                      setState(() {
-                                        loading = false;
-                                      });
+                                      Navigator.pop(context);
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.error,
+                                        title: 'Error',
+                                        text: '$e',
+                                      );
                                       print(e);
                                     }
                                 }

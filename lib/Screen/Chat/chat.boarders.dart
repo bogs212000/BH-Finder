@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../cons.dart';
 
@@ -66,47 +67,71 @@ class _ChatBoardersState extends State<ChatBoarders> {
         children: [
           Expanded(
               child: Container(
-                child: StreamBuilder(
-                  stream: _firestore
-                      .collection('Chats')
-                      .doc('$boardersEmail+$currentEmail')
-                      .collection('Chats')
-                      .orderBy('createdAt', descending: false)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (!snapshot.hasData) {
-                      return Center(
-                        child: Lottie.asset('assets/lottie/animation_loading.json',
-                            width: 100, height: 100),
-                      );
-                    }
+            child: StreamBuilder(
+              stream: _firestore
+                  .collection('Chats')
+                  .doc('$boardersEmail+${FirebaseAuth.instance.currentUser?.email.toString()}')
+                  .collection('Chats')
+                  .orderBy('createdAt', descending: false)
+                  .snapshots(),
+              builder: (context, snapshot) {
+                if (!snapshot.hasData) {
+                  return Column(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Shimmer.fromColors(
+                              baseColor: Colors.grey.shade200,
+                              highlightColor: Colors.white,
+                              child: Padding(
+                                padding: EdgeInsets.only(left: 20, right: 20),
+                                child: Container(
+                                  height: 40,
+                                  width: 150,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.only(
+                                        topLeft: Radius.circular(20),
+                                        bottomLeft: Radius.circular(20),
+                                        topRight: Radius.circular(20)),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 30)
+                      ],);
+                }
 
-                    var messages = snapshot.data?.docs.reversed;
-                    List<MessageBubble> messageBubbles = [];
-                    for (var message in messages!) {
-                      final messageText = message['text'];
-                      final messageSender = message['sender'].toString();
-                      final time = message['date'].toString();
+                var messages = snapshot.data?.docs.reversed;
+                List<MessageBubble> messageBubbles = [];
+                for (var message in messages!) {
+                  final messageText = message['text'];
+                  final messageSender = message['sender'].toString();
+                  final time = message['date'].toString();
 
-                      final messageBubble = MessageBubble(
-                        sender: time,
-                        text: messageText,
-                        isMe: _auth.currentUser?.email == messageSender,
-                      );
-                      messageBubbles.add(messageBubble);
-                    }
-                    return Container(
-                      child: ListView.builder(
-                        reverse: true,
-                        itemCount: messageBubbles.length,
-                        itemBuilder: (context, index) {
-                          return messageBubbles[index];
-                        },
-                      ),
-                    );
-                  },
-                ),
-              )),
+                  final messageBubble = MessageBubble(
+                    sender: time,
+                    text: messageText,
+                    isMe: _auth.currentUser?.email == messageSender,
+                  );
+                  messageBubbles.add(messageBubble);
+                }
+                return Container(
+                  child: ListView.builder(
+                    reverse: true,
+                    itemCount: messageBubbles.length,
+                    itemBuilder: (context, index) {
+                      return messageBubbles[index];
+                    },
+                  ),
+                );
+              },
+            ),
+          )),
           SizedBox(height: 2),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceEvenly,
@@ -132,7 +157,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
                   onPressed: () {
                     DateTime nowChat = DateTime.now();
                     String formattedDate =
-                    DateFormat('EEEE, yyyy-MM-dd').format(nowChat);
+                        DateFormat('EEEE, yyyy-MM-dd').format(nowChat);
                     String formattedTime = DateFormat('h:mm a').format(nowChat);
                     String date = "$formattedDate, $formattedTime";
                     _sendMessage(date.toString());
@@ -161,13 +186,16 @@ class _ChatBoardersState extends State<ChatBoarders> {
     if (_messageController.text.trim().isNotEmpty) {
       await FirebaseFirestore.instance
           .collection('Chats')
-          .doc('$email+$ownerEmail')
+          .doc('$boardersEmail+${FirebaseAuth.instance.currentUser?.email.toString()}')
           .set({
-        'ownerEmail': ownerEmail,
-        'email': email,
+        'ownerEmail': FirebaseAuth.instance.currentUser?.email.toString(),
+        'email': boardersEmail,
         'bHouse': bHouse,
-        'name': 'name',
+        'name': chatName,
         'role': 'boarder',
+        'createdAt': DateTime.now(),
+        'seenBorder?': true,
+        'seenOwner?': false,
       });
 
       await _firestore
@@ -199,7 +227,7 @@ class MessageBubble extends StatelessWidget {
       padding: EdgeInsets.all(10),
       child: Column(
         crossAxisAlignment:
-        isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
         children: [
           Text(
             sender,
@@ -211,15 +239,15 @@ class MessageBubble extends StatelessWidget {
           Material(
             borderRadius: isMe
                 ? const BorderRadius.only(
-              topLeft: Radius.circular(20),
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            )
+                    topLeft: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  )
                 : const BorderRadius.only(
-              topRight: Radius.circular(20),
-              bottomLeft: Radius.circular(20),
-              bottomRight: Radius.circular(20),
-            ),
+                    topRight: Radius.circular(20),
+                    bottomLeft: Radius.circular(20),
+                    bottomRight: Radius.circular(20),
+                  ),
             elevation: 5,
             color: isMe ? Colors.blue : Colors.white,
             child: Padding(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'cons.dart';
 
@@ -35,7 +36,7 @@ Future<void> fetchBoarderData(Function setState) async {
   try {
     final snapshot = await FirebaseFirestore.instance
         .collection('Users')
-        .doc(currentEmail)
+        .doc(FirebaseAuth.instance.currentUser?.email.toString())
         .get();
 
     setState(() {
@@ -173,6 +174,7 @@ Future<void> fetchBhouseData(Function setState) async {
       setState(() {
         BhouseName = doc['BoardingHouseName'];
         bHouseRules = doc['Rules'];
+        bUuId = doc['OwnerUId'];
         print('$BhouseName');
         // fetchRoleError = false;
       });

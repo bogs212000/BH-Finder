@@ -1,19 +1,23 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:io';
-
+import 'package:path_provider/path_provider.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../../Auth/auth.wrapper.dart';
 import '../../Loading/loading.screen.dart';
 import 'owner.signup.data.dart';
 
-File?_imageID;
+File? _imageID;
 File? _imageBldgPermit;
 
 class OwnerSignupFirst extends StatefulWidget {
@@ -31,6 +35,7 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
   TextEditingController _ownerAddress = TextEditingController();
   String date = "";
   DateTime selectedDate = DateTime.now();
+  String? errors;
 
   _selectDate(BuildContext context) async {
     final DateTime? selected = await showDatePicker(
@@ -168,8 +173,14 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                         const EdgeInsets.only(left: 5, right: 5, bottom: 20),
                     child: TextField(
                       controller: _ownerContactNumber,
-                      keyboardType: TextInputType.name,
+                      keyboardType: TextInputType.number,
                       textAlign: TextAlign.left,
+                      inputFormatters: [
+                        LengthLimitingTextInputFormatter(11),
+                        // Limit input to 11 characters
+                        FilteringTextInputFormatter.digitsOnly,
+                        // Only allow digits
+                      ],
                       style: const TextStyle(
                         fontSize: 15,
                         fontWeight: FontWeight.bold,
@@ -262,17 +273,35 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                       height: 50,
                       child: ElevatedButton(
                         onPressed: () async {
-                          setState(() {
-                            ownerFirstName = _ownerFirstName.text.toString();
-                            ownerMiddleName = _ownerMiddleName.text.toString();
-                            ownerLastName = _ownerLastName.text.toString();
-                            ownerContactNumber =
-                                _ownerContactNumber.text.toString();
-                          });
-                          print(
-                              '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber');
-                          Navigator.pushNamed(
-                              context, '/OwnerSignupSecondScreen');
+                          if (_ownerFirstName.text.isEmpty ||
+                              _ownerMiddleName.text.isEmpty ||
+                              _ownerLastName.text.isEmpty ||
+                              _ownerAddress.text.isEmpty ||
+                              _ownerContactNumber.text.isEmpty ||
+                              _imageID == null) {
+                            setState(() {
+                              errors = 'Please complete the required details';
+                            });
+                            QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.error,
+                              title: 'Error',
+                              text: '$errors',
+                            );
+                          } else {
+                            setState(() {
+                              ownerFirstName = _ownerFirstName.text.toString();
+                              ownerMiddleName =
+                                  _ownerMiddleName.text.toString();
+                              ownerLastName = _ownerLastName.text.toString();
+                              ownerContactNumber =
+                                  _ownerContactNumber.text.toString();
+                            });
+                            print(
+                                '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber');
+                            Navigator.pushNamed(
+                                context, '/OwnerSignupSecondScreen');
+                          }
                         },
                         style: ElevatedButton.styleFrom(
                           backgroundColor: Color.fromRGBO(26, 60, 105, 1.0),
@@ -305,9 +334,7 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
             height: double.infinity,
             child: Column(
               mainAxisAlignment: MainAxisAlignment.end,
-              children: [
-
-              ],
+              children: [],
             ),
           ),
         ],
@@ -336,7 +363,6 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
   }
 }
 
-
 //Second
 class OwnerSignupSecond extends StatefulWidget {
   const OwnerSignupSecond({super.key});
@@ -348,11 +374,12 @@ class OwnerSignupSecond extends StatefulWidget {
 class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
   TextEditingController _boardingHouseName = TextEditingController();
   final _picker = ImagePicker();
+  String? errors;
 
   //IDs
   Future<void> _openImagePicker() async {
     final XFile? pickedImage =
-    await _picker.pickImage(source: ImageSource.camera);
+        await _picker.pickImage(source: ImageSource.camera);
     if (pickedImage != null) {
       setState(() {
         _imageBldgPermit = File(pickedImage.path);
@@ -418,31 +445,31 @@ class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
                     },
                     child: _imageBldgPermit != null
                         ? Container(
-                      width: double.infinity,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        image: DecorationImage(
-                          image: FileImage(_imageBldgPermit!),
-                          fit: BoxFit.cover,
-                        ),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    )
+                            width: double.infinity,
+                            height: 300,
+                            decoration: BoxDecoration(
+                              image: DecorationImage(
+                                image: FileImage(_imageBldgPermit!),
+                                fit: BoxFit.cover,
+                              ),
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          )
                         : Container(
-                      width: double.infinity,
-                      height: 300,
-                      decoration: BoxDecoration(
-                        color: Colors.blue[100],
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.camera_alt_rounded,
-                          color: Colors.blue[300],
-                          size: 50,
-                        ),
-                      ),
-                    ),
+                            width: double.infinity,
+                            height: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.blue[100],
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                            child: Center(
+                              child: Icon(
+                                Icons.camera_alt_rounded,
+                                color: Colors.blue[300],
+                                size: 50,
+                              ),
+                            ),
+                          ),
                   ),
                 )
               ],
@@ -460,13 +487,27 @@ class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
                     height: 40,
                     child: ElevatedButton(
                       onPressed: () async {
-                        setState(() {
-                          boardingHouseName =
-                              _boardingHouseName.text.toString();
-                        });
-                        print(
-                            '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber - $boardingHouseName');
-                        Navigator.pushNamed(context, '/OwnerSignupThirdScreen');
+                        if (_boardingHouseName.text.isEmpty ||
+                            _imageBldgPermit == null) {
+                          setState(() {
+                            errors = 'Please complete the required details';
+                          });
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.error,
+                            title: 'Error',
+                            text: '$errors',
+                          );
+                        } else {
+                          setState(() {
+                            boardingHouseName =
+                                _boardingHouseName.text.toString();
+                          });
+                          print(
+                              '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber - $boardingHouseName');
+                          Navigator.pushNamed(
+                              context, '/OwnerSignupThirdScreen');
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Color.fromRGBO(26, 60, 105, 1.0),
@@ -519,7 +560,6 @@ class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
   }
 }
 
-
 //Third
 class OwnerSignupThird extends StatefulWidget {
   const OwnerSignupThird({super.key});
@@ -534,205 +574,420 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
   TextEditingController _ownerConfirmPassword = TextEditingController();
   bool verified = false;
   bool loading = false;
+  bool emailExists = false;
+  bool isChecking = false;
+  String? error;
+
+  // Function to check if the email exists in Firestore
+  Future<void> checkEmailExists(String email) async {
+    if (email.isEmpty) {
+      setState(() {
+        emailExists = false;
+      });
+      return;
+    }
+
+    setState(() {
+      isChecking = true; // Show loading while checking
+    });
+
+    try {
+      // Reference the collection where the email is stored as document ID
+      DocumentSnapshot emailDoc = await FirebaseFirestore.instance
+          .collection('Users') // Replace with your collection name
+          .doc(email)
+          .get();
+
+      setState(() {
+        emailExists = emailDoc.exists;
+      });
+    } catch (e) {
+      print("Error checking email existence: $e");
+      setState(() {
+        emailExists = false;
+      });
+    } finally {
+      setState(() {
+        isChecking = false; // Stop loading
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
-    return loading ? LoadingScreen() : Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: 'Finalizing'.text.make(),
-      ),
-      body: Stack(
-        children: [
-          Container(
-            padding: EdgeInsets.all(20),
-            color: Colors.white,
-            width: double.infinity,
-            height: double.infinity,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                  child: TextField(
-                    controller: _ownerEmail,
-                    keyboardType: TextInputType.name,
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey.withOpacity(0.1),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      labelText: 'Email',
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                  child: TextField(
-                    controller: _ownerPassword,
-                    keyboardType: TextInputType.name,
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey.withOpacity(0.1),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      labelText: 'Create Password',
-                    ),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(left: 5, right: 5, bottom: 20),
-                  child: TextField(
-                    controller: _ownerConfirmPassword,
-                    keyboardType: TextInputType.name,
-                    textAlign: TextAlign.left,
-                    style: const TextStyle(
-                      fontSize: 15,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    decoration: InputDecoration(
-                      filled: true,
-                      fillColor: Colors.grey.withOpacity(0.1),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(20),
-                        borderSide: BorderSide(color: Colors.white),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderSide: BorderSide(color: Colors.white),
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      labelText: 'Confirm Password',
-                    ),
-                  ),
-                ),
-              ],
+    return loading
+        ? LoadingScreen()
+        : Scaffold(
+            appBar: AppBar(
+              backgroundColor: Colors.white,
+              elevation: 0,
+              title: 'Finalizing'.text.make(),
             ),
-          ),
-          Container(
-            width: double.infinity,
-            height: double.infinity,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.end,
+            body: Stack(
               children: [
-                Padding(
-                  padding: EdgeInsets.only(left: 30, right: 30, bottom: 20),
-                  child: SizedBox(
-                    height: 40,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        setState(() {
-                          loading = true;
-                        });
-                        String ownerUId = Uuid().v4();
-                        print('Uuid : $ownerUId');
-                        try {
-                          String url;
-                          final ref = FirebaseStorage.instance
-                              .ref()
-                              .child('${_ownerEmail.text.trim()}/$ownerUId');
-                          await ref.putFile(File(_imageID!.path));
-                          url = await ref.getDownloadURL();
-
-                          await FirebaseFirestore.instance
-                              .collection('Users')
-                              .doc(_ownerEmail.text.trim())
-                              .set({
-                            'OwnerUId': ownerUId,
-                            'role': 'Owner',
-                            'createdAt': DateTime.now(),
-                            'BoardingHouseName': boardingHouseName,
-                            'Email': _ownerEmail.text.trim(),
-                            'FirstName': ownerFirstName,
-                            'MiddleName': ownerMiddleName,
-                            'LastName': ownerLastName,
-                            'Birthday': '',
-                            'Image': '',
-                            'Rules': '',
-                            'PhoneNumber': ownerContactNumber,
-                            'verified': verified,
-                          });
-                          await FirebaseFirestore.instance
-                              .collection('BoardingHouses')
-                              .doc(_ownerEmail.text.trim())
-                              .set({
-                            'OwnerUId': ownerUId,
-                            'BoardingHouseName': boardingHouseName,
-                            'PhoneNumber': ownerContactNumber,
-                            'lat': '',
-                            'long': '',
-                            'createdAt': DateTime.now(),
-                            'Email': _ownerEmail.text.trim(),
-                            'FirstName': ownerFirstName,
-                            'MiddleName': ownerMiddleName,
-                            'LastName': ownerLastName,
-                            'BuildingPermitImage': '',
-                            'Rules': '',
-                            'verified': verified,
-                          });
-                          await FirebaseAuth.instance
-                              .createUserWithEmailAndPassword(
-                              email: _ownerEmail.text.trim(),
-                              password: _ownerPassword.text.trim());
-                          setState(() {
-                            loading = false;
-                          });
-                        } on FirebaseAuthException catch (e) {
-                          setState(() {
-                            loading = false;
-                          });
-                          print(e);
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Color(0xFF31355C),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                Container(
+                  padding: EdgeInsets.all(20),
+                  color: Colors.white,
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Column(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 5),
+                        child: TextField(
+                          controller: _ownerEmail,
+                          keyboardType: TextInputType.name,
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.withOpacity(0.1),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            labelText: 'Email',
+                          ),
+                          onChanged: (email) {
+                            // Perform the check as the user types
+                            checkEmailExists(email.trim());
+                          },
                         ),
                       ),
-                      child: const Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Text(
-                            "Request Account",
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 18,
-                              fontWeight: FontWeight.w500,
+                      _ownerEmail.text.isNotEmpty
+                          ? isChecking
+                              ? CircularProgressIndicator() // Show loading while checking
+                              : Text(
+                                  emailExists
+                                      ? 'This email address is already registered.'
+                                      : '',
+                                  style: TextStyle(
+                                    color:
+                                        emailExists ? Colors.red : Colors.green,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                )
+                          : SizedBox(),
+                      SizedBox(height: 10),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 20),
+                        child: TextField(
+                          controller: _ownerPassword,
+                          keyboardType: TextInputType.name,
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.withOpacity(0.1),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            labelText: 'Create Password',
+                          ),
+                        ),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                            left: 5, right: 5, bottom: 20),
+                        child: TextField(
+                          controller: _ownerConfirmPassword,
+                          keyboardType: TextInputType.name,
+                          textAlign: TextAlign.left,
+                          style: const TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          decoration: InputDecoration(
+                            filled: true,
+                            fillColor: Colors.grey.withOpacity(0.1),
+                            focusedBorder: OutlineInputBorder(
+                              borderRadius: BorderRadius.circular(20),
+                              borderSide: BorderSide(color: Colors.white),
+                            ),
+                            enabledBorder: OutlineInputBorder(
+                              borderSide: BorderSide(color: Colors.white),
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                            labelText: 'Confirm Password',
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Padding(
+                        padding:
+                            EdgeInsets.only(left: 30, right: 30, bottom: 20),
+                        child: SizedBox(
+                          height: 40,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.loading,
+                                title: 'Loading...',
+                                text: 'Please Wait',
+                              );
+                              if (_ownerEmail.text.isEmpty ||
+                                  _ownerPassword.text.isEmpty ||
+                                  _ownerConfirmPassword.text.isEmpty) {
+                                setState(() {
+                                  error =
+                                      'Please complete the required details';
+                                });
+                                Navigator.pop(context);
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: '$error',
+                                );
+                              } else if (emailExists == true) {
+                                setState(() {
+                                  error =
+                                      'This email is already associated with an account.';
+                                });
+                                Navigator.pop(context);
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: '$error',
+                                );
+                              } else if (_ownerPassword.text !=
+                                  _ownerConfirmPassword.text) {
+                                setState(() {
+                                  error = 'Password do not match';
+                                });
+                                Navigator.pop(context);
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: '$error',
+                                );
+                              } else {
+                                String ownerUId = Uuid().v4();
+                                print('Uuid : $ownerUId');
+                                try {
+                                  String url;
+                                  String url2;
+                                  // Get the application directory
+                                  final appDocDir =
+                                      await getApplicationDocumentsDirectory();
+                                  final filePath =
+                                      "${appDocDir.absolute}/path/to/${_ownerEmail.text}.jpg";
+                                  final file = File(_imageID!
+                                      .path); // Use selected image path
+
+                                  final appDocDir2 =
+                                      await getApplicationDocumentsDirectory();
+                                  final filePath2 =
+                                      "${appDocDir.absolute}/path/to/${_ownerEmail.text}.jpg";
+                                  final file2 = File(_imageBldgPermit!.path);
+
+                                  // Create metadata for the image
+                                  final metadata = SettableMetadata(
+                                      contentType: "image/jpeg");
+
+                                  // Create a reference to Firebase Storage
+                                  final storageRef =
+                                      FirebaseStorage.instance.ref();
+
+                                  // Upload file and metadata to Firebase Storage
+                                  final uploadTask = storageRef
+                                      .child(
+                                          "OwnersImages/${DateTime.now().toString()}.jpg")
+                                      .putFile(file, metadata);
+
+                                  // Upload file and metadata to Firebase Storage
+                                  final uploadTask2 = storageRef
+                                      .child(
+                                          "OwnersImages/${DateTime.now().toString()}.jpg")
+                                      .putFile(file2, metadata);
+
+                                  // Listen for state changes, errors, and completion of the upload.
+                                  uploadTask.snapshotEvents
+                                      .listen((TaskSnapshot taskSnapshot) {
+                                    switch (taskSnapshot.state) {
+                                      case TaskState.running:
+                                        final progress = 100.0 *
+                                            (taskSnapshot.bytesTransferred /
+                                                taskSnapshot.totalBytes);
+                                        print("Upload is $progress% complete.");
+                                        break;
+                                      case TaskState.paused:
+                                        print("Upload is paused.");
+                                        break;
+                                      case TaskState.canceled:
+                                        print("Upload was canceled");
+                                        break;
+                                      case TaskState.error:
+                                        print("Upload encountered an error.");
+                                        break;
+                                      case TaskState.success:
+                                        print("Upload successful!");
+                                        break;
+                                    }
+                                  });
+
+                                  uploadTask2.snapshotEvents
+                                      .listen((TaskSnapshot taskSnapshot) {
+                                    switch (taskSnapshot.state) {
+                                      case TaskState.running:
+                                        final progress = 100.0 *
+                                            (taskSnapshot.bytesTransferred /
+                                                taskSnapshot.totalBytes);
+                                        print("Upload is $progress% complete.");
+                                        break;
+                                      case TaskState.paused:
+                                        print("Upload is paused.");
+                                        break;
+                                      case TaskState.canceled:
+                                        print("Upload was canceled");
+                                        break;
+                                      case TaskState.error:
+                                        print("Upload encountered an error.");
+                                        break;
+                                      case TaskState.success:
+                                        print("Upload successful!");
+                                        break;
+                                    }
+                                  });
+
+                                  // Get download URL after successful upload
+                                  url = await (await uploadTask)
+                                      .ref
+                                      .getDownloadURL();
+                                  url2 = await (await uploadTask2)
+                                      .ref
+                                      .getDownloadURL();
+
+                                  await FirebaseFirestore.instance
+                                      .collection('Users')
+                                      .doc(_ownerEmail.text.trim())
+                                      .set({
+                                    'OwnerUId': ownerUId,
+                                    'role': 'Owner',
+                                    'createdAt': DateTime.now(),
+                                    'BoardingHouseName': boardingHouseName,
+                                    'Email': _ownerEmail.text.trim(),
+                                    'FirstName': ownerFirstName,
+                                    'MiddleName': ownerMiddleName,
+                                    'LastName': ownerLastName,
+                                    'Birthday': '',
+                                    'ImageID': url,
+                                    'ImageIdPermit': url2,
+                                    'Rules': '',
+                                    'PhoneNumber': ownerContactNumber,
+                                    'verified': false,
+                                  });
+                                  await FirebaseFirestore.instance
+                                      .collection('BoardingHouses')
+                                      .doc(_ownerEmail.text.trim())
+                                      .set({
+                                    'OwnerUId': ownerUId,
+                                    'BoardingHouseName': boardingHouseName,
+                                    'PhoneNumber': ownerContactNumber,
+                                    'Lat': '',
+                                    'Long': '',
+                                    'chat': 0,
+                                    'createdAt': DateTime.now(),
+                                    'Email': _ownerEmail.text.trim(),
+                                    'FirstName': ownerFirstName,
+                                    'MiddleName': ownerMiddleName,
+                                    'LastName': ownerLastName,
+                                    'BuildingPermitImage': '',
+                                    'Rules': '',
+                                    'verified': verified,
+                                    'Image': '',
+                                    'ratings': [],
+                                  });
+                                  Navigator.of(context);
+                                  QuickAlert.show(
+                                    barrierDismissible: false,
+                                    onConfirmBtnTap: () {
+                                      _ownerEmail.clear();
+                                      _ownerConfirmPassword.clear();
+                                      _ownerPassword.clear();
+                                      Navigator.of(context).pushReplacement(
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AuthWrapper()), // Change NextScreen() to your desired screen
+                                      );
+                                    },
+                                    context: context,
+                                    type: QuickAlertType.success,
+                                    title: 'Success!',
+                                    text:
+                                        'Thank you for registering! Please allow some time for your account to be verified by the admin. We appreciate your patience.',
+                                  );
+                                  await FirebaseAuth.instance
+                                      .createUserWithEmailAndPassword(
+                                          email: _ownerEmail.text.trim(),
+                                          password: _ownerPassword.text.trim());
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                } on FirebaseAuthException catch (e) {
+                                  setState(() {
+                                    loading = false;
+                                  });
+                                  print(e);
+                                }
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: Color(0xFF31355C),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                            ),
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  "Request Account",
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
                 ),
               ],
             ),
-          ),
-        ],
-      ),
-    );
+          );
   }
 
   Route _toSignInScreen() {

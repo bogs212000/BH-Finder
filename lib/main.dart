@@ -2,6 +2,7 @@
 
 import 'package:bh_finder/Screen/ForgotPass/forgotpass.screen.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
+import 'package:bh_finder/Screen/Owner/BHouseProfile/bhouse.profile.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/second.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/third.screen.dart';
 import 'package:bh_finder/Screen/Profile/user.profile.dart';
@@ -20,12 +21,16 @@ import 'Screen/Chat/chat.owner.dart';
 import 'Screen/Chat/owner.chat.list.dart';
 import 'Screen/Home/guest.home.screen.dart';
 import 'Screen/Loading/loading.screen.dart';
+import 'Screen/Owner/Map/location.dart';
 import 'Screen/Owner/OwnerSignUp/first.screen.dart';
+import 'Screen/Owner/Rooms/view.room.dart';
 import 'Screen/Owner/add.rooms.dart';
 import 'Screen/Owner/list.rooms.screen.dart';
 import 'Screen/Owner/owner.home.screen.dart';
+import 'Screen/Owner/owner.notification.dart';
 import 'Screen/Owner/reservation/reservation.view.screen.dart';
 import 'Screen/Receipt/receipt.screen.dart';
+import 'Screen/Review/review.section.dart';
 import 'Screen/SignUp/signup.screen.dart';
 import 'Screen/TermsAndConditons/terms.conditions.dart';
 import 'firebase_options.dart';
@@ -55,6 +60,8 @@ class MyApp extends StatelessWidget {
       routes: {
         '/HomeScreen': (context) => HomeScreen(),
         '/UserProfile': (context) => UserProfile(),
+        '/ViewRoom': (context) => ViewRoom(),
+        '/BHouseProfile': (context) => BHouseProfile(),
         '/GuestHomeScreen': (context) => GuestHomeScreen(),
         '/LoadingScreen': (context) => LoadingScreen(),
         '/SignInScreen': (context) => SignInScreen(),
@@ -76,6 +83,9 @@ class MyApp extends StatelessWidget {
         '/BoarderReservationScreen': (context) => BoarderReservationScreen(),
         '/TermsAndConditions': (context) => TermsAndConditionsScreen(),
         '/ReceiptScreen': (context) => ReceiptScreen(),
+        '/ReviewSectionScreen': (context) => ReviewSectionScreen(),
+        '/BHouseAddress': (context) => BHouseAddress(),
+        '/OwnerNotificationScreen': (context) => OwnerNotificationScreen(),
       }
     );
   }

@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/owner.signup.data.dart';
+import 'package:bh_finder/Screen/Owner/owner.home.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -14,6 +15,7 @@ import 'package:uuid/v1.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../cons.dart';
+import 'Rooms/view.room.dart';
 
 class ListRoomsScreen extends StatefulWidget {
   const ListRoomsScreen({super.key});
@@ -45,9 +47,17 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
         ? LoadingScreen()
         : Scaffold(
             appBar: AppBar(
+              leading: GestureDetector(onTap: (){
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) => OwnerHomeScreen(),
+                  ),
+                      (Route<dynamic> route) => false, // Removes all previous routes
+                );
+              }, child: Icon(Icons.arrow_back),),
               backgroundColor: Colors.white,
               elevation: 0,
-              title: 'Add Rooms'.text.make(),
+              title: 'Rooms'.text.make(),
             ),
             body: Stack(
               children: [
@@ -64,7 +74,7 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                     builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
                       // Check if the snapshot has an error
                       if (snapshot.hasError) {
-                        return Center(
+                        return const Center(
                           child: Text(
                             "Something went wrong!",
                             style: TextStyle(
@@ -100,14 +110,12 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                             padding: const EdgeInsets.only(bottom: 10),
                             child: GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  rRoomsDocId = data['roomDocId'];
-                                });
-                                print('room ID: $roomId');
-                                // Navigator.of(context).pushAndRemoveUntil(
-                                //   _toRoomsScreen(),
-                                //       (Route<dynamic> route) => false,
-                                // );
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  MaterialPageRoute(
+                                    builder: (context) => ViewRoom(viewRoomId: data['roomDocId']),
+                                  ),
+                                      (Route<dynamic> route) => false, // Removes all previous routes
+                                );
                               },
                               child: Container(
                                 height: 90,

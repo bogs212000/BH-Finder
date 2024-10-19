@@ -11,6 +11,13 @@ class GuestScreen extends StatefulWidget {
 }
 
 class _GuestScreenState extends State<GuestScreen> {
+
+  @override
+  void initState() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    super.initState();
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(

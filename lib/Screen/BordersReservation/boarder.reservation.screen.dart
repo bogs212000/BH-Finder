@@ -1,8 +1,11 @@
+import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/reservation/reservation.success.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
@@ -10,6 +13,7 @@ import 'package:uuid/uuid.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 import '../../cons.dart';
+import '../../fetch.dart';
 import '../BHouse/room.screen.dart';
 
 class BoarderReservationScreen extends StatefulWidget {
@@ -29,6 +33,7 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
 
   @override
   void initState() {
+    fetchBoarderData(setState);
     super.initState();
     DateTime checkInDate = selectedDateCheckIn;
     DateTime checkOutDate = checkInDate.add(const Duration(days: 30));
@@ -93,6 +98,9 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                             padding: EdgeInsets.only(top: 40, left: 20),
                             child: GestureDetector(
                               onTap: () {
+                               setState(() {
+                                 reserved = false;
+                               });
                                 Navigator.of(context).pushAndRemoveUntil(
                                   _toRoomScreen(),
                                   (Route<dynamic> route) => false,
@@ -288,10 +296,13 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                                         GestureDetector(
                                           onTap: () {
                                             String docID = Uuid().v4();
+                                            QuickAlert.show(
+                                              context: context,
+                                              type: QuickAlertType.loading,
+                                              title: 'Pleas wait...',
+                                              text: 'Reserving room on process.',
+                                            );
                                             try {
-                                              setState(() {
-                                                loading = true;
-                                              });
                                               FirebaseFirestore.instance
                                                   .collection('Reservations')
                                                   .doc('$docID')
@@ -299,9 +310,10 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                                                 'createdAt': DateTime.now(),
                                                 'docID': docID,
                                                 'roomNumber': roomNumber,
-                                                'status': false,
+                                                'status': 'pending',
                                                 'OwnerId': OwnerUuId,
                                                 'boarderUuId': bUuId,
+                                                'boarderEmail': FirebaseAuth.instance.currentUser?.email.toString(),
                                                 'roomId': roomId,
                                                 'message': _message.text,
                                                 'checkIn': checkIn,
@@ -311,16 +323,25 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                                                 'boardersConNumber':
                                                     '$bPhoneNumber',
                                                 'boarderAddress': '',
+                                                'read': false,
                                               });
-                                              setState(() {
-                                                loading = false;
-                                              });
-                                              Navigator.of(context)
-                                                  .pushReplacement(
-                                                MaterialPageRoute(
-                                                    builder: (context) =>
-                                                        ReservationSuccess()), // Change NextScreen() to your desired screen
+                                              QuickAlert.show(
+                                                context: context,
+                                                type:
+                                                QuickAlertType.success,
+                                                title: 'Room reserved successfully!',
+                                                text:
+                                                'Kindly review your reservation status on the homepage.',
+                                                onConfirmBtnTap: () {
+                                                  Navigator.of(context)
+                                                      .pushReplacement(
+                                                    MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            HomeScreen()), // Change NextScreen() to your desired screen
+                                                  );
+                                                },
                                               );
+
                                             } on FirebaseAuthException catch (e) {
                                               setState(() {
                                                 loading = false;

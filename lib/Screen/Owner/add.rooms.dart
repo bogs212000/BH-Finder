@@ -43,7 +43,7 @@ class _AddRoomsState extends State<AddRooms> {
   //IDs
   Future<void> _openImagePicker() async {
     final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.camera, imageQuality: 50);
+        await _picker.pickImage(source: ImageSource.gallery, imageQuality: 50);
     if (pickedImage != null) {
       setState(() {
         _image = File(pickedImage.path);
@@ -123,7 +123,7 @@ class _AddRoomsState extends State<AddRooms> {
                                     ),
                                     child: Center(
                                       child: Icon(
-                                        Icons.camera_alt_rounded,
+                                        Icons.image,
                                         color: Colors.blue[300],
                                         size: 50,
                                       ),
@@ -253,7 +253,7 @@ class _AddRoomsState extends State<AddRooms> {
 
                                     // Upload file and metadata to Firebase Storage
                                     final uploadTask = storageRef
-                                        .child("images/rooms/${DateTime.now().toString()}.jpg")
+                                        .child("roomImages/$roomId/${DateTime.now().toString()}.jpg")
                                         .putFile(file, metadata);
 
                                     // Listen for state changes, errors, and completion of the upload.
@@ -295,8 +295,8 @@ class _AddRoomsState extends State<AddRooms> {
                                       'boardersName': '',
                                       'boardersConNumber': '',
                                       'boardersAddress': '',
-                                      'boardersIn': '',
-                                      'boardersOut': '',
+                                      'boardersIn': DateTime.now(),
+                                      'boardersOut': DateTime.now(),
                                       'roomNameNumber': roomName.text,
                                       'contactNumber': OwnerPhone,
                                       'roomStatus': 'available',

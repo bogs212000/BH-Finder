@@ -2,6 +2,7 @@
 
 import 'package:bh_finder/Admin/admin.home.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
+import 'package:bh_finder/Screen/Loading/home.loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/waiting.verification.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:bh_finder/Screen/SignUp/waiting.screen.dart';
@@ -30,42 +31,9 @@ class Wrapper extends StatelessWidget {
       builder:
           (BuildContext context, AsyncSnapshot<DocumentSnapshot> userData) {
         if (!userData.hasData) {
-          return Center(
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Lottie.asset('assets/Lottie/119400-waiting.json',
-                  //     height: 50),
-                  const Text("Loading please wait...",
-                      style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.blueGrey,
-                          letterSpacing: 1.0,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          );
+          return HomeLoadingScreen();
         } else if (userData.connectionState == ConnectionState.waiting) {
-          return Center(
-            child: Container(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  // Lottie.asset('assets/Lottie/119400-waiting.json',
-                  //     height: 50),
-                  SizedBox(width: 5),
-                  const Text("Loading please wait...",
-                      style: TextStyle(
-                          fontSize: 12.0,
-                          color: Colors.blueGrey,
-                          letterSpacing: 1.0,
-                          fontWeight: FontWeight.bold)),
-                ],
-              ),
-            ),
-          );
+          return HomeLoadingScreen();
         } else if (userData.hasError) {
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,

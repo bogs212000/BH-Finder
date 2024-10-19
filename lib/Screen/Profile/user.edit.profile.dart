@@ -81,7 +81,10 @@ class _UserEditProfileState extends State<UserEditProfile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(),
+        backgroundColor: Colors.white,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+        ),
         body: Padding(
           padding: const EdgeInsets.only(left: 20, right: 20),
           child: SingleChildScrollView(

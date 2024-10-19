@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shimmer/shimmer.dart';
 
 import '../../cons.dart';
 
@@ -75,9 +76,34 @@ class _ChatOwnerState extends State<ChatOwner> {
                   .snapshots(),
               builder: (context, snapshot) {
                 if (!snapshot.hasData) {
-                  return Center(
-                    child: Lottie.asset('assets/lottie/animation_loading.json',
-                        width: 100, height: 100),
+                  return Column(
+                    mainAxisAlignment: MainAxisAlignment.end,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Shimmer.fromColors(
+                            baseColor: Colors.grey.shade200,
+                            highlightColor: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 20, right: 20),
+                              child: Container(
+                                height: 40,
+                                width: 150,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.only(
+                                      topLeft: Radius.circular(20),
+                                      bottomLeft: Radius.circular(20),
+                                      topRight: Radius.circular(20)),
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      SizedBox(height: 30)
+                    ],
                   );
                 }
 
@@ -166,10 +192,16 @@ class _ChatOwnerState extends State<ChatOwner> {
         'ownerEmail': ownerEmail,
         'email': email,
         'bHouse': bHouse,
-        'name': 'name',
+        'name': '$fName $mName $lName',
         'role': 'boarder',
+        'createdAt': DateTime.now(),
+        'seenBorder?': false,
+        'seenOwner?': true,
+        'count': FieldValue.increment(1)
       });
-
+      await FirebaseFirestore.instance.collection('BoardingHouses').doc(ownerEmail).update({
+        'chat': FieldValue.increment(1),
+      });
       await _firestore
           .collection('Chats')
           .doc('$email+$ownerEmail')

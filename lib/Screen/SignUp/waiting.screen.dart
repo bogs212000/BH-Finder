@@ -3,6 +3,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class WaitEmailVerify extends StatefulWidget {
@@ -38,17 +40,22 @@ class _WaitEmailVerifyState extends State<WaitEmailVerify> {
                   SizedBox(height: 20),
                   ElevatedButton(
                     onPressed: () async {
-                      setState(() {
-                        loading = true;
-                      });
+                      QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.loading,
+                        title: 'Loading...',
+                        text: 'Sending verification email.',
+                      );
                       User? user = FirebaseAuth.instance.currentUser;
                       if (user != null && !user.emailVerified) {
                         await user.sendEmailVerification();
                       }
-                      setState(() {
-                        loading = false;
-                        message = "verification link we've sent";
-                      });
+                      QuickAlert.show(
+                        context: context,
+                        type: QuickAlertType.success,
+                        title: 'Verification',
+                        text: 'Email Verification sent!',
+                      );
                       await FirebaseAuth.instance.signOut();
                     },
                     child: Text('Verify email'),

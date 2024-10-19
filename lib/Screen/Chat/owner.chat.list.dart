@@ -8,6 +8,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_profile_picture/flutter_profile_picture.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:lottie/lottie.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../cons.dart';
@@ -21,6 +22,8 @@ class OwnerChatList extends StatefulWidget {
 }
 
 class _OwnerChatListState extends State<OwnerChatList> {
+  String? myEmail = FirebaseAuth.instance.currentUser?.email.toString();
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,8 +44,8 @@ class _OwnerChatListState extends State<OwnerChatList> {
             stream: FirebaseFirestore.instance
                 .collection("Chats")
                 .where('ownerEmail',
-                isEqualTo:
-                FirebaseAuth.instance.currentUser!.email.toString())
+                    isEqualTo:
+                        FirebaseAuth.instance.currentUser!.email.toString())
                 .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -63,9 +66,40 @@ class _OwnerChatListState extends State<OwnerChatList> {
                 );
               }
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return Center(
-                  child: Lottie.asset('assets/lottie/animation_loading.json',
-                      width: 100, height: 100),
+                return Column(
+                  children: [
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade200,
+                      highlightColor: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                    SizedBox(height: 20),
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade200,
+                      highlightColor: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 20, right: 20),
+                        child: Container(
+                          height: 50,
+                          width: double.infinity,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 );
               }
               if (snapshot.data?.size == 0) {
@@ -85,18 +119,25 @@ class _OwnerChatListState extends State<OwnerChatList> {
                 padding: EdgeInsets.only(top: 0),
                 children: snapshot.data!.docs.map((DocumentSnapshot document) {
                   Map<String, dynamic> data =
-                  document.data()! as Map<String, dynamic>;
+                      document.data()! as Map<String, dynamic>;
                   return Padding(
                     padding:
-                    const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+                        const EdgeInsets.only(left: 5, right: 5, bottom: 10),
                     child: GestureDetector(
-                      onTap: () {
+                      onTap: () async {
                         setState(() {
                           boardersEmail = data['email'].toString();
+                          bHouse = data['bHouse'];
+                          chatName = data['name'];
                         });
+                        await FirebaseFirestore.instance
+                            .collection('BoardingHouses')
+                            .doc(myEmail)
+                            .update({'chat': 0});
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ChatBoarders()),
+                          MaterialPageRoute(
+                              builder: (context) => ChatBoarders()),
                         );
                       },
                       child: Card(
