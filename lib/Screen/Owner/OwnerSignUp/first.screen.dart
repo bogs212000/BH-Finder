@@ -296,6 +296,7 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                               ownerLastName = _ownerLastName.text.toString();
                               ownerContactNumber =
                                   _ownerContactNumber.text.toString();
+                              boardingHouseAddress = _ownerAddress.text.toString();
                             });
                             print(
                                 '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber');
@@ -504,7 +505,7 @@ class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
                                 _boardingHouseName.text.toString();
                           });
                           print(
-                              '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber - $boardingHouseName');
+                              '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber - $boardingHouseName - $boardingHouseAddress');
                           Navigator.pushNamed(
                               context, '/OwnerSignupThirdScreen');
                         }
@@ -904,11 +905,13 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'Rules': '',
                                     'PhoneNumber': ownerContactNumber,
                                     'verified': false,
+                                    'address': boardingHouseAddress,
                                   });
                                   await FirebaseFirestore.instance
                                       .collection('BoardingHouses')
                                       .doc(_ownerEmail.text.trim())
                                       .set({
+                                    'address': boardingHouseAddress,
                                     'OwnerUId': ownerUId,
                                     'BoardingHouseName': boardingHouseName,
                                     'PhoneNumber': ownerContactNumber,
@@ -924,7 +927,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'Rules': '',
                                     'verified': verified,
                                     'Image': '',
-                                    'ratings': [],
+                                    'ratings': [0],
                                   });
                                   Navigator.of(context);
                                   QuickAlert.show(

@@ -31,7 +31,8 @@ class _ViewRoomState extends State<ViewRoom> {
   late Future<DocumentSnapshot> bHouseRoom;
   User? currentUser = FirebaseAuth.instance.currentUser;
   String? left;
-  final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final RefreshController _refreshController =
+      RefreshController(initialRefresh: false);
 
   @override
   void initState() {
@@ -70,7 +71,8 @@ class _ViewRoomState extends State<ViewRoom> {
           .doc(widget.viewRoomId)
           .get();
     });
-    await Future.delayed(Duration(milliseconds: 1000)); // Simulate loading delay
+    await Future.delayed(
+        Duration(milliseconds: 1000)); // Simulate loading delay
     _refreshController.refreshCompleted(); // Notify that refresh is complete
   }
 
@@ -97,14 +99,11 @@ class _ViewRoomState extends State<ViewRoom> {
           Timestamp? boardersOut = data['boardersOut'];
           DateTime boardersInCount = DateTime.fromMillisecondsSinceEpoch(
               data['boardersIn'].millisecondsSinceEpoch);
-          DateTime boardersOutCount =
-          DateTime.fromMillisecondsSinceEpoch(
+          DateTime boardersOutCount = DateTime.fromMillisecondsSinceEpoch(
               data['boardersOut'].millisecondsSinceEpoch);
-          Duration difference =
-          boardersOutCount.difference(DateTime.now());
+          Duration difference = boardersOutCount.difference(DateTime.now());
           int daysLeft = difference.inDays;
-          print(
-              'IN: ${boardersInCount.toLocal()}, Days Left: $daysLeft');
+          print('IN: ${boardersInCount.toLocal()}, Days Left: $daysLeft');
 
           String formattedDateIn = (boardersIn != null)
               ? DateFormat('EEE - MMM d, yyyy').format(boardersIn.toDate())
@@ -184,7 +183,8 @@ class _ViewRoomState extends State<ViewRoom> {
                 height: double.infinity,
                 child: SmartRefresher(
                   enablePullDown: true,
-                  enablePullUp: false, // Assuming no pull-up loading is needed
+                  enablePullUp: false,
+                  // Assuming no pull-up loading is needed
                   controller: _refreshController,
                   onRefresh: _onRefresh,
                   header: WaterDropMaterialHeader(
@@ -306,73 +306,109 @@ class _ViewRoomState extends State<ViewRoom> {
                                                   children: [
                                                     'Days left: '.text.make(),
                                                     Spacer(),
-                                                    '$left Days'
-                                                        .text.bold.size(20)
+                                                    '$daysLeft Days'
+                                                        .text
+                                                        .bold
+                                                        .size(20)
                                                         .overflow(
-                                                        TextOverflow
-                                                            .fade)
+                                                            TextOverflow.fade)
                                                         .make(),
                                                     SizedBox(width: 10),
-                                                    if(daysLeft < 7)
+                                                    if (daysLeft < 7)
                                                       SizedBox(
                                                           height: 30,
                                                           child: ElevatedButton(
-                                                            onPressed: () async {
+                                                            onPressed:
+                                                                () async {
                                                               try {
                                                                 QuickAlert.show(
-                                                                  context: context,
-                                                                  type: QuickAlertType.loading,
-                                                                  title: 'Loading...',
-                                                                  text: 'Please wait',
+                                                                  context:
+                                                                      context,
+                                                                  type: QuickAlertType
+                                                                      .loading,
+                                                                  title:
+                                                                      'Loading...',
+                                                                  text:
+                                                                      'Please wait',
                                                                 );
 
                                                                 // Send notification
-                                                                await FirebaseFirestore.instance.collection('Notifications').doc().set({
-                                                                  'boarderID': data['boarderID'],
-                                                                  'createdAt': DateTime.now(),
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Notifications')
+                                                                    .doc()
+                                                                    .set({
+                                                                  'boarderID': data[
+                                                                      'boarderID'],
+                                                                  'createdAt':
+                                                                      DateTime
+                                                                          .now(),
                                                                   'message':
-                                                                  'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.',
-                                                                  'status': false,
+                                                                      'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment.',
+                                                                  'status':
+                                                                      false,
                                                                 });
 
                                                                 // Update notification count for the boarder
-                                                                await FirebaseFirestore.instance
-                                                                    .collection('Users')
-                                                                    .doc('${data['boarderEmail']}')
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Users')
+                                                                    .doc(
+                                                                        '${data['boarderEmail']}')
                                                                     .update({
-                                                                  'notification': FieldValue.increment(1),
+                                                                  'notification':
+                                                                      FieldValue
+                                                                          .increment(
+                                                                              1),
                                                                 });
 
-                                                                Navigator.pop(context); // Close the loading dialog
+                                                                Navigator.pop(
+                                                                    context); // Close the loading dialog
 
                                                                 QuickAlert.show(
-                                                                  context: context,
-                                                                  type: QuickAlertType.success,
-                                                                  title: 'Success!',
-                                                                  text: 'You successfully notified ${data['boardersName']}.',
+                                                                  context:
+                                                                      context,
+                                                                  type: QuickAlertType
+                                                                      .success,
+                                                                  title:
+                                                                      'Success!',
+                                                                  text:
+                                                                      'You successfully notified ${data['boardersName']}.',
                                                                 );
                                                               } catch (e) {
-                                                                Navigator.pop(context); // Close the loading dialog if there's an error
+                                                                Navigator.pop(
+                                                                    context); // Close the loading dialog if there's an error
 
                                                                 QuickAlert.show(
-                                                                  context: context,
-                                                                  type: QuickAlertType.error,
-                                                                  title: 'Error!',
-                                                                  text: 'Failed to notify ${data['boardersName']}. Please try again.',
+                                                                  context:
+                                                                      context,
+                                                                  type:
+                                                                      QuickAlertType
+                                                                          .error,
+                                                                  title:
+                                                                      'Error!',
+                                                                  text:
+                                                                      'Failed to notify ${data['boardersName']}. Please try again.',
                                                                 );
 
-                                                                print('Error: $e'); // Log the error for debugging
+                                                                print(
+                                                                    'Error: $e'); // Log the error for debugging
                                                               }
                                                             },
-                                                            child: 'Notify'.text.make(),
-                                                          )
-                                                      ),
+                                                            child: 'Notify'
+                                                                .text
+                                                                .make(),
+                                                          )),
                                                   ],
                                                 ),
                                                 Divider(),
                                                 Row(
                                                   children: [
-                                                    'Boarders name: '.text.make(),
+                                                    'Boarders name: '
+                                                        .text
+                                                        .make(),
                                                     Spacer(),
                                                     Flexible(
                                                       child:
@@ -388,7 +424,9 @@ class _ViewRoomState extends State<ViewRoom> {
                                                 Divider(),
                                                 Row(
                                                   children: [
-                                                    'Check-in date: '.text.make(),
+                                                    'Check-in date: '
+                                                        .text
+                                                        .make(),
                                                     Spacer(),
                                                     Flexible(
                                                       child: '$formattedDateIn '
@@ -407,11 +445,13 @@ class _ViewRoomState extends State<ViewRoom> {
                                                         .make(),
                                                     Spacer(),
                                                     Flexible(
-                                                      child: '$formattedDateOut '
-                                                          .text
-                                                          .overflow(
-                                                              TextOverflow.fade)
-                                                          .make(),
+                                                      child:
+                                                          '$formattedDateOut '
+                                                              .text
+                                                              .overflow(
+                                                                  TextOverflow
+                                                                      .fade)
+                                                              .make(),
                                                     )
                                                   ],
                                                 ),
@@ -434,114 +474,177 @@ class _ViewRoomState extends State<ViewRoom> {
                                                           .make(),
                                                     Spacer(),
                                                     if (data['paid?'] == false)
-                                                    SizedBox(
-                                                        height: 30,
-                                                        child: ElevatedButton(
-                                                          onPressed: () async {
-                                                            try {
-                                                              QuickAlert.show(
-                                                                context: context,
-                                                                type: QuickAlertType.loading,
-                                                                title: 'Loading...',
-                                                                text: 'Please wait',
-                                                              );
+                                                      SizedBox(
+                                                          height: 30,
+                                                          child: ElevatedButton(
+                                                            onPressed:
+                                                                () async {
+                                                              try {
+                                                                QuickAlert.show(
+                                                                  context:
+                                                                      context,
+                                                                  type: QuickAlertType
+                                                                      .loading,
+                                                                  title:
+                                                                      'Loading...',
+                                                                  text:
+                                                                      'Please wait',
+                                                                );
 
-                                                              // Send notification
-                                                              await FirebaseFirestore.instance.collection('Notifications').doc().set({
-                                                                'boarderID': data['boarderID'],
-                                                                'createdAt': DateTime.now(),
-                                                                'message':
-                                                                'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.',
-                                                                'status': false,
-                                                              });
+                                                                // Send notification
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Notifications')
+                                                                    .doc()
+                                                                    .set({
+                                                                  'boarderID': data[
+                                                                      'boarderID'],
+                                                                  'createdAt':
+                                                                      DateTime
+                                                                          .now(),
+                                                                  'message':
+                                                                      'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.',
+                                                                  'status':
+                                                                      false,
+                                                                });
 
-                                                              // Update notification count for the boarder
-                                                              await FirebaseFirestore.instance
-                                                                  .collection('Users')
-                                                                  .doc('${data['boarderEmail']}')
-                                                                  .update({
-                                                                'notification': FieldValue.increment(1),
-                                                              });
+                                                                // Update notification count for the boarder
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Users')
+                                                                    .doc(
+                                                                        '${data['boarderEmail']}')
+                                                                    .update({
+                                                                  'notification':
+                                                                      FieldValue
+                                                                          .increment(
+                                                                              1),
+                                                                });
 
-                                                              Navigator.pop(context); // Close the loading dialog
+                                                                Navigator.pop(
+                                                                    context); // Close the loading dialog
 
-                                                              QuickAlert.show(
-                                                                context: context,
-                                                                type: QuickAlertType.success,
-                                                                title: 'Success!',
-                                                                text: 'You successfully notified ${data['boardersName']}.',
-                                                              );
-                                                            } catch (e) {
-                                                              Navigator.pop(context); // Close the loading dialog if there's an error
+                                                                QuickAlert.show(
+                                                                  context:
+                                                                      context,
+                                                                  type: QuickAlertType
+                                                                      .success,
+                                                                  title:
+                                                                      'Success!',
+                                                                  text:
+                                                                      'You successfully notified ${data['boardersName']}.',
+                                                                );
+                                                              } catch (e) {
+                                                                Navigator.pop(
+                                                                    context); // Close the loading dialog if there's an error
 
-                                                              QuickAlert.show(
-                                                                context: context,
-                                                                type: QuickAlertType.error,
-                                                                title: 'Error!',
-                                                                text: 'Failed to notify ${data['boardersName']}. Please try again.',
-                                                              );
+                                                                QuickAlert.show(
+                                                                  context:
+                                                                      context,
+                                                                  type:
+                                                                      QuickAlertType
+                                                                          .error,
+                                                                  title:
+                                                                      'Error!',
+                                                                  text:
+                                                                      'Failed to notify ${data['boardersName']}. Please try again.',
+                                                                );
 
-                                                              print('Error: $e'); // Log the error for debugging
-                                                            }
-                                                          },
-                                                          child: 'Notify'.text.make(),
-                                                        )
-                                                    ),
+                                                                print(
+                                                                    'Error: $e'); // Log the error for debugging
+                                                              }
+                                                            },
+                                                            child: 'Notify'
+                                                                .text
+                                                                .make(),
+                                                          )),
                                                     SizedBox(width: 10),
                                                     if (data['paid?'] == false)
-                                                    SizedBox(
-                                                        height: 30,
-                                                        child: ElevatedButton(
-                                                          onPressed: () async {
-                                                            try {
-                                                              QuickAlert.show(
-                                                                context: context,
-                                                                type: QuickAlertType.loading,
-                                                                title: 'Loading...',
-                                                                text: 'Please wait',
-                                                              );
+                                                      SizedBox(
+                                                          height: 30,
+                                                          child: ElevatedButton(
+                                                            onPressed:
+                                                                () async {
+                                                              try {
+                                                                QuickAlert.show(
+                                                                  context:
+                                                                      context,
+                                                                  type: QuickAlertType
+                                                                      .loading,
+                                                                  title:
+                                                                      'Loading...',
+                                                                  text:
+                                                                      'Please wait',
+                                                                );
 
-                                                              // Send notification
-                                                              await FirebaseFirestore.instance.collection('Notifications').doc().set({
-                                                                'boarderID': data['boarderID'],
-                                                                'createdAt': DateTime.now(),
-                                                                'message':
-                                                                'Hi ${data['boardersName']}, thank you for settling your rent!',
-                                                                'status': false,
-                                                              });
+                                                                // Send notification
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Notifications')
+                                                                    .doc()
+                                                                    .set({
+                                                                  'boarderID': data[
+                                                                      'boarderID'],
+                                                                  'createdAt':
+                                                                      DateTime
+                                                                          .now(),
+                                                                  'message':
+                                                                      'Hi ${data['boardersName']}, thank you for settling your rent!',
+                                                                  'status':
+                                                                      false,
+                                                                });
 
-                                                              // Update notification count for the boarder
-                                                              await FirebaseFirestore.instance
-                                                                  .collection('Rooms')
-                                                                  .doc('${data['roomDocId']}')
-                                                                  .update({
-                                                                'paid?': true,
-                                                              });
+                                                                // Update notification count for the boarder
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Rooms')
+                                                                    .doc(
+                                                                        '${data['roomDocId']}')
+                                                                    .update({
+                                                                  'paid?': true,
+                                                                });
 
-                                                              Navigator.pop(context); // Close the loading dialog
+                                                                Navigator.pop(
+                                                                    context); // Close the loading dialog
 
-                                                              QuickAlert.show(
-                                                                context: context,
-                                                                type: QuickAlertType.success,
-                                                                title: 'Success!',
-                                                                text: '${data['boardersName']} has been paid.',
-                                                              );
-                                                            } catch (e) {
-                                                              Navigator.pop(context); // Close the loading dialog if there's an error
+                                                                QuickAlert.show(
+                                                                  context:
+                                                                      context,
+                                                                  type: QuickAlertType
+                                                                      .success,
+                                                                  title:
+                                                                      'Success!',
+                                                                  text:
+                                                                      '${data['boardersName']} has been paid.',
+                                                                );
+                                                              } catch (e) {
+                                                                Navigator.pop(
+                                                                    context); // Close the loading dialog if there's an error
 
-                                                              QuickAlert.show(
-                                                                context: context,
-                                                                type: QuickAlertType.error,
-                                                                title: 'Error!',
-                                                                text: 'Failed to update ${data['boardersName']} data. Please try again.',
-                                                              );
+                                                                QuickAlert.show(
+                                                                  context:
+                                                                      context,
+                                                                  type:
+                                                                      QuickAlertType
+                                                                          .error,
+                                                                  title:
+                                                                      'Error!',
+                                                                  text:
+                                                                      'Failed to update ${data['boardersName']} data. Please try again.',
+                                                                );
 
-                                                              print('Error: $e'); // Log the error for debugging
-                                                            }
-                                                          },
-                                                          child: 'Paid'.text.make(),
-                                                        )
-                                                    )
+                                                                print(
+                                                                    'Error: $e'); // Log the error for debugging
+                                                              }
+                                                            },
+                                                            child: 'Paid'
+                                                                .text
+                                                                .make(),
+                                                          ))
                                                   ],
                                                 ),
                                                 SizedBox(height: 20)
@@ -594,6 +697,80 @@ class _ViewRoomState extends State<ViewRoom> {
                           ),
                         ),
                         Spacer(),
+                        Padding(
+                          padding: EdgeInsets.only(top: 40, right: 20),
+                          child: GestureDetector(
+                            onTap: () {
+                              QuickAlert.show(
+                                onCancelBtnTap: () {
+                                  Navigator.pop(context);
+                                },
+                                onConfirmBtnTap: () async {
+                                  Navigator.pop(context);
+                                  QuickAlert.show(
+                                      text: 'Cleaning room',
+                                      title: 'Please wait...',
+                                      context: (context),
+                                      type: QuickAlertType.loading);
+                                  try {
+                                    await FirebaseFirestore.instance
+                                        .collection('Rooms')
+                                        .doc(data['roomDocId'].toString())
+                                        .update({
+                                      'boarderEmail': '',
+                                      'boarderID': '',
+                                      'boardersConNumber': '',
+                                      'boardersName': '',
+                                      'roomStatus': 'available',
+                                    });
+                                    Navigator.pop(context);
+                                    QuickAlert.show(
+                                        text: 'Cleaning successful',
+                                        title: 'Cleaning successful',
+                                        context: (context),
+                                        type: QuickAlertType.success);
+                                  } catch (e) {
+                                    print(e);
+                                  }
+                                },
+                                context: context,
+                                type: QuickAlertType.confirm,
+                                text:
+                                    'Would you like to proceed with cleaning the room? This will make it available for others to reserve.',
+                                titleAlignment: TextAlign.center,
+                                textAlignment: TextAlign.center,
+                                confirmBtnText: 'Yes',
+                                cancelBtnText: 'No',
+                                confirmBtnColor: Colors.blue,
+                                backgroundColor: Colors.white,
+                                headerBackgroundColor: Colors.grey,
+                                confirmBtnTextStyle: const TextStyle(
+                                  color: Colors.white,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                                titleColor: Colors.black,
+                                textColor: Colors.black,
+                              );
+                            },
+                            child: Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.2),
+                                border:
+                                    Border.all(color: Colors.grey, width: 0.3),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  size: 17,
+                                  Icons.cleaning_services,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ],
                     ),
                     Spacer(),

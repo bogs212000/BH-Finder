@@ -137,7 +137,7 @@ class _OwnerChatListState extends State<OwnerChatList> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ChatBoarders()),
+                              builder: (context) => ChatBoarders(boarderNumber: data['boarderNumber'].toString())),
                         );
                       },
                       child: Card(

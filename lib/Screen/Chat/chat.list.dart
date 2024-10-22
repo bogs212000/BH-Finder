@@ -128,7 +128,11 @@ class _ChatListState extends State<ChatList> {
                         });
                         Navigator.push(
                           context,
-                          MaterialPageRoute(builder: (context) => ChatOwner()),
+                          MaterialPageRoute(
+                            builder: (context) => ChatOwner(
+                              ownerNumber: data['ownerNumber'],
+                            ),
+                          ),
                         );
                       },
                       child: Card(

@@ -1,15 +1,19 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../cons.dart';
 
 class ChatBoarders extends StatefulWidget {
-  ChatBoarders({Key? key}) : super(key: key);
+  final String? boarderNumber;
+  ChatBoarders({Key? key, this.boarderNumber}) : super(key: key);
 
   @override
   State<ChatBoarders> createState() => _ChatBoardersState();
@@ -25,6 +29,35 @@ class _ChatBoardersState extends State<ChatBoarders> {
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     double screenWidth = MediaQuery.of(context).size.width;
+
+    _callNumber() async{
+      QuickAlert.show(
+        onCancelBtnTap: () {
+          Navigator.pop(context);
+        },
+        onConfirmBtnTap: () async {
+          String number = '${widget.boarderNumber}'; //set the number here
+          bool? res = await FlutterPhoneDirectCaller.callNumber(number);
+          Navigator.pop(context);
+        },
+        context: context,
+        type: QuickAlertType.confirm,
+        text: 'Do you want to continue?',
+        titleAlignment: TextAlign.center,
+        textAlignment: TextAlign.center,
+        confirmBtnText: 'Yes',
+        cancelBtnText: 'No',
+        confirmBtnColor: Colors.blue,
+        backgroundColor: Colors.white,
+        headerBackgroundColor: Colors.grey,
+        confirmBtnTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+        titleColor: Colors.black,
+        textColor: Colors.black,
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -62,6 +95,20 @@ class _ChatBoardersState extends State<ChatBoarders> {
             ),
           ),
         ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: () {
+                _callNumber();
+              },
+              child: const Icon(
+                Icons.call,
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
       body: Column(
         children: [

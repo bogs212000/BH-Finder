@@ -1,15 +1,20 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 
 import '../../cons.dart';
 
 class ChatOwner extends StatefulWidget {
-  ChatOwner({Key? key}) : super(key: key);
+  final String? ownerNumber;
+
+  ChatOwner({Key? key, this.ownerNumber}) : super(key: key);
 
   @override
   State<ChatOwner> createState() => _ChatOwnerState();
@@ -25,6 +30,35 @@ class _ChatOwnerState extends State<ChatOwner> {
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     double screenWidth = MediaQuery.of(context).size.width;
+
+    _callNumber() async{
+      QuickAlert.show(
+        onCancelBtnTap: () {
+          Navigator.pop(context);
+        },
+        onConfirmBtnTap: () async {
+          String number = '${widget.ownerNumber}'; //set the number here
+          bool? res = await FlutterPhoneDirectCaller.callNumber(number);
+          Navigator.pop(context);
+        },
+        context: context,
+        type: QuickAlertType.confirm,
+        text: 'Do you want to continue?',
+        titleAlignment: TextAlign.center,
+        textAlignment: TextAlign.center,
+        confirmBtnText: 'Yes',
+        cancelBtnText: 'No',
+        confirmBtnColor: Colors.blue,
+        backgroundColor: Colors.white,
+        headerBackgroundColor: Colors.grey,
+        confirmBtnTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+        titleColor: Colors.black,
+        textColor: Colors.black,
+      );
+    }
 
     return Scaffold(
       appBar: AppBar(
@@ -62,6 +96,20 @@ class _ChatOwnerState extends State<ChatOwner> {
             ),
           ),
         ),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: () {
+                _callNumber();
+              },
+              child: Icon(
+                Icons.call,
+                color: Colors.white,
+              ),
+            ),
+          )
+        ],
       ),
       body: Column(
         children: [
@@ -197,9 +245,13 @@ class _ChatOwnerState extends State<ChatOwner> {
         'createdAt': DateTime.now(),
         'seenBorder?': false,
         'seenOwner?': true,
-        'count': FieldValue.increment(1)
+        'count': FieldValue.increment(1),
+        'ownerNumber': '${widget.ownerNumber.toString()}',
       });
-      await FirebaseFirestore.instance.collection('BoardingHouses').doc(ownerEmail).update({
+      await FirebaseFirestore.instance
+          .collection('BoardingHouses')
+          .doc(ownerEmail)
+          .update({
         'chat': FieldValue.increment(1),
       });
       await _firestore

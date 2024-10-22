@@ -11,10 +11,13 @@ import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../fetch.dart';
 import 'package:location/location.dart' as loc;
 
+import '../Auth/auth.wrapper.dart';
 import 'admin.view.bhouse.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -27,248 +30,306 @@ class AdminHomeScreen extends StatefulWidget {
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
 
   @override
+  void initState() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    super.initState();
+  }
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: ''.text.make(),
-        actions: [],
+        title: 'Admin'.text.make(),
+        actions: [
+          Padding(
+            padding: EdgeInsets.only(right: 10),
+            child: GestureDetector(
+              onTap: () {
+                QuickAlert.show(
+                  onCancelBtnTap: () {
+                    Navigator.pop(context);
+                  },
+                  onConfirmBtnTap: () async {
+                    await FirebaseAuth.instance.signOut();
+                    setState(() {
+                      bUuId = null;
+                      ownerEmail = null;
+                    });
+                    Navigator.pop(context);
+                    Navigator.of(context).pushAndRemoveUntil(
+                      MaterialPageRoute(
+                        builder: (context) => AuthWrapper(),
+                      ),
+                      (Route<dynamic> route) =>
+                          false, // Removes all previous routes
+                    );
+                  },
+                  context: context,
+                  type: QuickAlertType.confirm,
+                  text: 'Going to signing out',
+                  titleAlignment: TextAlign.center,
+                  textAlignment: TextAlign.center,
+                  confirmBtnText: 'Yes',
+                  cancelBtnText: 'No',
+                  confirmBtnColor: Colors.blue,
+                  backgroundColor: Colors.white,
+                  headerBackgroundColor: Colors.grey,
+                  confirmBtnTextStyle: const TextStyle(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+                  titleColor: Colors.black,
+                  textColor: Colors.black,
+                );
+              },
+              child: 'Sign out'.text.make(),
+            ),
+          )
+        ],
       ),
       body: Container(
         color: Colors.white,
         height: double.infinity,
         width: double.infinity,
-        child: SingleChildScrollView(
-          child: Column(
-            children: [
-              Container(
-                padding: EdgeInsets.only(right: 20, left: 20),
-                color: Colors.white,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Container(
-                          width: 150,
-                          padding: EdgeInsets.all(5),
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(12),
-                            color: Color(0xFF31355C),
-                          ),
-                          child: 'Boarding Houses'
-                              .text
-                              .lg
-                              .size(11)
-                              .center
-                              .color(Colors.white)
-                              .make(),
-                        )
-                      ],
-                    ),
-                    SizedBox(height: 5),
-                  ],
-                ),
+        child: Column(
+          children: [
+            Container(
+              padding: EdgeInsets.only(right: 20, left: 20),
+              color: Colors.white,
+              width: double.infinity,
+              child: Column(
+                children: [
+                  Row(
+                    children: [
+                      Container(
+                        width: 150,
+                        padding: EdgeInsets.all(5),
+                        decoration: BoxDecoration(
+                          borderRadius: BorderRadius.circular(12),
+                          color: Color(0xFF31355C),
+                        ),
+                        child: 'Boarding Houses'
+                            .text
+                            .lg
+                            .size(11)
+                            .center
+                            .color(Colors.white)
+                            .make(),
+                      )
+                    ],
+                  ),
+                  SizedBox(height: 5),
+                ],
               ),
-              SizedBox(height: 10),
-              Padding(
-                padding: const EdgeInsets.only(right: 20, left: 20),
-                child: Expanded(
-                  child: Container(
-                    height: 500,
-                    width: double.infinity,
-                    child: StreamBuilder<QuerySnapshot>(
-                      stream: FirebaseFirestore.instance
-                          .collection("BoardingHouses")
-                          .snapshots(),
-                      builder: (context, snapshot) {
-                        if (snapshot.hasError) {
-                          return Center(
-                            child: Text('Error: ${snapshot.error}'),
-                          );
-                        }
-                        if (snapshot.connectionState ==
-                            ConnectionState.waiting) {
-                          return const Center(
-                            child: CircularProgressIndicator(),
-                          );
-                        }
-                        final datas = snapshot.data?.docs ?? [];
-                        return Scaffold(
-                          body: Container(
-                            color: Colors.white,
-                            width: double.infinity,
-                            height: double.infinity,
-                            child: AlignedGridView.count(
-                              crossAxisCount: 2,
-                              mainAxisSpacing: 0,
-                              crossAxisSpacing: 0,
-                              itemCount: datas.length,
-                              itemBuilder: (context, index) {
-                                final data =
-                                    datas[index].data() as Map<String, dynamic>;
-                                return GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      OwnerUuId = data['OwnerUId'];
-                                      rBHouseDocId = data['Email'];
-                                    });
-                                    Navigator.of(context).pushAndRemoveUntil(
-                                      _toAdminBhouseScreen(),
-                                      (Route<dynamic> route) => false,
-                                    );
-                                  },
-                                  child: Container(
-                                    width: 150,
-                                    height: 300,
-                                    margin: EdgeInsets.all(5),
-                                    // Add margin for spacing
-                                    decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(2),
-                                        color: Colors.white),
-                                    child: Column(
+            ),
+            SizedBox(height: 10),
+            Expanded(
+              child: Container(
+                width: double.infinity,
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection("BoardingHouses")
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasError) {
+                      return Center(
+                        child: Text('Error: ${snapshot.error}'),
+                      );
+                    }
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(),
+                      );
+                    }
+                    final datas = snapshot.data?.docs ?? [];
+                    return Scaffold(
+                      body: Container(
+                        color: Colors.white,
+                        width: double.infinity,
+                        height: double.infinity,
+                        child: AlignedGridView.count(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 0,
+                          crossAxisSpacing: 0,
+                          itemCount: datas.length,
+                          itemBuilder: (context, index) {
+                            final data =
+                                datas[index].data() as Map<String, dynamic>;
+                            List<dynamic> ratings = data['ratings'];
+                            double average = ratings.reduce((a, b) => a + b) /
+                                ratings.length;
+                            double star = average;
+                            double clampedRating = star.clamp(0.0, 5.0);
+                            return GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  OwnerUuId = data['OwnerUId'];
+                                  rBHouseDocId = data['Email'];
+                                });
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  _toAdminBhouseScreen(),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: Container(
+                                width: 150,
+                                height: 225,
+                                margin: EdgeInsets.all(5),
+                                // Add margin for spacing
+                                decoration: BoxDecoration(
+                                    borderRadius: BorderRadius.circular(2),
+                                    color: Colors.white),
+                                child: Column(
+                                  children: [
+                                    Stack(
                                       children: [
                                         Stack(
                                           children: [
-                                            Stack(
-                                              children: [
-                                                Container(
-                                                  width: double.infinity,
-                                                  height: 220,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.white,
+                                            Container(
+                                              width: double.infinity,
+                                              height: 220,
+                                              decoration: BoxDecoration(
+                                                  color: Colors.white,
+                                                  borderRadius:
+                                                      BorderRadius.circular(5),
+                                                  boxShadow: [
+                                                    BoxShadow(
+                                                      color: Colors.grey
+                                                          .withOpacity(0.2),
+                                                      spreadRadius: 1,
+                                                      blurRadius: 3,
+                                                      offset: Offset(0, 0.5),
+                                                    ),
+                                                  ]),
+                                              child: Column(
+                                                children: [
+                                                  Container(
+                                                    width: double.infinity,
+                                                    height: 150,
+                                                    decoration: BoxDecoration(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              5),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.grey
-                                                              .withOpacity(0.2),
-                                                          spreadRadius: 1,
-                                                          blurRadius: 3,
-                                                          offset:
-                                                              Offset(0, 0.5),
-                                                        ),
-                                                      ]),
-                                                  child: Column(
-                                                    children: [
-                                                      Container(
-                                                        width: double.infinity,
-                                                        height: 150,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              const BorderRadius
-                                                                  .only(
-                                                            topLeft:
-                                                                Radius.circular(
-                                                                    5),
-                                                            topRight:
-                                                                Radius.circular(
-                                                                    5),
-                                                          ),
-                                                          image:
-                                                              DecorationImage(
-                                                            image:
-                                                                CachedNetworkImageProvider(
-                                                                    data[
-                                                                        'Image']),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
+                                                          const BorderRadius
+                                                              .only(
+                                                        topLeft:
+                                                            Radius.circular(5),
+                                                        topRight:
+                                                            Radius.circular(5),
                                                       ),
-                                                      Container(
-                                                        padding:
-                                                            EdgeInsets.all(5),
-                                                        width: double.infinity,
-                                                        height: 70,
-                                                        decoration:
-                                                            BoxDecoration(
-                                                          borderRadius:
-                                                              const BorderRadius
-                                                                  .only(
-                                                            bottomLeft:
-                                                                Radius.circular(
-                                                                    5),
-                                                            bottomRight:
-                                                                Radius.circular(
-                                                                    5),
-                                                          ),
-                                                        ),
-                                                        child: Column(
+                                                      image: DecorationImage(
+                                                        image:
+                                                            CachedNetworkImageProvider(
+                                                                data['Image']),
+                                                        fit: BoxFit.cover,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Container(
+                                                    padding: EdgeInsets.all(5),
+                                                    width: double.infinity,
+                                                    height: 70,
+                                                    decoration: BoxDecoration(
+                                                      borderRadius:
+                                                          const BorderRadius
+                                                              .only(
+                                                        bottomLeft:
+                                                            Radius.circular(5),
+                                                        bottomRight:
+                                                            Radius.circular(5),
+                                                      ),
+                                                    ),
+                                                    child: Column(
+                                                      children: [
+                                                        Row(
                                                           children: [
-                                                            Row(
-                                                              children: [
-                                                                Flexible(
-                                                                    child: '${data['BoardingHouseName']}'
-                                                                        .text
-                                                                        .overflow(
-                                                                            TextOverflow.ellipsis)
-                                                                        .light
-                                                                        .make())
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Flexible(
-                                                                    child: '${data['address']}'
-                                                                        .text
-                                                                        .overflow(TextOverflow
+                                                            Flexible(
+                                                                child: '${data['BoardingHouseName']}'
+                                                                    .text
+                                                                    .overflow(
+                                                                        TextOverflow
                                                                             .ellipsis)
-                                                                        .size(
-                                                                            10)
-                                                                        .color(Colors
-                                                                            .grey)
-                                                                        .make())
-                                                              ],
-                                                            ),
+                                                                    .light
+                                                                    .make())
+                                                          ],
+                                                        ),
+                                                        Row(
+                                                          children: [
+                                                            Flexible(
+                                                                child: '${data['address']}'
+                                                                    .text
+                                                                    .overflow(
+                                                                        TextOverflow
+                                                                            .ellipsis)
+                                                                    .size(10)
+                                                                    .color(Colors
+                                                                        .grey)
+                                                                    .make())
+                                                          ],
+                                                        ),
+                                                        Spacer(),
+                                                        Row(
+                                                          children: [
+                                                            data['verified'] ==
+                                                                    true
+                                                                ? 'Verified'
+                                                                    .text
+                                                                    .color(Colors
+                                                                        .green)
+                                                                    .make()
+                                                                : 'Unverified'
+                                                                    .text
+                                                                    .color(Colors
+                                                                        .red)
+                                                                    .make(),
                                                             Spacer(),
                                                             Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
                                                               children: [
-                                                                data['verified'] ==
-                                                                        true
-                                                                    ? 'Verified'
-                                                                        .text
-                                                                        .color(Colors
-                                                                            .green)
-                                                                        .make()
-                                                                    : 'Unverified'
-                                                                        .text
-                                                                        .color(Colors
-                                                                            .red)
-                                                                        .make(),
-                                                                Spacer(),
-                                                                Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .amber,
-                                                                  size: 10,
+                                                                GestureDetector(
+                                                                  onTap: () {},
+                                                                  child: Row(
+                                                                    mainAxisAlignment:
+                                                                        MainAxisAlignment
+                                                                            .end,
+                                                                    children: List
+                                                                        .generate(
+                                                                            5,
+                                                                            (index) {
+                                                                      if (index <
+                                                                          clampedRating
+                                                                              .toInt()) {
+                                                                        // Filled star
+                                                                        return const Icon(
+                                                                          Icons
+                                                                              .star,
+                                                                          color:
+                                                                              Colors.amber,
+                                                                          size:
+                                                                              12,
+                                                                        );
+                                                                      } else if (index <
+                                                                          clampedRating) {
+                                                                        // Half star
+                                                                        return const Icon(
+                                                                            Icons
+                                                                                .star_half,
+                                                                            color:
+                                                                                Colors.amber,
+                                                                            size: 12);
+                                                                      } else {
+                                                                        // Empty star
+                                                                        return const Icon(
+                                                                            Icons
+                                                                                .star_border,
+                                                                            color:
+                                                                                Colors.amber,
+                                                                            size: 12);
+                                                                      }
+                                                                    }),
+                                                                  ),
                                                                 ),
-                                                                Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .amber,
-                                                                  size: 10,
-                                                                ),
-                                                                Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .amber,
-                                                                  size: 10,
-                                                                ),
-                                                                Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .amber,
-                                                                  size: 10,
-                                                                ),
-                                                                Icon(
-                                                                  Icons.star,
-                                                                  color: Colors
-                                                                      .amber,
-                                                                  size: 10,
-                                                                ),
-                                                                ' 4.5'
+                                                                ' - $average'
                                                                     .text
                                                                     .size(10)
                                                                     .light
@@ -277,31 +338,31 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                                             ),
                                                           ],
                                                         ),
-                                                      ),
-                                                    ],
+                                                      ],
+                                                    ),
                                                   ),
-                                                ),
-                                              ],
+                                                ],
+                                              ),
                                             ),
-                                            SizedBox(height: 5),
                                           ],
                                         ),
                                         SizedBox(height: 5),
                                       ],
                                     ),
-                                  ),
-                                );
-                              },
-                            ),
-                          ),
-                        );
-                      },
-                    ),
-                  ),
+                                    SizedBox(height: 5),
+                                  ],
+                                ),
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    );
+                  },
                 ),
-              )
-            ],
-          ),
+              ),
+            )
+          ],
         ),
       ),
     );
