@@ -1,20 +1,29 @@
+import 'dart:convert';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:googleapis_auth/auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:intl/intl.dart';
 import 'package:lottie/lottie.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
-
+import 'package:http/http.dart' as http;
 import '../../cons.dart';
+
+final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class ChatOwner extends StatefulWidget {
   final String? ownerNumber;
+  final String? emailOwner;
+  final String? token;
 
-  ChatOwner({Key? key, this.ownerNumber}) : super(key: key);
+  ChatOwner({Key? key, this.ownerNumber, this.emailOwner, this.token}) : super(key: key);
 
   @override
   State<ChatOwner> createState() => _ChatOwnerState();
@@ -25,6 +34,56 @@ class _ChatOwnerState extends State<ChatOwner> {
   String email = FirebaseAuth.instance.currentUser!.email.toString();
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _messageController = TextEditingController();
+
+  void sendPushMessage(String body, String title) async {
+    try {
+      final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
+        await rootBundle.loadString(
+            'assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json'),
+      );
+
+      final client =
+      await clientViaServiceAccount(serviceAccountCredentials, _scopes);
+      final accessToken = client.credentials.accessToken.data;
+
+        final response = await http.post(
+          Uri.parse(
+              'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+          },
+          body: jsonEncode({
+            'message': {
+              'token': widget.token,
+              // Send notification to all users subscribed to this topic
+              'notification': {
+                'body': body,
+                'title': title,
+              },
+              'data': {
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done',
+                'body': body, // Include additional data if needed
+                'title': title,
+              },
+            },
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          print('Push notification sent successfully to all users');
+        } else {
+          print(
+              'Failed to send push notification. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+
+    } catch (e) {
+      print("Error sending push notification: $e");
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -118,7 +177,7 @@ class _ChatOwnerState extends State<ChatOwner> {
             child: StreamBuilder(
               stream: _firestore
                   .collection('Chats')
-                  .doc('$email+$ownerEmail')
+                  .doc('$email+${widget.emailOwner}')
                   .collection('Chats')
                   .orderBy('createdAt', descending: false)
                   .snapshots(),
@@ -247,6 +306,8 @@ class _ChatOwnerState extends State<ChatOwner> {
         'seenOwner?': true,
         'count': FieldValue.increment(1),
         'ownerNumber': '${widget.ownerNumber.toString()}',
+        'ownerToken': widget.token.toString(),
+        'myToken': myToken,
       });
       await FirebaseFirestore.instance
           .collection('BoardingHouses')
@@ -265,7 +326,11 @@ class _ChatOwnerState extends State<ChatOwner> {
         'sender': _auth.currentUser?.email?.toString(),
         'createdAt': DateTime.now(),
       });
+      String body = _messageController.text;
+      String title = "$fName $mName $lName";
       _messageController.clear();
+      sendPushMessage(body, title);
+
     }
   }
 }

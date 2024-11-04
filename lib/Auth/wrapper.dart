@@ -11,6 +11,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
+import '../Screen/Home/nav.home.dart';
 import '../Screen/Owner/owner.home.screen.dart';
 import '../Screen/SignUp/guest.screen.dart';
 import '../cons.dart';
@@ -69,7 +70,7 @@ class Wrapper extends StatelessWidget {
                 mName = userData.data!['MiddleName'];
                 lName = userData.data!['LastName'];
                 bPhoneNumber = userData.data!['PhoneNumber'];
-                return HomeScreen();
+                return NavHome();
               } else if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Admin") &&
                   (user != null && user.emailVerified)) {
@@ -78,7 +79,7 @@ class Wrapper extends StatelessWidget {
                   (userData.data!['role'] == "Owner")) {
                 return WaitingVerificationScreen();
               } else if ((userData.data!['role'] == "Client")) {
-                return HomeScreen();
+                return NavHome();
               } else {
                 return GuestScreen();
               }

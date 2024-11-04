@@ -163,263 +163,6 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: searchActive == false
-          ? AppBar(
-              backgroundColor: Colors.white,
-              title: searchActive == false
-                  ? GestureDetector(
-                      onTap: () {
-                        Navigator.of(context).pushAndRemoveUntil(
-                          _toNearMeMapScreen(),
-                          (Route<dynamic> route) => false,
-                        );
-                      },
-                      child: searchActive == false && userLat != null
-                          ? Container(
-                              padding: EdgeInsets.only(left: 5, right: 5),
-                              height: 35,
-                              width: 150,
-                              decoration: BoxDecoration(
-                                color: Colors.white,
-                                border:
-                                    Border.all(color: Colors.grey, width: 0.3),
-                                borderRadius: BorderRadius.circular(20),
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.grey.withOpacity(0.2),
-                                    // Shadow color with opacity
-                                    spreadRadius: 1,
-                                    // Spread radius
-                                    blurRadius: 1,
-                                    // Blur radius
-                                    offset: Offset(0,
-                                        1), // Position of the shadow (horizontal, vertical)
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Row(
-                                    children: [
-                                      Icon(
-                                        Icons.pin_drop_outlined,
-                                        color: Colors.grey.withOpacity(0.8),
-                                      ),
-                                      SizedBox(width: 5),
-                                      'Street'
-                                          .text
-                                          .color(Colors.grey.withOpacity(0.8))
-                                          .size(12)
-                                          .bold
-                                          .make()
-                                    ],
-                                  ),
-                                ],
-                              ),
-                            )
-                          : Row(
-                              children: [
-                                Shimmer.fromColors(
-                                  baseColor: Colors.grey.shade200,
-                                  highlightColor: Colors.white,
-                                  child: Padding(
-                                    padding:
-                                        EdgeInsets.only(left: 20, right: 20),
-                                    child: Container(
-                                      height: 40,
-                                      width: 130,
-                                      decoration: BoxDecoration(
-                                        color: Colors.grey,
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                    )
-                  : SizedBox(),
-              actions: [
-                searchActive == false &&
-                        currentUser != null &&
-                        userEmail != null
-                    ? FutureBuilder<DocumentSnapshot>(
-                        future: notification,
-                        builder: (BuildContext context,
-                            AsyncSnapshot<DocumentSnapshot> snapshot) {
-                          if (snapshot.connectionState ==
-                              ConnectionState.waiting) {
-                            return Shimmer.fromColors(
-                              baseColor: Colors.grey.shade200,
-                              highlightColor: Colors.white,
-                              child: Padding(
-                                padding: EdgeInsets.only(left: 20, right: 20),
-                                child: Container(
-                                  height: 35,
-                                  width: double.infinity,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                ),
-                              ),
-                            );
-                          }
-                          if (snapshot.hasError) {
-                            return const Center(
-                                child: Text('Error fetching data'));
-                          }
-                          if (!snapshot.hasData || !snapshot.data!.exists) {
-                            return const Center(
-                                child: Text('No Reservation found'));
-                          }
-                          Map<String, dynamic> data =
-                              snapshot.data!.data() as Map<String, dynamic>;
-                          return Padding(
-                            padding: EdgeInsets.only(right: 10),
-                            child: GestureDetector(
-                              onTap: () async {
-                                await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser?.email.toString()).update({
-                                  'notification': 0,
-                                });
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  _toNotificationScreen(),
-                                  (Route<dynamic> route) => false,
-                                );
-                              },
-                              child: Stack(
-                                children: [
-                                  Container(
-                                    height: 35,
-                                    width: 35,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white,
-                                      border: Border.all(
-                                          color: Colors.grey, width: 0.3),
-                                      borderRadius: BorderRadius.circular(20),
-                                      boxShadow: [
-                                        BoxShadow(
-                                          color: Colors.grey.withOpacity(0.2),
-                                          spreadRadius: 1,
-                                          blurRadius: 1,
-                                          offset: Offset(0, 1),
-                                        ),
-                                      ],
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.notifications_active_outlined,
-                                        color: Colors.grey.withOpacity(0.8),
-                                      ),
-                                    ),
-                                  ),
-                                  data['notification'] != 0 ?
-                                  Container(
-                                    height: 35,
-                                    width: 35,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            CircleAvatar(
-                                              backgroundColor: Colors.red,
-                                              radius: 8,
-                                              child: Center(
-                                                  child:
-                                                      '${data['notification']}'
-                                                          .text
-                                                          .size(1)
-                                                          .color(Colors.white)
-                                                          .make()),
-                                            )
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ) :
-                                      SizedBox(),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
-                      )
-                    : SizedBox(),
-                searchActive == false && currentUser != null
-                    ? Padding(
-                        padding: EdgeInsets.only(right: 10),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/ChatList');
-                          },
-                          child: Container(
-                            height: 35,
-                            width: 35,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border:
-                                  Border.all(color: Colors.grey, width: 0.3),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 1,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.chat_outlined,
-                                color: Colors.grey.withOpacity(0.8),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : SizedBox(),
-                searchActive == false && currentUser != null
-                    ? Padding(
-                        padding: EdgeInsets.only(right: 20),
-                        child: GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/UserProfile');
-                            print('hahaha');
-                          },
-                          child: Container(
-                            height: 35,
-                            width: 35,
-                            decoration: BoxDecoration(
-                              color: Colors.white,
-                              border:
-                                  Border.all(color: Colors.grey, width: 0.3),
-                              borderRadius: BorderRadius.circular(20),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 1,
-                                  offset: Offset(0, 1),
-                                ),
-                              ],
-                            ),
-                            child: Center(
-                              child: Icon(
-                                Icons.account_circle_outlined,
-                                color: Colors.grey.withOpacity(0.8),
-                              ),
-                            ),
-                          ),
-                        ),
-                      )
-                    : SizedBox(),
-              ],
-            )
-          : null,
       body: Container(
         color: Colors.white,
         height: double.infinity,
@@ -586,104 +329,11 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     : SizedBox(height: 1),
 
-                Container(
-                  padding: searchActive == false
-                      ? EdgeInsets.all(20)
-                      : EdgeInsets.only(left: 20, right: 20),
-                  color: Colors.white,
-                  width: double.infinity,
-                  child: Column(
-                    children: [
-                      searchActive == false
-                          ? Row(
-                              children: [
-                                Image.asset(
-                                  'assets/logo.png',
-                                  scale: 5,
-                                ),
-                              ],
-                            )
-                          : SizedBox(),
-                      searchActive == false
-                          ? Row(
-                              children: [
-                                'Discover your'
-                                    .text
-                                    .light
-                                    .color(Colors.grey)
-                                    .size(25)
-                                    .make(),
-                              ],
-                            )
-                          : SizedBox(),
-                      searchActive == false
-                          ? Row(
-                              children: [
-                                'perfect place to stay'
-                                    .text
-                                    .bold
-                                    .color(Colors.black)
-                                    .size(25)
-                                    .make(),
-                              ],
-                            )
-                          : SizedBox(),
-                      Padding(
-                        padding:
-                            const EdgeInsets.only(left: 5, right: 5, top: 40),
-                        child: TextField(
-                          onChanged: (value) {
-                            setState(() {
-                              search = value;
-                            });
-                          },
-                          focusNode: _focusNode,
-                          keyboardType: TextInputType.name,
-                          textAlign: TextAlign.left,
-                          style: const TextStyle(
-                            fontSize: 15,
-                            fontWeight: FontWeight.bold,
-                          ),
-                          decoration: InputDecoration(
-                              prefixIcon: Icon(
-                                Icons.search,
-                                color: Colors.black,
-                              ),
-                              suffixIcon: Padding(
-                                padding: const EdgeInsets.only(right: 10),
-                                child: CircleAvatar(
-                                  radius: 12,
-                                  backgroundColor: Colors.white,
-                                  child: Center(
-                                    child: Icon(
-                                      Icons.filter_list,
-                                      color: Colors.grey.withOpacity(0.8),
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              filled: true,
-                              fillColor: Colors.grey.withOpacity(0.1),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(20),
-                                borderSide: BorderSide(color: Colors.white),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: BorderSide(color: Colors.white),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              labelText: 'Search',
-                              labelStyle:
-                                  TextStyle(color: Colors.grey.withOpacity(0.8))),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
+                SizedBox(height: 20),
                 //List BH
                 currentUser != null
                     ? Padding(
-                        padding: const EdgeInsets.only(left: 20, right: 20),
+                        padding: const EdgeInsets.only(left: 20, right: 20, bottom: 20),
                         child: Container(
                           height: 500, // Specify height for the tab container
                           child: DefaultTabController(
@@ -804,13 +454,12 @@ class _HomeScreenState extends State<HomeScreen> {
                                                       final data = datas[index]
                                                               .data()
                                                           as Map<String, dynamic>;
-                                                      OwnerUuId =
-                                                          data['OwnerUId'];
                                                       rBHouseDocId =
                                                           data['Email'];
                                                       print("$OwnerUuId");
                                                       List<dynamic> ratings = data['ratings'];
                                                       double average = ratings.reduce((a, b) => a + b) / ratings.length;
+                                                      String averageOneDecimal = average.toStringAsFixed(1);
                                                       double star = average;
                                                       double clampedRating = star.clamp(0.0, 5.0);
                                                       return GestureDetector(
@@ -936,7 +585,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                                             }
                                                                                           }),
                                                                                         ),
-                                                                                      ), ' - $average'.text.size(10).light.make(),
+                                                                                      ), ' - $averageOneDecimal'.text.size(10).light.make(),
                                                                                     ],
                                                                                   ),
                                                                                 ],
@@ -1196,7 +845,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       )
                     : Padding(
                         padding:
-                            const EdgeInsets.only(right: 20, left: 20, top: 10),
+                            const EdgeInsets.only(right: 20, left: 20, top: 10, bottom: 20),
                         child: Container(
                           height: 500,
                           width: double.infinity,
@@ -1278,6 +927,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                           as Map<String, dynamic>;
                                       List<dynamic> ratings = data['ratings'];
                                       double average = ratings.reduce((a, b) => a + b) / ratings.length;
+                                      String averageOneDecimal = average.toStringAsFixed(1);
                                       double star = average;
                                       double clampedRating = star.clamp(0.0, 5.0);
                                       return GestureDetector(
@@ -1420,7 +1070,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                                             }
                                                                           }),
                                                                         ),
-                                                                      ), ' - $average'.text.size(10).light.make(),
+                                                                      ), ' - $averageOneDecimal'.text.size(10).light.make(),
                                                                     ],
                                                                   ),
                                                                 ],

@@ -441,6 +441,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         'PhoneNumber': contactNumber.text,
                                         'notification': 0,
                                         'verified': true,
+                                        'token': '',
                                       });
                                       Navigator.of(context);
                                       QuickAlert.show(

@@ -58,42 +58,6 @@ class _UserProfileState extends State<UserProfile> {
         ? LoadingScreen()
         : Scaffold(
       backgroundColor: Colors.white,
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        actions: [
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              onTap: () {
-                // Your action here
-              },
-              child: Container(
-                height: 35,
-                width: 35,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey, width: 0.3),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 1,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.settings,
-                    color: Colors.grey.withOpacity(0.8),
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
       body: SmartRefresher(
         enablePullDown: true,
         enablePullUp: false, // Assuming no pull-up loading is needed
@@ -119,6 +83,7 @@ class _UserProfileState extends State<UserProfile> {
               padding: const EdgeInsets.only(left: 20, right: 20),
               child: Column(
                 children: [
+                  SizedBox(height: 20,),
                   const CircleAvatar(
                     radius: 50,
                     child: Center(

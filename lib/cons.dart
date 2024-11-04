@@ -2,12 +2,16 @@ import 'package:firebase_auth/firebase_auth.dart';
 
 String currentEmail = FirebaseAuth.instance.currentUser!.email.toString();
 String? userRole;
+String? ownerToken;
 String? OwnerUuId;
 String? OwnerPhone;
 String? BhouseName;
 int? roomAvailable;
 int? roomUnavailable;
 int? allRooms;
+
+//Boarder
+String? myToken;
 
 //bHouse data
 String? bHouseRules;

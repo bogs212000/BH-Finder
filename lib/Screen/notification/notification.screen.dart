@@ -25,41 +25,6 @@ class _NotificationScreenState extends State<NotificationScreen> {
         elevation: 0,
         title: Row(
           children: [
-            Padding(
-              padding: EdgeInsets.only(right: 20),
-              child: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    _toHomeScreen(),
-                        (Route<dynamic> route) =>
-                    false,
-                  );
-                },
-                child: Container(
-                  height: 35,
-                  width: 35,
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    border: Border.all(color: Colors.grey, width: 0.3),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        spreadRadius: 1,
-                        blurRadius: 1,
-                        offset: Offset(0, 1),
-                      ),
-                    ],
-                  ),
-                  child: Center(
-                    child: Icon(
-                      Icons.arrow_back_ios_new,
-                      color: Colors.grey.withOpacity(0.8),
-                    ),
-                  ),
-                ),
-              ),
-            ),
             'Notification'.text.make(),
           ],
         ),

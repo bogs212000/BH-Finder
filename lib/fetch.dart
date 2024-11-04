@@ -40,6 +40,7 @@ Future<void> fetchBoarderData(Function setState) async {
         .get();
 
     setState(() {
+      myToken = snapshot.data()?['token'];
       userRole = snapshot.data()?['role'];
       fName = snapshot.data()?['FirstName'];
       mName = snapshot.data()?['MiddleName'];
@@ -112,6 +113,7 @@ Future<void> fetchOwnerData(Function setState) async {
         .get();
 
     setState(() {
+      ownerToken = snapshot.data()?['token'];
       userRole = snapshot.data()?['role'];
       OwnerUuId = snapshot.data()?['OwnerUId'];
       OwnerPhone = snapshot.data()?['PhoneNumber'];

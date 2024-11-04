@@ -8,8 +8,10 @@ import 'package:bh_finder/Screen/Owner/OwnerSignUp/third.screen.dart';
 import 'package:bh_finder/Screen/Profile/user.profile.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'Auth/auth.wrapper.dart';
 import 'Screen/BHouse/bh.screen.dart';
@@ -33,15 +35,46 @@ import 'Screen/Receipt/receipt.screen.dart';
 import 'Screen/Review/review.section.dart';
 import 'Screen/SignUp/signup.screen.dart';
 import 'Screen/TermsAndConditons/terms.conditions.dart';
+import 'Screen/notification/notification.screen.dart';
 import 'firebase_options.dart';
 
+// Define FlutterLocalNotificationsPlugin as a top-level variable
+final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
+FlutterLocalNotificationsPlugin();
+
+// Background handler to handle FCM messages when the app is in the background or terminated
+Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage message) async {
+  await Firebase.initializeApp();
+  _showLocalNotification(message);
+}
+
+// Show local notification function
+void _showLocalNotification(RemoteMessage message) async {
+  const AndroidNotificationDetails androidPlatformChannelSpecifics =
+  AndroidNotificationDetails(
+    'channel_id', // Your channel id
+    'channel_name', // Your channel name
+    importance: Importance.high,
+    priority: Priority.high,
+  );
+  const NotificationDetails platformChannelSpecifics =
+  NotificationDetails(android: androidPlatformChannelSpecifics);
+
+  // Show the notification
+  flutterLocalNotificationsPlugin.show(
+    0,
+    message.notification?.title ?? 'Notification Title',
+    message.notification?.body ?? 'Notification Body',
+    platformChannelSpecifics,
+  );
+}
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp(
     options: DefaultFirebaseOptions.currentPlatform,
   );
   FirebaseStorage storage = FirebaseStorage.instance;
-
+  FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   runApp(const MyApp());
 }
 
@@ -62,7 +95,7 @@ class MyApp extends StatelessWidget {
         '/UserProfile': (context) => UserProfile(),
         '/ViewRoom': (context) => ViewRoom(),
         '/BHouseProfile': (context) => BHouseProfile(),
-        '/GuestHomeScreen': (context) => GuestHomeScreen(),
+        // '/GuestHomeScreen': (context) => GuestHomeScreen(),
         '/LoadingScreen': (context) => LoadingScreen(),
         '/SignInScreen': (context) => SignInScreen(),
         '/BHScreen': (context) => BHouseScreen(),
@@ -86,6 +119,7 @@ class MyApp extends StatelessWidget {
         '/ReviewSectionScreen': (context) => ReviewSectionScreen(),
         '/BHouseAddress': (context) => BHouseAddress(),
         '/OwnerNotificationScreen': (context) => OwnerNotificationScreen(),
+        '/NotificationScreen': (context) => NotificationScreen(),
       }
     );
   }

@@ -83,4 +83,5 @@ class DefaultFirebaseOptions {
     authDomain: 'bh-finder-50ccf.firebaseapp.com',
     storageBucket: 'bh-finder-50ccf.appspot.com',
   );
+
 }

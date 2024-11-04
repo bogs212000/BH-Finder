@@ -906,6 +906,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'PhoneNumber': ownerContactNumber,
                                     'verified': false,
                                     'address': boardingHouseAddress,
+                                    'token': '',
                                   });
                                   await FirebaseFirestore.instance
                                       .collection('BoardingHouses')
@@ -928,6 +929,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'verified': verified,
                                     'Image': '',
                                     'ratings': [0],
+                                    'gCashNum': '',
                                   });
                                   Navigator.of(context);
                                   QuickAlert.show(

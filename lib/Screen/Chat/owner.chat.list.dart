@@ -46,6 +46,7 @@ class _OwnerChatListState extends State<OwnerChatList> {
                 .where('ownerEmail',
                     isEqualTo:
                         FirebaseAuth.instance.currentUser!.email.toString())
+            .orderBy('createdAt', descending: true)
                 .snapshots(),
             builder:
                 (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
@@ -137,7 +138,11 @@ class _OwnerChatListState extends State<OwnerChatList> {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => ChatBoarders(boarderNumber: data['boarderNumber'].toString())),
+                              builder: (context) => ChatBoarders(
+                                    boarderNumber:
+                                        data['boarderNumber'].toString(),
+                                    token: data['myToken'],
+                                  )),
                         );
                       },
                       child: Card(
@@ -170,6 +175,7 @@ class _OwnerChatListState extends State<OwnerChatList> {
                                     fontsize: 25,
                                   ),
                                   SizedBox(width: 5),
+                                  data['seenBorder?'] == true ?
                                   Text(
                                     data['name'].toString(),
                                     maxLines: 1,
@@ -178,6 +184,14 @@ class _OwnerChatListState extends State<OwnerChatList> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w200),
+                                  ) : Text(
+                                    data['name'].toString(),
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),

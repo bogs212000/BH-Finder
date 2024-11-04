@@ -11,7 +11,10 @@ import 'package:bh_finder/cons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:intl/intl.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -21,9 +24,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../fetch.dart';
 import '../BHouse/bh.screen.dart';
-import '../Map/nearme.map.dart';
-import '../SignUp/guest.screen.dart';
-import '../notification/notification.screen.dart';
+import 'package:http/http.dart' as http;
 import 'Map/location.dart';
 import 'owner.notification.dart';
 
@@ -36,6 +37,8 @@ class OwnerHomeScreen extends StatefulWidget {
 
 class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   late Future<DocumentSnapshot> ownersBHouseData;
+  late AndroidNotificationChannel channel;
+  late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   String? myEmail = FirebaseAuth.instance.currentUser?.email.toString();
   TextEditingController _searchText = TextEditingController();
   final RefreshController _refreshController =
@@ -61,6 +64,120 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         searchActive = _focusNode.hasFocus;
       });
     });
+
+    requestPermission();
+
+    loadFCM();
+
+    listenFCM();
+
+    getToken();
+
+    FirebaseMessaging.instance.subscribeToTopic("Owner");
+  }
+
+  void getToken() async {
+    String? token = await FirebaseMessaging.instance.getToken();
+    if (token != null) {
+      print("FCM Token: $token");
+      saveToken(token); // Save the token to your Firestore or your server
+      // Subscribe the user to a topic
+      FirebaseMessaging.instance.subscribeToTopic("Users");
+    } else {
+      print("Failed to get FCM token");
+    }
+  }
+
+  void saveToken(String token) async {
+    await FirebaseFirestore.instance
+        .collection("Users")
+        .doc(FirebaseAuth.instance.currentUser!.email)
+        .update({
+      'token': token,
+    });
+    await FirebaseFirestore.instance
+        .collection("BoardingHouses")
+        .doc(FirebaseAuth.instance.currentUser!.email)
+        .update({
+      'token': token,
+    });
+  }
+
+  void requestPermission() async {
+    FirebaseMessaging messaging = FirebaseMessaging.instance;
+
+    NotificationSettings settings = await messaging.requestPermission(
+      alert: true,
+      announcement: false,
+      badge: true,
+      carPlay: false,
+      criticalAlert: false,
+      provisional: false,
+      sound: true,
+    );
+
+    if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+      print('User granted permission');
+    } else if (settings.authorizationStatus ==
+        AuthorizationStatus.provisional) {
+      print('User granted provisional permission');
+    } else {
+      print('User declined or has not accepted permission');
+    }
+  }
+
+  void listenFCM() async {
+    FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+      RemoteNotification? notification = message.notification;
+      AndroidNotification? android = message.notification?.android;
+      if (notification != null && android != null && !kIsWeb) {
+        flutterLocalNotificationsPlugin.show(
+          notification.hashCode,
+          notification.title,
+          notification.body,
+          NotificationDetails(
+            android: AndroidNotificationDetails(
+              channel.id,
+              channel.name,
+              // TODO add a proper drawable resource to android, for now using
+              //      one that already exists in example app.
+              icon: 'launch_background',
+            ),
+          ),
+        );
+      }
+    });
+  }
+
+  void loadFCM() async {
+    if (!kIsWeb) {
+      channel = const AndroidNotificationChannel(
+        'high_importance_channel', // id
+        'High Importance Notifications', // title
+        importance: Importance.high,
+        enableVibration: true,
+      );
+
+      flutterLocalNotificationsPlugin = FlutterLocalNotificationsPlugin();
+
+      /// Create an Android Notification Channel.
+      ///
+      /// We use this channel in the `AndroidManifest.xml` file to override the
+      /// default FCM channel to enable heads up notifications.
+      await flutterLocalNotificationsPlugin
+          .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin>()
+          ?.createNotificationChannel(channel);
+
+      /// Update the iOS foreground notification presentation options to allow
+      /// heads up notifications.
+      await FirebaseMessaging.instance
+          .setForegroundNotificationPresentationOptions(
+        alert: true,
+        badge: true,
+        sound: true,
+      );
+    }
   }
 
   Future<void> _onRefresh() async {

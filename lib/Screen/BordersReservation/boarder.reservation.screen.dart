@@ -1,9 +1,14 @@
+import 'dart:convert';
+
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/reservation/reservation.success.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:googleapis_auth/auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
@@ -15,6 +20,9 @@ import 'package:intl/intl.dart';
 import '../../cons.dart';
 import '../../fetch.dart';
 import '../BHouse/room.screen.dart';
+import 'package:http/http.dart' as http;
+
+final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class BoarderReservationScreen extends StatefulWidget {
   const BoarderReservationScreen({super.key});
@@ -51,6 +59,56 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
       initialDateSelected: checkInDate,
       endDateSelected: checkOutDate, // Automatically setting 1 month later
     );
+  }
+
+  void sendPushMessage(String body, String title) async {
+    try {
+      final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
+        await rootBundle.loadString(
+            'assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json'),
+      );
+
+      final client =
+      await clientViaServiceAccount(serviceAccountCredentials, _scopes);
+      final accessToken = client.credentials.accessToken.data;
+
+        final response = await http.post(
+          Uri.parse(
+              'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
+          headers: <String, String>{
+            'Content-Type': 'application/json',
+            'Authorization': 'Bearer $accessToken',
+          },
+          body: jsonEncode({
+            'message': {
+              'token': '',
+              // Send notification to all users subscribed to this topic
+              'notification': {
+                'body': body,
+                'title': title,
+              },
+              'data': {
+                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+                'id': '1',
+                'status': 'done',
+                'body': body, // Include additional data if needed
+                'title': title,
+              },
+            },
+          }),
+        );
+
+        if (response.statusCode == 200) {
+          print('Push notification sent successfully to all users');
+        } else {
+          print(
+              'Failed to send push notification. Status code: ${response.statusCode}');
+          print('Response body: ${response.body}');
+        }
+
+    } catch (e) {
+      print("Error sending push notification: $e");
+    }
   }
 
   @override

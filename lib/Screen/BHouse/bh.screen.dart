@@ -17,6 +17,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../cons.dart';
 import '../../fetch.dart';
+import '../Home/nav.home.dart';
 import '../Loading/loading.bhouse.screen.dart';
 import '../Map/location.map.dart';
 import '../SignUp/guest.screen.dart';
@@ -265,8 +266,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                         roomCountAvailable =
                                                         snapshot.data ??
                                                             0; // Get the count of rooms with the OwnersID
-                                                    return roomCountAvailable ==
-                                                            null
+                                                    return roomCountAvailable == null
                                                         ? '0'
                                                             .text
                                                             .bold
@@ -329,8 +329,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                         roomCountAvailable =
                                                         snapshot.data ??
                                                             0; // Get the count of rooms with the OwnersID
-                                                    return roomCountAvailable ==
-                                                            null
+                                                    return roomCountAvailable == null
                                                         ? '0'
                                                             .text
                                                             .bold
@@ -769,6 +768,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                       context,
                                       MaterialPageRoute(
                                         builder: (context) => ChatOwner(
+                                          emailOwner : data['Email'].toString(),
+                                          token: data['token'],
                                           ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
                                         ),
                                       ),
@@ -809,7 +810,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
 
   Route _toHomeScreen() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => HomeScreen(),
+      pageBuilder: (context, animation, anotherAnimation) => NavHome(),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -822,7 +823,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
             textDirection: TextDirection.rtl,
-            child: HomeScreen());
+            child: NavHome());
       },
     );
   }

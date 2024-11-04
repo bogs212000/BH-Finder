@@ -389,6 +389,8 @@ class _RoomScreenState extends State<RoomScreen> {
                                                     .instance.currentUser?.email
                                                     .toString())
                                             .where('roomId', isEqualTo: room)
+                                            .where('status',
+                                                isEqualTo: 'pending')
                                             .get();
 
                                     // Check if the document exists
@@ -455,8 +457,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                           confirmBtnColor: Colors.blue,
                                         );
                                       } else if (bUuId == data['boarderID'] &&
-                                              currentUser != null ||
-                                          currentUser.email != null) {
+                                              currentUser != null) {
                                         // If the user is already renting the room, notify them
                                         QuickAlert.show(
                                           onCancelBtnTap: () {

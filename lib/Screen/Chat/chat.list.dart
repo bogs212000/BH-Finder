@@ -24,15 +24,6 @@ class _ChatListState extends State<ChatList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: Row(
-            children: [
-              'Chat'.text.make(),
-            ],
-          ),
-        ),
         body: Container(
           color: Colors.white,
           width: double.infinity,
@@ -119,7 +110,7 @@ class _ChatListState extends State<ChatList> {
                       document.data()! as Map<String, dynamic>;
                   return Padding(
                     padding:
-                        const EdgeInsets.only(left: 5, right: 5, bottom: 10),
+                        const EdgeInsets.only(left: 5, right: 5, top: 5),
                     child: GestureDetector(
                       onTap: () {
                         setState(() {
@@ -130,7 +121,9 @@ class _ChatListState extends State<ChatList> {
                           context,
                           MaterialPageRoute(
                             builder: (context) => ChatOwner(
+                              emailOwner: data['ownerEmail'],
                               ownerNumber: data['ownerNumber'],
+                              token: data['ownerToken'],
                             ),
                           ),
                         );
@@ -165,6 +158,7 @@ class _ChatListState extends State<ChatList> {
                                     fontsize: 25,
                                   ),
                                   SizedBox(width: 5),
+                                  data['seenOwner?'] == true ?
                                   Text(
                                     data['bHouse'].toString(),
                                     maxLines: 1,
@@ -173,6 +167,15 @@ class _ChatListState extends State<ChatList> {
                                     style: TextStyle(
                                         fontSize: 15,
                                         fontWeight: FontWeight.w200),
+                                  ) :
+                                  Text(
+                                    data['bHouse'].toString(),
+                                    maxLines: 1,
+                                    softWrap: false,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                        fontSize: 15,
+                                        fontWeight: FontWeight.bold),
                                   ),
                                 ],
                               ),

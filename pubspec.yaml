@@ -71,6 +71,11 @@ dependencies:
   permission_handler: ^11.3.1
   flutter_image_slideshow: ^0.1.6
   pull_to_refresh: ^2.0.0
+  flashy_tab_bar2: ^0.0.10
+  googleapis_auth: ^1.4.1
+  firebase_messaging: ^14.1.2
+  flutter_local_notifications: ^13.0.0
+
 
 #  geolocator: ^9.0.2
 #  geocoding: ^2.0.5
@@ -101,6 +106,7 @@ flutter:
   assets:
      - assets/lottie/
      - assets/
+     - assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json
   #   - images/a_dot_ham.jpeg
 
   # An image asset can refer to one or more resolution-specific "variants", see
