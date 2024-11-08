@@ -1,11 +1,20 @@
+import 'dart:io';
+import 'package:path_provider/path_provider.dart';
 import 'package:bh_finder/cons.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:firebase_storage/firebase_storage.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
+
+File? _profilePic;
 
 class UserEditProfile extends StatefulWidget {
   final String? first;
@@ -14,9 +23,17 @@ class UserEditProfile extends StatefulWidget {
   final String? email;
   final String? address;
   final String? phoneNum;
+  final String? profilePic;
 
   const UserEditProfile(
-      {super.key, this.first, this.middle, this.last, this.address, this.email, this.phoneNum});
+      {super.key,
+      this.first,
+      this.middle,
+      this.last,
+      this.address,
+      this.email,
+      this.profilePic,
+      this.phoneNum});
 
   @override
   State<UserEditProfile> createState() => _UserEditProfileState();
@@ -80,6 +97,22 @@ class _UserEditProfileState extends State<UserEditProfile> {
 
   @override
   Widget build(BuildContext context) {
+    final _picker = ImagePicker();
+
+    //IDs
+    Future<void> _openImagePicker() async {
+      final XFile? pickedImage =
+      await _picker.pickImage(source: ImageSource.gallery);
+      if (pickedImage != null) {
+        setState(() {
+          _profilePic = File(pickedImage.path);
+        });
+        // setState(() {
+        //   loading = false;
+        // });
+      }
+    }
+
     return Scaffold(
         backgroundColor: Colors.white,
         appBar: AppBar(
@@ -90,16 +123,170 @@ class _UserEditProfileState extends State<UserEditProfile> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                const CircleAvatar(
-                  radius: 50,
-                  child: Center(
-                    child: Icon(
-                      size: 50,
-                      Icons.account_circle_outlined,
-                      color: Colors.grey,
-                    ),
-                  ),
+                Stack(
+                  children: [
+                    widget.profilePic != ''
+                        ? StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser!.email.toString()).snapshots(),
+                      builder: (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const CircleAvatar(
+                            radius: 50,
+                            child: Center(
+                              child: Icon(
+                                size: 50,
+                                Icons.account_circle_outlined,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          );
+                        }
+                        if (snapshot.hasError) {
+                          return const Center(child: Text('Error fetching data'));
+                        }
+                        if (!snapshot.hasData || !snapshot.data!.exists) {
+                          return const Center(child: Text('No Reservation found'));
+                        }
+                        Map<String, dynamic> data = snapshot.data!.data() as Map<String, dynamic>;
+                        return CircleAvatar(
+                          radius: 50,
+                          backgroundImage: CachedNetworkImageProvider(
+                              '${data['Image']}'), // Path to your image
+                        );
+                      },
+                    )
+                        : const CircleAvatar(
+                            radius: 50,
+                            child: Center(
+                              child: Icon(
+                                size: 50,
+                                Icons.account_circle_outlined,
+                                color: Colors.grey,
+                              ),
+                            ),
+                          ),
+                    Container(
+                      height: 100,
+                      width: 100,
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.end,
+                            children: [
+                              GestureDetector(
+                                onTap: (){
+                                  _openImagePicker();
+                                },
+                                child: const CircleAvatar(
+                                  backgroundColor: Colors.blue,
+                                  child: Icon(
+                                    Icons.add,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              )
+                            ],
+                          )
+                        ],
+                      ),
+                    )
+                  ],
                 ),
+                if (_profilePic != null)
+                  Row(
+                    children: [
+                      Flexible(
+                          child: '${_profilePic?.path}'
+                              .text
+                              .overflow(TextOverflow.ellipsis)
+                              .make()),
+                      Spacer(),
+                      ElevatedButton(
+                          onPressed: () async {
+                            QuickAlert.show(
+                              context: context,
+                              type: QuickAlertType.loading,
+                              title: 'Uploading',
+                              text: 'Please Wait...',
+                            );
+                            try {
+                              // Get the application documents directory
+                              final appDocDir =
+                              await getApplicationDocumentsDirectory();
+
+                              // Construct the file path for saving the image locally (optional)
+                              final filePath =
+                                  "${appDocDir.path}/path/to/${widget.email}.jpg";
+
+                              // Get the selected image file (use the path from the selected image)
+                              final file = File(_profilePic!.path);
+
+                              // Create metadata for the image
+                              final metadata = SettableMetadata(
+                                  contentType: "image/jpeg");
+
+                              // Create a reference to Firebase Storage
+                              final storageRef = FirebaseStorage.instance.ref();
+                              final imageRef = storageRef.child("profilePic/${widget.email.toString()}/${DateTime.now().toString()}.jpg");
+
+                              // Upload file and metadata to Firebase Storage
+                              final uploadTask = imageRef.putFile(file, metadata);
+                              // Listen for state changes, errors, and completion of the upload.
+                              uploadTask.snapshotEvents
+                                  .listen((TaskSnapshot taskSnapshot) async {
+                                switch (taskSnapshot.state) {
+                                  case TaskState.running:
+                                    final progress = 100.0 *
+                                        (taskSnapshot.bytesTransferred /
+                                            taskSnapshot.totalBytes);
+                                    print(
+                                        "Upload is $progress% complete.");
+                                    break;
+                                  case TaskState.paused:
+                                    print("Upload is paused.");
+                                    break;
+                                  case TaskState.canceled:
+                                    print("Upload was canceled.");
+                                    break;
+                                  case TaskState.error:
+                                    print("Upload encountered an error.");
+                                    break;
+                                  case TaskState.success:
+                                    print("Upload successful!");
+                                    final downloadURL = await imageRef.getDownloadURL();
+                                    print("Download URL: $downloadURL");
+
+                                    // Add the URL to Firestore
+                                    await FirebaseFirestore.instance.collection('Users').doc(widget.email).update({
+                                      'Image': downloadURL,
+                                    });
+                                    setState(() {
+                                      _profilePic = null;
+                                    });
+                                }
+                              });
+
+                              _profilePic = null;
+                              Navigator.pop(context);
+
+                              // Show a success dialog
+                              QuickAlert.show(
+                                context: context,
+                                type: QuickAlertType.success,
+                                title: 'Success!',
+                                text: 'Images has been Uploaded',
+                                onConfirmBtnTap: () {
+                                  Navigator.pop(context);
+                                },
+                              );
+                            } catch (e) {
+                              print("Error uploading image: $e");
+                            }
+                          },
+                          child: 'Upload'.text.make()),
+                    ],
+                  ),
                 SizedBox(height: 20),
                 Container(
                   padding: EdgeInsets.all(20),
@@ -264,16 +451,20 @@ class _UserEditProfileState extends State<UserEditProfile> {
                               onConfirmBtnTap: () async {
                                 Navigator.pop(context);
                                 try {
-                                  await FirebaseAuth.instance.sendPasswordResetEmail(email: widget.email.toString());
+                                  await FirebaseAuth.instance
+                                      .sendPasswordResetEmail(
+                                          email: widget.email.toString());
                                   message = "Password reset email sent.";
                                 } catch (e) {
-                                  message = "Error sending password reset email";
+                                  message =
+                                      "Error sending password reset email";
                                 }
                                 _toast();
                               },
                               context: context,
                               type: QuickAlertType.info,
-                              text: "We will sent a password reset link to your email. Click 'Ok' to continue.",
+                              text:
+                                  "We will sent a password reset link to your email. Click 'Ok' to continue.",
                               titleAlignment: TextAlign.center,
                               textAlignment: TextAlign.center,
                               confirmBtnText: 'Ok',
@@ -294,7 +485,7 @@ class _UserEditProfileState extends State<UserEditProfile> {
                             // Custom background color
                             shape: RoundedRectangleBorder(
                               borderRadius:
-                              BorderRadius.circular(25), // Rounded corners
+                                  BorderRadius.circular(25), // Rounded corners
                             ),
                           ),
                           child: 'Change Password'
@@ -326,12 +517,14 @@ class _UserEditProfileState extends State<UserEditProfile> {
                                 Navigator.pop(context);
                                 await FirebaseFirestore.instance
                                     .collection('Users')
-                                    .doc(widget.email.toString())  // Assuming the document is based on user email
+                                    .doc(widget.email
+                                        .toString()) // Assuming the document is based on user email
                                     .update({
-                                  'FirstName': _fname.text,    // Use `.text` to update the actual text
+                                  'FirstName': _fname.text,
+                                  // Use `.text` to update the actual text
                                   'MiddleName': _mname.text,
                                   'LastName': _lname.text,
-                                  'Address': _address.text,
+                                  'address': _address.text,
                                   'PhoneNumber': _pnumber.text,
                                 });
                                 setState(() {
@@ -380,6 +573,7 @@ class _UserEditProfileState extends State<UserEditProfile> {
           ),
         ));
   }
+
   void _toast() async {
     print('Showing Toast');
     await Future.delayed(const Duration(seconds: 1));

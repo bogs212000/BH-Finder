@@ -10,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:uuid/uuid.dart';
 import 'package:uuid/v1.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -33,7 +35,7 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
 
   Future<void> _openImagePicker() async {
     final XFile? pickedImage =
-    await _picker.pickImage(source: ImageSource.camera);
+        await _picker.pickImage(source: ImageSource.camera);
     if (pickedImage != null) {
       setState(() {
         _image = File(pickedImage.path);
@@ -47,14 +49,18 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
         ? LoadingScreen()
         : Scaffold(
             appBar: AppBar(
-              leading: GestureDetector(onTap: (){
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) => OwnerHomeScreen(),
-                  ),
-                      (Route<dynamic> route) => false, // Removes all previous routes
-                );
-              }, child: Icon(Icons.arrow_back),),
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => OwnerHomeScreen(),
+                    ),
+                    (Route<dynamic> route) =>
+                        false, // Removes all previous routes
+                  );
+                },
+                child: Icon(Icons.arrow_back),
+              ),
               backgroundColor: Colors.white,
               elevation: 0,
               title: 'Rooms'.text.make(),
@@ -71,7 +77,8 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                         .collection("Rooms")
                         .where('ownerUid', isEqualTo: OwnerUuId)
                         .snapshots(),
-                    builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                    builder: (BuildContext context,
+                        AsyncSnapshot<QuerySnapshot> snapshot) {
                       // Check if the snapshot has an error
                       if (snapshot.hasError) {
                         return const Center(
@@ -103,18 +110,23 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                       // Data is available, display it
                       return ListView.builder(
                         physics: BouncingScrollPhysics(),
-                        itemCount: snapshot.data!.docs.length,  // Use the length of the fetched data
+                        itemCount: snapshot.data!.docs.length,
+                        // Use the length of the fetched data
                         itemBuilder: (context, index) {
-                          Map<String, dynamic> data = snapshot.data!.docs[index].data()! as Map<String, dynamic>;
+                          Map<String, dynamic> data = snapshot.data!.docs[index]
+                              .data()! as Map<String, dynamic>;
+                          String docId = snapshot.data!.docs[index].id;
                           return Padding(
                             padding: const EdgeInsets.only(bottom: 10),
                             child: GestureDetector(
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
-                                    builder: (context) => ViewRoom(viewRoomId: data['roomDocId']),
+                                    builder: (context) =>
+                                        ViewRoom(viewRoomId: data['roomDocId'], boarderToken: data['boarderToken']),
                                   ),
-                                      (Route<dynamic> route) => false, // Removes all previous routes
+                                  (Route<dynamic> route) =>
+                                      false, // Removes all previous routes
                                 );
                               },
                               child: Container(
@@ -132,7 +144,8 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                         borderRadius: BorderRadius.circular(10),
                                         image: DecorationImage(
                                           image: CachedNetworkImageProvider(
-                                            data['roomImage'] ?? 'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                            data['roomImage'] ??
+                                                'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                                           ),
                                           fit: BoxFit.cover,
                                         ),
@@ -143,8 +156,10 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                       child: Container(
                                         color: Colors.white,
                                         child: Column(
-                                          mainAxisAlignment: MainAxisAlignment.center,
-                                          crossAxisAlignment: CrossAxisAlignment.start,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.center,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
                                           children: [
                                             Text(
                                               '${data['roomNameNumber']}',
@@ -166,16 +181,19 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                     ),
                                     Container(
                                       width: 110,
-                                      padding: EdgeInsets.symmetric(horizontal: 10),
+                                      padding:
+                                          EdgeInsets.symmetric(horizontal: 10),
                                       child: Column(
-                                        mainAxisAlignment: MainAxisAlignment.center,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
                                         children: [
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
                                               Text(
                                                 '₱ ${data['price'] ?? '---'} per month',
-                                                style: TextStyle(
+                                                style: const TextStyle(
                                                   fontWeight: FontWeight.bold,
                                                   fontSize: 10,
                                                 ),
@@ -183,19 +201,58 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                             ],
                                           ),
                                           Row(
-                                            mainAxisAlignment: MainAxisAlignment.end,
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
-                                              Icon(
-                                                Icons.star,
-                                                color: Colors.amber,
-                                                size: 20,
-                                              ),
-                                              SizedBox(width: 4),
-                                              Text(
-                                                data['rating']?.toString() ?? '4.8',  // Use data for rating
-                                                style: TextStyle(
+                                              GestureDetector(
+                                                onTap: () {
+                                                  QuickAlert.show(
+                                                    onCancelBtnTap: () {
+                                                      Navigator.pop(context);
+                                                    },
+                                                    onConfirmBtnTap: () async {
+                                                      Navigator.pop(context);
+                                                      try {
+                                                        await FirebaseFirestore
+                                                            .instance
+                                                            .collection('Rooms')
+                                                            .doc(docId)
+                                                            .delete();
+                                                      } catch (e) {
+                                                        print(e);
+                                                      }
+                                                    },
+                                                    context: context,
+                                                    type:
+                                                        QuickAlertType.confirm,
+                                                    text:
+                                                        "Are you sure you want to delete this room?",
+                                                    titleAlignment:
+                                                        TextAlign.center,
+                                                    textAlignment:
+                                                        TextAlign.center,
+                                                    confirmBtnText: 'Yes',
+                                                    cancelBtnText: 'No',
+                                                    confirmBtnColor:
+                                                        Colors.blue,
+                                                    backgroundColor:
+                                                        Colors.white,
+                                                    headerBackgroundColor:
+                                                        Colors.grey,
+                                                    confirmBtnTextStyle:
+                                                        const TextStyle(
+                                                      color: Colors.white,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                    titleColor: Colors.black,
+                                                    textColor: Colors.black,
+                                                  );
+                                                },
+                                                child: const Icon(
+                                                  Icons.delete_forever_outlined,
                                                   color: Colors.grey,
-                                                  fontSize: 12,
+                                                  size: 25,
                                                 ),
                                               ),
                                             ],

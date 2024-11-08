@@ -69,12 +69,11 @@ class _BHouseScreenState extends State<BHouseScreen> {
   }
 
   FirebaseStorage storage = FirebaseStorage.instance;
-  String? ownerId;
 
   Future<List<String>> _loadImage() async {
     ListResult result = await storage
         .ref()
-        .child("BHouseImages/${ownerId.toString()}")
+        .child("BHouseImages/${bUuId.toString()}")
         .listAll();
     List<String> imageUrls = [];
 
@@ -104,8 +103,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
           }
           Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;
-          ownerId = data['OwnerUId'];
-          print(ownerId);
+          bUuId = data['OwnerUId'];
+          print(bUuId);
           List<dynamic> ratings = data['ratings'];
           double average = ratings.reduce((a, b) => a + b) / ratings.length;
           double star = average;
@@ -553,7 +552,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                         itemCount: snapshot.data!.docs.length,
                                         // Use the length of the fetched data
                                         itemBuilder: (context, index) {
-                                          Map<String, dynamic> data =
+                                          Map<String, dynamic> datas =
                                               snapshot.data!.docs[index].data()!
                                                   as Map<String, dynamic>;
                                           return Padding(
@@ -563,15 +562,17 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                               onTap: () {
                                                 setState(() {
                                                   rRoomsDocId =
-                                                      data['roomDocId'];
+                                                      datas['roomDocId'];
                                                 });
                                                 print('room ID: $roomId');
 
-                                                Navigator.of(context)
-                                                    .pushAndRemoveUntil(
-                                                  _toRoomsScreen(),
-                                                  (Route<dynamic> route) =>
-                                                      false,
+                                                Navigator.pushNamedAndRemoveUntil(
+                                                  context,
+                                                  '/RoomScreen',
+                                                      (Route<dynamic> route) => false, // Remove all previous routes
+                                                  arguments: {
+                                                    'token': data['token'],
+                                                  },
                                                 );
                                               },
                                               child: Container(
@@ -658,33 +659,6 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                                       FontWeight
                                                                           .bold,
                                                                   fontSize: 10,
-                                                                ),
-                                                              ),
-                                                            ],
-                                                          ),
-                                                          Row(
-                                                            mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .end,
-                                                            children: [
-                                                              Icon(
-                                                                Icons.star,
-                                                                color: Colors
-                                                                    .amber,
-                                                                size: 20,
-                                                              ),
-                                                              SizedBox(
-                                                                  width: 4),
-                                                              Text(
-                                                                data['rating']
-                                                                        ?.toString() ??
-                                                                    '4.8',
-                                                                // Use data for rating
-                                                                style:
-                                                                    TextStyle(
-                                                                  color: Colors
-                                                                      .grey,
-                                                                  fontSize: 12,
                                                                 ),
                                                               ),
                                                             ],

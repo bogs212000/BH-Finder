@@ -33,6 +33,7 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
   TextEditingController _ownerLastName = TextEditingController();
   TextEditingController _ownerContactNumber = TextEditingController();
   TextEditingController _ownerAddress = TextEditingController();
+  TextEditingController _homeAddress = TextEditingController();
   String date = "";
   DateTime selectedDate = DateTime.now();
   String? errors;
@@ -198,6 +199,32 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                           ),
                           labelText: 'Contact Number',
                           hintText: '091XXXXXX0'),
+                    ),
+                  ),
+                  Padding(
+                    padding:
+                    const EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                    child: TextField(
+                      controller: _homeAddress,
+                      keyboardType: TextInputType.name,
+                      textAlign: TextAlign.left,
+                      style: const TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                      ),
+                      decoration: InputDecoration(
+                          filled: true,
+                          fillColor: Colors.grey.withOpacity(0.1),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(20),
+                            borderSide: BorderSide(color: Colors.white),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderSide: BorderSide(color: Colors.white),
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                          labelText: 'Home Address',
+                          hintText: ''),
                     ),
                   ),
                   Padding(
@@ -901,6 +928,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'LastName': ownerLastName,
                                     'Birthday': '',
                                     'ImageID': url,
+                                    'Image': '',
                                     'ImageIdPermit': url2,
                                     'Rules': '',
                                     'PhoneNumber': ownerContactNumber,
@@ -916,8 +944,8 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'OwnerUId': ownerUId,
                                     'BoardingHouseName': boardingHouseName,
                                     'PhoneNumber': ownerContactNumber,
-                                    'Lat': '',
-                                    'Long': '',
+                                    'Lat': 9.2690275,
+                                    'Long': 118.4058032,
                                     'chat': 0,
                                     'createdAt': DateTime.now(),
                                     'Email': _ownerEmail.text.trim(),
@@ -930,6 +958,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'Image': '',
                                     'ratings': [0],
                                     'gCashNum': '',
+                                    'token': '',
                                   });
                                   Navigator.of(context);
                                   QuickAlert.show(

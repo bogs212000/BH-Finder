@@ -438,6 +438,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                         'Birthday': '',
                                         'address': address.text,
                                         'Image': '', // Placeholder for user image
+                                        'ImageID': '', // Placeholder for user image
+                                        'ImageIdPermit': '', // Placeholder for user image
                                         'PhoneNumber': contactNumber.text,
                                         'notification': 0,
                                         'verified': true,

@@ -304,6 +304,7 @@ class _AddRoomsState extends State<AddRooms> {
                                       'rules': '',
                                       'rates': '',
                                       'paid?': false,
+                                      'boarderToken': '',
                                     });
 
                                     setState(() {

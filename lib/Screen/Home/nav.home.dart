@@ -30,10 +30,10 @@ class _NavHomeState extends State<NavHome> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   late Future<DocumentSnapshot> notification;
   List<Widget> tabItems = [
-   HomeScreen(),
-   ChatList(),
-   SearchScreen(),
-   UserProfile(),
+    HomeScreen(),
+    ChatList(),
+    SearchScreen(),
+    UserProfile(),
   ];
 
   @override
@@ -142,7 +142,7 @@ class _NavHomeState extends State<NavHome> {
       /// default FCM channel to enable heads up notifications.
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
 
       /// Update the iOS foreground notification presentation options to allow
@@ -160,6 +160,37 @@ class _NavHomeState extends State<NavHome> {
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     return Scaffold(
+      // drawer: Drawer(
+      //   backgroundColor: Colors.white,
+      //   child: ListView(
+      //     padding: EdgeInsets.zero,
+      //     children: [
+      //       SizedBox(height: 40),
+      //       const Row(children: [
+      //         SizedBox(width: 10),
+      //         Text(
+      //           "BH Finder",
+      //           style: TextStyle(
+      //               fontSize: 20.0,
+      //               color: Colors.blueAccent,
+      //               letterSpacing: 1.0,
+      //               fontWeight: FontWeight.bold),
+      //         ),
+      //       ]),
+      //
+      //       //profile
+      //       ListTile(
+      //         contentPadding: EdgeInsets.only(left: 20),
+      //         leading:
+      //             Icon(Icons.person_outline, size: 30, color: Colors.black),
+      //         title: const Text('Profile',
+      //             style: TextStyle(
+      //                 fontWeight: FontWeight.bold, color: Colors.black)),
+      //         onTap: () {},
+      //       ),
+      //     ],
+      //   ),
+      // ),
       appBar: AppBar(
         backgroundColor: Colors.white,
         title: GestureDetector(
@@ -171,68 +202,66 @@ class _NavHomeState extends State<NavHome> {
           },
           child: userLat != null
               ? Container(
-            padding: EdgeInsets.only(left: 5, right: 5),
-            height: 35,
-            width: 150,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border:
-              Border.all(color: Colors.grey, width: 0.3),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  // Shadow color with opacity
-                  spreadRadius: 1,
-                  // Spread radius
-                  blurRadius: 1,
-                  // Blur radius
-                  offset: Offset(0,
-                      1), // Position of the shadow (horizontal, vertical)
-                ),
-              ],
-            ),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Row(
+                  padding: EdgeInsets.only(left: 5, right: 5),
+                  height: 35,
+                  width: 150,
+                  decoration: BoxDecoration(
+                    color: Colors.white.withOpacity(0.2),
+                    border: Border.all(color: Colors.grey, width: 0.3),
+                    borderRadius: BorderRadius.circular(20),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.grey.withOpacity(0.2),
+                        // Shadow color with opacity
+                        spreadRadius: 1,
+                        // Spread radius
+                        blurRadius: 1,
+                        // Blur radius
+                        offset: Offset(0,
+                            1), // Position of the shadow (horizontal, vertical)
+                      ),
+                    ],
+                  ),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.pin_drop_outlined,
+                            color: Colors.white.withOpacity(0.8),
+                          ),
+                          SizedBox(width: 5),
+                          'Street'
+                              .text
+                              .color(Colors.white.withOpacity(0.8))
+                              .size(12)
+                              .bold
+                              .make()
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              : Row(
                   children: [
-                    Icon(
-                      Icons.pin_drop_outlined,
-                      color: Colors.grey.withOpacity(0.8),
+                    Shimmer.fromColors(
+                      baseColor: Colors.grey.shade200,
+                      highlightColor: Colors.white,
+                      child: Padding(
+                        padding: EdgeInsets.only(left: 5, right: 5),
+                        child: Container(
+                          height: 40,
+                          width: 130,
+                          decoration: BoxDecoration(
+                            color: Colors.grey,
+                            borderRadius: BorderRadius.circular(20),
+                          ),
+                        ),
+                      ),
                     ),
-                    SizedBox(width: 5),
-                    'Street'
-                        .text
-                        .color(Colors.grey.withOpacity(0.8))
-                        .size(12)
-                        .bold
-                        .make()
                   ],
                 ),
-              ],
-            ),
-          )
-              : Row(
-            children: [
-              Shimmer.fromColors(
-                baseColor: Colors.grey.shade200,
-                highlightColor: Colors.white,
-                child: Padding(
-                  padding:
-                  EdgeInsets.only(left: 5, right: 5),
-                  child: Container(
-                    height: 40,
-                    width: 130,
-                    decoration: BoxDecoration(
-                      color: Colors.grey,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                  ),
-                ),
-              ),
-            ],
-          ),
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
@@ -251,181 +280,184 @@ class _NavHomeState extends State<NavHome> {
           ),
         ),
         actions: [
-         currentUser != null &&
-              userEmail != null
-              ? FutureBuilder<DocumentSnapshot>(
-            future: notification,
-            builder: (BuildContext context,
-                AsyncSnapshot<DocumentSnapshot> snapshot) {
-              if (snapshot.connectionState ==
-                  ConnectionState.waiting) {
-                return Shimmer.fromColors(
-                  baseColor: Colors.grey.shade200,
-                  highlightColor: Colors.white,
-                  child: Padding(
-                    padding: EdgeInsets.only(left: 20, right: 20),
-                    child: Container(
-                      height: 35,
-                      width: double.infinity,
-                      decoration: BoxDecoration(
-                        color: Colors.grey,
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                  ),
-                );
-              }
-              if (snapshot.hasError) {
-                return const Center(
-                    child: Text('Error fetching data'));
-              }
-              if (!snapshot.hasData || !snapshot.data!.exists) {
-                return const Center(
-                    child: Text('No Reservation found'));
-              }
-              Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
-              return Padding(
-                padding: EdgeInsets.only(right: 10),
-                child: GestureDetector(
-                  onTap: () async {
-                    await FirebaseFirestore.instance.collection('Users').doc(FirebaseAuth.instance.currentUser?.email.toString()).update({
-                      'notification': 0,
-                    });
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => NotificationScreen(boardersID: bUuId,)),
-                    );
-                  },
-                  child: Stack(
-                    children: [
-                      Container(
-                        height: 35,
-                        width: 35,
-                        decoration: BoxDecoration(
-                          color: Colors.white.withOpacity(0.5),
-                          border: Border.all(
-                              color: Colors.grey, width: 0.3),
-                          borderRadius: BorderRadius.circular(20),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.grey.withOpacity(0.2),
-                              spreadRadius: 1,
-                              blurRadius: 1,
-                              offset: Offset(0, 1),
+          currentUser != null && userEmail != null
+              ? StreamBuilder<DocumentSnapshot>(
+              stream: FirebaseFirestore.instance.collection('Users').doc(userEmail).snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey.shade200,
+                        highlightColor: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          child: Container(
+                            height: 35,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
                             ),
-                          ],
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.notifications_active_outlined,
-                            color: Colors.white,
                           ),
                         ),
-                      ),
-                      data['notification'] != 0 ?
-                      Container(
-                        height: 35,
-                        width: 35,
-                        child: Column(
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(child: Text('Error fetching data'));
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return const Center(child: Text('No Reservation found'));
+                    }
+                    Map<String, dynamic> data =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    return Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: GestureDetector(
+                        onTap: () async {
+                          await FirebaseFirestore.instance
+                              .collection('Users')
+                              .doc(FirebaseAuth.instance.currentUser?.email
+                                  .toString())
+                              .update({
+                            'notification': 0,
+                          });
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => NotificationScreen(
+                                      boardersID: bUuId,
+                                    )),
+                          );
+                        },
+                        child: Stack(
                           children: [
-                            Row(
-                              mainAxisAlignment:
-                              MainAxisAlignment.end,
-                              children: [
-                                CircleAvatar(
-                                  backgroundColor: Colors.red,
-                                  radius: 8,
-                                  child: Center(
-                                      child:
-                                      '${data['notification']}'
-                                          .text
-                                          .size(1)
-                                          .color(Colors.white)
-                                          .make()),
-                                )
-                              ],
+                            Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.5),
+                                border:
+                                    Border.all(color: Colors.grey, width: 0.3),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 1,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: const Center(
+                                child: Icon(
+                                  Icons.notifications_active_outlined,
+                                  color: Colors.white,
+                                ),
+                              ),
                             ),
+                            data['notification'] != 0
+                                ? Container(
+                                    height: 35,
+                                    width: 35,
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: Colors.red,
+                                              radius: 8,
+                                              child: Center(
+                                                  child:
+                                                      '${data['notification']}'
+                                                          .text
+                                                          .size(1)
+                                                          .color(Colors.white)
+                                                          .make()),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox(),
                           ],
                         ),
-                      ) :
-                      SizedBox(),
-                    ],
-                  ),
-                ),
-              );
-            },
-          )
+                      ),
+                    );
+                  },
+                )
               : SizedBox(),
           currentUser != null
               ? Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              onTap: () {
-             setState(() {
-               _selectedIndex = 1;
-             });
-              },
-              child: Container(
-                height: 35,
-                width: 35,
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.5),
-                  border:
-                  Border.all(color: Colors.grey, width: 0.3),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 1,
-                      offset: Offset(0, 1),
+                  padding: EdgeInsets.only(right: 10),
+                  child: GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        _selectedIndex = 1;
+                      });
+                    },
+                    child: Container(
+                      height: 35,
+                      width: 35,
+                      decoration: BoxDecoration(
+                        color: Colors.white.withOpacity(0.5),
+                        border: Border.all(color: Colors.grey, width: 0.3),
+                        borderRadius: BorderRadius.circular(20),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.grey.withOpacity(0.2),
+                            spreadRadius: 1,
+                            blurRadius: 1,
+                            offset: Offset(0, 1),
+                          ),
+                        ],
+                      ),
+                      child: const Center(
+                        child: Icon(
+                          Icons.chat_outlined,
+                          color: Colors.white,
+                          size: 20,
+                        ),
+                      ),
                     ),
-                  ],
-                ),
-                child: const Center(
-                  child: Icon(
-                    Icons.chat_outlined,
-                    color: Colors.white,
-                    size: 20,
                   ),
-                ),
-              ),
-            ),
-          )
+                )
               : SizedBox(),
         ],
       ),
-        body: Center(
-          child: tabItems[_selectedIndex],
-        ),
-        bottomNavigationBar: FlashyTabBar(
-          animationCurve: Curves.linear,
-          selectedIndex: _selectedIndex,
-          iconSize: 30,
-          showElevation: false, // use this to remove appBar's elevation
-          onItemSelected: (index) => setState(() {
-            _selectedIndex = index;
-          }),
-          items: [
-            FlashyTabBarItem(
-              icon: Icon(Icons.home),
-              title: Text('Home'),
-            ),
-            FlashyTabBarItem(
-              icon: Icon(Icons.chat_rounded),
-              title: Text('Chats'),
-            ),
-            FlashyTabBarItem(
-              icon: Icon(Icons.search),
-              title: Text('Search'),
-            ),
-            FlashyTabBarItem(
-              icon: Icon(Icons.account_circle),
-              title: Text('Profile'),
-            ),
-          ],
-        ),
-      );
+      body: Center(
+        child: tabItems[_selectedIndex],
+      ),
+      bottomNavigationBar: FlashyTabBar(
+        animationCurve: Curves.linear,
+        selectedIndex: _selectedIndex,
+        iconSize: 30,
+        showElevation: false,
+        // use this to remove appBar's elevation
+        onItemSelected: (index) => setState(() {
+          _selectedIndex = index;
+        }),
+        items: [
+          FlashyTabBarItem(
+            icon: Icon(Icons.home),
+            title: Text('Home'),
+          ),
+          FlashyTabBarItem(
+            icon: Icon(Icons.chat_rounded),
+            title: Text('Chats'),
+          ),
+          FlashyTabBarItem(
+            icon: Icon(Icons.search),
+            title: Text('Search'),
+          ),
+          FlashyTabBarItem(
+            icon: Icon(Icons.account_circle),
+            title: Text('Profile'),
+          ),
+        ],
+      ),
+    );
   }
 }

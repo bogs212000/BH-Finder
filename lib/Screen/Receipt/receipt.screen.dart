@@ -9,7 +9,9 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 
 class ReceiptScreen extends StatefulWidget {
-  const ReceiptScreen({super.key});
+  final String? roomId;
+
+  const ReceiptScreen({super.key, this.roomId});
 
   @override
   State<ReceiptScreen> createState() => _ReceiptScreenState();
@@ -21,8 +23,10 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   @override
   void initState() {
     super.initState();
-    receipt =
-        FirebaseFirestore.instance.collection('Rooms').doc('$cDocId').get();
+    receipt = FirebaseFirestore.instance
+        .collection('Rooms')
+        .doc(widget.roomId.toString())
+        .get();
   }
 
   @override
@@ -60,7 +64,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                 Container(
                   padding: EdgeInsets.all(20),
                   width: double.infinity,
-                  height: 400,
+                  height: data['paid?'] == false ? 500 : 350,
                   decoration: BoxDecoration(
                     color: Colors.white,
                     borderRadius: BorderRadius.circular(10),
@@ -136,21 +140,32 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                               .text
                               .light
                               .make(),
+                      Divider(),
+                      data['paid?'] == true
+                          ? SizedBox(height: 1)
+                          : 'After making your payment on GCash, please message the boarding house owner and send them the payment receipt reference number for confirmation.'
+                              .text
+                              .light
+                              .make(),
                       Spacer(),
-                      Row(
-                        children: [
-                          'Gcash #: ${data['gcashNum']}'.text.make(),
-                          Spacer(),
-                          GestureDetector(
-                            onTap: () {
-                              Clipboard.setData(
-                                  ClipboardData(text: data['gcashNum']));
-                              _toast();
-                            },
-                            child: Icon(Icons.copy),
-                          ),
-                        ],
-                      ),
+                      data['paid?'] == true
+                          ? SizedBox()
+                          : Row(
+                              children: [
+                                'Gcash #: ${data['boardersConNumber']}'
+                                    .text
+                                    .make(),
+                                Spacer(),
+                                GestureDetector(
+                                  onTap: () {
+                                    Clipboard.setData(ClipboardData(
+                                        text: data['boardersConNumber']));
+                                    _toast();
+                                  },
+                                  child: Icon(Icons.copy),
+                                ),
+                              ],
+                            ),
                       Divider(),
                       Row(
                         children: [
@@ -211,6 +226,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
       ),
     );
   }
+
   void _toast() async {
     print('Showing Toast');
     await Future.delayed(const Duration(seconds: 1));

@@ -19,8 +19,8 @@ import '../../cons.dart';
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class ChatBoarders extends StatefulWidget {
-  final String? boarderNumber, token;
-  ChatBoarders({Key? key, this.boarderNumber, this.token}) : super(key: key);
+  final String? boarderNumber, token, ownerToken, boarderEmail, name, bhouseName;
+  ChatBoarders({Key? key, this.boarderNumber, this.token, this.ownerToken, this.boarderEmail, this.name, this.bhouseName}) : super(key: key);
 
   @override
   State<ChatBoarders> createState() => _ChatBoardersState();
@@ -174,7 +174,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
             child: StreamBuilder(
               stream: _firestore
                   .collection('Chats')
-                  .doc('$boardersEmail+${FirebaseAuth.instance.currentUser?.email.toString()}')
+                  .doc('${widget.boarderEmail}+${FirebaseAuth.instance.currentUser?.email.toString()}')
                   .collection('Chats')
                   .orderBy('createdAt', descending: false)
                   .snapshots(),
@@ -194,7 +194,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
                                 child: Container(
                                   height: 40,
                                   width: 150,
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: Colors.grey,
                                     borderRadius: BorderRadius.only(
                                         topLeft: Radius.circular(20),
@@ -221,6 +221,37 @@ class _ChatBoardersState extends State<ChatBoarders> {
                     sender: time,
                     text: messageText,
                     isMe: _auth.currentUser?.email == messageSender,
+                    onLongPress: () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: Text('Delete Message'),
+                            content: Text('Are you sure you want to delete this message?'),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Cancel'),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  await _firestore
+                                      .collection('Chats')
+                                      .doc('$boardersEmail+${_auth.currentUser?.email}')
+                                      .collection('Chats')
+                                      .doc(message.id)
+                                      .delete();
+                                  Navigator.of(context).pop();
+                                },
+                                child: Text('Delete'),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
                   );
                   messageBubbles.add(messageBubble);
                 }
@@ -288,35 +319,40 @@ class _ChatBoardersState extends State<ChatBoarders> {
 
   void _sendMessage(String date) async {
     if (_messageController.text.trim().isNotEmpty) {
-      await FirebaseFirestore.instance
-          .collection('Chats')
-          .doc('$boardersEmail+${FirebaseAuth.instance.currentUser?.email.toString()}')
-          .set({
-        'ownerEmail': FirebaseAuth.instance.currentUser?.email.toString(),
-        'email': boardersEmail,
-        'bHouse': bHouse,
-        'name': chatName,
-        'role': 'boarder',
-        'createdAt': DateTime.now(),
-        'seenBorder?': true,
-        'seenOwner?': false,
-      });
+      try{
+        await FirebaseFirestore.instance
+            .collection('Chats')
+            .doc('${widget.boarderEmail}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+            .set({
+          'ownerEmail': FirebaseAuth.instance.currentUser?.email.toString(),
+          'email': widget.boarderEmail,
+          'bHouse': widget.bhouseName,
+          'name': widget.name,
+          'role': 'boarder',
+          'createdAt': DateTime.now(),
+          'myToken': widget.token,
+          'ownerToken': widget.ownerToken,
+          'seenBorder?': true,
+          'seenOwner?': false,
+        });
+        await FirebaseFirestore.instance
+            .collection('Chats')
+            .doc('${widget.boarderEmail}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+            .collection('Chats')
+            .add({
+          'date': date,
+          'role': 'owner',
+          'text': _messageController.text,
+          'sender': _auth.currentUser?.email?.toString(),
+          'createdAt': DateTime.now(),
+        });
+        print('Success!');
+        String body = _messageController.text;
+        String title = widget.bhouseName.toString();
+        _messageController.clear();
+        sendPushMessage(body, title);
+      } catch(e){print(e);}
 
-      await _firestore
-          .collection('Chats')
-          .doc('$boardersEmail+$currentEmail')
-          .collection('Chats')
-          .add({
-        'date': date,
-        'role': 'owner',
-        'text': _messageController.text,
-        'sender': _auth.currentUser?.email?.toString(),
-        'createdAt': DateTime.now(),
-      });
-      String body = _messageController.text;
-      String title = bHouse.toString();
-      _messageController.clear();
-      sendPushMessage(body, title);
     }
   }
 }
@@ -325,50 +361,54 @@ class MessageBubble extends StatelessWidget {
   final String sender;
   final String text;
   final bool isMe;
+  final VoidCallback? onLongPress;
 
-  MessageBubble({required this.sender, required this.text, required this.isMe});
+  MessageBubble({required this.sender, required this.text, required this.isMe, this.onLongPress,});
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Text(
-            sender,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment:
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Text(
+              sender,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
             ),
-          ),
-          Material(
-            borderRadius: isMe
-                ? const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  )
-                : const BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
+            Material(
+              borderRadius: isMe
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    )
+                  : const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+              elevation: 5,
+              color: isMe ? Colors.blue : Colors.white,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isMe ? Colors.white : Colors.black,
                   ),
-            elevation: 5,
-            color: isMe ? Colors.blue : Colors.white,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isMe ? Colors.white : Colors.black,
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

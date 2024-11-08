@@ -6,6 +6,7 @@ import 'package:bh_finder/Auth/auth.wrapper.dart';
 import 'package:bh_finder/Screen/Home/guest.home.screen.dart';
 import 'package:bh_finder/Screen/Loading/home.loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/BHouseProfile/bhouse.profile.dart';
+import 'package:bh_finder/Screen/Owner/reservation/reservation.view.screen.dart';
 import 'package:bh_finder/Screen/Owner/rooms.owner.screen.dart';
 import 'package:bh_finder/cons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -50,7 +51,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   @override
   void initState() {
     Navigator.of(context).popUntil((route) => route.isFirst);
-    super.initState();
     ownersBHouseData = FirebaseFirestore.instance
         .collection('BoardingHouses')
         .doc(FirebaseAuth.instance.currentUser?.email)
@@ -73,7 +73,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
 
     getToken();
 
-    FirebaseMessaging.instance.subscribeToTopic("Owner");
+    super.initState();
   }
 
   void getToken() async {
@@ -82,7 +82,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
       print("FCM Token: $token");
       saveToken(token); // Save the token to your Firestore or your server
       // Subscribe the user to a topic
-      FirebaseMessaging.instance.subscribeToTopic("Users");
     } else {
       print("Failed to get FCM token");
     }
@@ -343,7 +342,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                           backgroundColor: Colors.red,
                                           radius: 8,
                                           child: Center(
-                                              child: chat != null
+                                              child: chat != 0
                                                   ? '$chat'
                                                       .text
                                                       .size(1)
@@ -450,8 +449,11 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                FutureBuilder<DocumentSnapshot>(
-                  future: ownersBHouseData,
+                StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('BoardingHouses')
+                      .doc(FirebaseAuth.instance.currentUser?.email)
+                      .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -728,8 +730,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                                           data['docID'];
                                                     });
                                                     print(rBHouseDocId);
-                                                    Navigator.pushNamed(context,
-                                                        '/ViewReservationScreen');
+                                                    Navigator.push(
+                                                        context,
+                                                    MaterialPageRoute(
+                                                        builder: (context) => ViewReservationScreen(
+                                                          token: data['token'],
+                                                        )));
                                                   },
                                                   child: Padding(
                                                     padding:

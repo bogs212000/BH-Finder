@@ -1,8 +1,13 @@
+import 'dart:convert';
 import 'dart:io';
 
+import 'package:bh_finder/Screen/Chat/chat.boarders.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+import 'package:googleapis_auth/auth.dart';
+import 'package:googleapis_auth/auth_io.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:quickalert/models/quickalert_type.dart';
@@ -14,9 +19,14 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../../../cons.dart';
 import '../owner.home.screen.dart';
+import 'package:http/http.dart' as http;
+
+final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class ViewReservationScreen extends StatefulWidget {
-  const ViewReservationScreen({Key? key}) : super(key: key);
+  final String? token;
+
+  const ViewReservationScreen({Key? key, this.token}) : super(key: key);
 
   @override
   State<ViewReservationScreen> createState() => _ViewReservationScreenState();
@@ -32,6 +42,55 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
         .collection('Reservations')
         .doc(rBHouseDocId)
         .get();
+  }
+
+  void sendPushMessage(String body, String title) async {
+    try {
+      final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
+        await rootBundle.loadString(
+            'assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json'),
+      );
+
+      final client =
+          await clientViaServiceAccount(serviceAccountCredentials, _scopes);
+      final accessToken = client.credentials.accessToken.data;
+
+      final response = await http.post(
+        Uri.parse(
+            'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode({
+          'message': {
+            'token': widget.token,
+            // Send notification to all users subscribed to this topic
+            'notification': {
+              'body': body,
+              'title': title,
+            },
+            'data': {
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done',
+              'body': body, // Include additional data if needed
+              'title': title,
+            },
+          },
+        }),
+      );
+
+      if (response.statusCode == 200) {
+        print('Push notification sent successfully to all users');
+      } else {
+        print(
+            'Failed to send push notification. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
+    } catch (e) {
+      print("Error sending push notification: $e");
+    }
   }
 
   @override
@@ -263,8 +322,15 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                       'status': 'canceled',
                                                     });
                                                     //increment notification
-                                                    await FirebaseFirestore.instance.collection('Users').doc(data['boarderEmail']).update({
-                                                      'notification': FieldValue.increment(1),
+                                                    await FirebaseFirestore
+                                                        .instance
+                                                        .collection('Users')
+                                                        .doc(data[
+                                                            'boarderEmail'])
+                                                        .update({
+                                                      'notification':
+                                                          FieldValue.increment(
+                                                              1),
                                                     });
 
                                                     await FirebaseFirestore
@@ -281,7 +347,12 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                           data['boarderUuId'],
                                                       'status': false,
                                                     });
-
+                                                    String title =
+                                                        '$BhouseName';
+                                                    String body =
+                                                        "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been rejected. If you have any questions or need assistance, please don't hesitate to reach out.";
+                                                    sendPushMessage(
+                                                        body, title);
                                                     Navigator.pop(context);
 
                                                     // Show a success dialog
@@ -368,8 +439,13 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                   });
 
                                                   //increment notification
-                                                  await FirebaseFirestore.instance.collection('Users').doc(data['boarderEmail']).update({
-                                                    'notification': FieldValue.increment(1),
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Users')
+                                                      .doc(data['boarderEmail'])
+                                                      .update({
+                                                    'notification':
+                                                        FieldValue.increment(1),
                                                   });
 
                                                   // Add a notification in the 'Notifications' collection
@@ -386,7 +462,10 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                         data['boarderUuId'],
                                                     'status': false,
                                                   });
-
+                                                  String title = '$BhouseName';
+                                                  String body =
+                                                      "HHi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been canceled. If you have any questions or need assistance, please don't hesitate to reach out.";
+                                                  sendPushMessage(body, title);
                                                   Navigator.pop(context);
 
                                                   // Show a success dialog
@@ -471,6 +550,8 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                       .collection('Rooms')
                                                       .doc('${data['roomId']}')
                                                       .update({
+                                                    'boarderToken':
+                                                        data['token'],
                                                     'boarderID':
                                                         data['boarderUuId'],
                                                     'boardersConNumber': data[
@@ -484,7 +565,8 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                     'totalToPay': '',
                                                     'roomStatus': 'unavailable',
                                                     'paid?': false,
-                                                    'boarderEmail': data['boarderEmail']
+                                                    'boarderEmail':
+                                                        data['boarderEmail']
                                                   });
 
                                                   await FirebaseFirestore
@@ -497,8 +579,13 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                   });
 
                                                   //increment notification
-                                                  await FirebaseFirestore.instance.collection('Users').doc(data['boarderEmail']).update({
-                                                    'notification': FieldValue.increment(1),
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Users')
+                                                      .doc(data['boarderEmail'])
+                                                      .update({
+                                                    'notification':
+                                                        FieldValue.increment(1),
                                                   });
 
                                                   // Add a notification in the 'Notifications' collection
@@ -515,7 +602,10 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                         data['boarderUuId'],
                                                     'status': false,
                                                   });
-
+                                                  String title = '$BhouseName';
+                                                  String body =
+                                                      "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you!";
+                                                  sendPushMessage(body, title);
                                                   // Update the 'read' field for all reservations where boarderUuId is not equal to the given ID
                                                   QuerySnapshot querySnapshot =
                                                       await FirebaseFirestore

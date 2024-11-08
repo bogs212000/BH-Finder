@@ -63,8 +63,8 @@ class Wrapper extends StatelessWidget {
                   (user != null && !user.emailVerified)) {
                 return WaitEmailVerify();
               } else if ((userData.data!['verified'] == true) &&
-              (userData.data!['role'] == "Boarder") &&
-              (user != null && user.emailVerified)) {
+                  (userData.data!['role'] == "Boarder") &&
+                  (user != null && user.emailVerified)) {
                 bUuId = userData.data!['UuId'];
                 fName = userData.data!['FirstName'];
                 mName = userData.data!['MiddleName'];
@@ -75,7 +75,7 @@ class Wrapper extends StatelessWidget {
                   (userData.data!['role'] == "Admin") &&
                   (user != null && user.emailVerified)) {
                 return AdminHomeScreen();
-              }else if ((userData.data!['verified'] == false) &&
+              } else if ((userData.data!['verified'] == false) &&
                   (userData.data!['role'] == "Owner")) {
                 return WaitingVerificationScreen();
               } else if ((userData.data!['role'] == "Client")) {

@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../cons.dart';
 import '../../fetch.dart';
@@ -292,21 +293,159 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                 'Description'.text.semiBold.size(16).make(),
                               ],
                             ),
+                            data['Rules'] == ''
+                                ? Row(
+                                    children: [
+                                      Flexible(
+                                        child: '${data['Rules']}'
+                                            .text
+                                            .light
+                                            .overflow(TextOverflow.fade)
+                                            .maxLines(3)
+                                            .color(Colors.grey)
+                                            .size(13)
+                                            .make(),
+                                      ),
+                                    ],
+                                  )
+                                : SizedBox(),
+                            SizedBox(height: 20),
                             Row(
                               children: [
-                                Flexible(
-                                  child: '${data['Rules']}'
-                                      .text
-                                      .light
-                                      .overflow(TextOverflow.fade)
-                                      .maxLines(3)
-                                      .color(Colors.grey)
-                                      .size(13)
-                                      .make(),
-                                ),
+                                'Owner info'.text.light.make(),
                               ],
                             ),
-                            SizedBox(height: 20),
+                            Divider(),
+                            StreamBuilder<DocumentSnapshot>(
+                              stream: FirebaseFirestore.instance
+                                  .collection('Users')
+                                  .doc(data['Email'])
+                                  .snapshots(),
+                              builder: (BuildContext context,
+                                  AsyncSnapshot<DocumentSnapshot> snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Shimmer.fromColors(
+                                    baseColor: Colors.grey.shade200,
+                                    highlightColor: Colors.white,
+                                    child: Padding(
+                                      padding:
+                                          EdgeInsets.only(left: 20, right: 20),
+                                      child: Container(
+                                        height: 35,
+                                        width: double.infinity,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey,
+                                          borderRadius:
+                                              BorderRadius.circular(10),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }
+                                if (snapshot.hasError) {
+                                  return const Center(
+                                      child: Text('Error fetching data'));
+                                }
+                                if (!snapshot.hasData ||
+                                    !snapshot.data!.exists) {
+                                  return const Center(
+                                      child: Text('No Reservation found'));
+                                }
+                                Map<String, dynamic> datas = snapshot.data!
+                                    .data() as Map<String, dynamic>;
+                                return Padding(
+                                  padding: EdgeInsets.only(right: 10),
+                                  child: Column(
+                                    children: [
+                                      Row(
+                                        children: [
+                                          '${datas['FirstName']} ${datas['MiddleName']} ${datas['LastName']}'
+                                              .text
+                                              .bold
+                                              .make(),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          '${datas['Email']}'.text.bold.make(),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          '${datas['PhoneNumber']}'
+                                              .text
+                                              .bold
+                                              .make(),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          '${datas['OwnerUId']}'
+                                              .text
+                                              .bold
+                                              .make(),
+                                        ],
+                                      ),
+                                      SizedBox(height: 5),
+                                      Row(
+                                        children: [
+                                          GestureDetector(
+                                            onTap: (){
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Dialog(
+                                                    child: InteractiveViewer(
+                                                      child: CachedNetworkImage(
+                                                        imageUrl: datas['ImageIdPermit']!,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 100,
+                                              child: CachedNetworkImage(
+                                                imageUrl: datas['ImageID'],
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(width: 5),
+                                          GestureDetector(
+                                            onTap: (){
+                                              showDialog(
+                                                context: context,
+                                                builder: (BuildContext context) {
+                                                  return Dialog(
+                                                    child: InteractiveViewer(
+                                                      child: CachedNetworkImage(
+                                                        imageUrl: datas['ImageIdPermit']!,
+                                                        fit: BoxFit.contain,
+                                                      ),
+                                                    ),
+                                                  );
+                                                },
+                                              );
+                                            },
+                                            child: Container(
+                                              height: 100,
+                                              child: CachedNetworkImage(
+                                                imageUrl: datas['ImageIdPermit'],
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+
+                                    ],
+                                  ),
+                                );
+                              },
+                            ),
+                            Divider(),
                             Row(
                               children: [
                                 'Rooms'.text.semiBold.size(16).make(),
@@ -563,7 +702,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                             onTap: () {
                               Navigator.of(context).pushAndRemoveUntil(
                                 _toHomeScreen(),
-                                    (Route<dynamic> route) => false,
+                                (Route<dynamic> route) => false,
                               );
                             },
                             child: Container(
@@ -605,11 +744,10 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                           onConfirmBtnTap: () async {
                                             Navigator.pop(context);
                                             QuickAlert.show(
-                                              context: context,
-                                              type: QuickAlertType.loading,
-                                              title: 'Loading...',
-                                              text: 'Please wait'
-                                            );
+                                                context: context,
+                                                type: QuickAlertType.loading,
+                                                title: 'Loading...',
+                                                text: 'Please wait');
                                             try {
                                               await FirebaseFirestore.instance
                                                   .collection('BoardingHouses')
@@ -625,22 +763,23 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                               });
                                               Navigator.pop(context);
                                               QuickAlert.show(
-                                                barrierDismissible: true,
+                                                  barrierDismissible: true,
                                                   context: (context),
                                                   type: QuickAlertType.success,
                                                   title: 'Verified',
-                                                  text: 'Boarding House has been verified',
-                                                onConfirmBtnTap: () {
-                                                  Navigator.of(context).pushAndRemoveUntil(
-                                                    MaterialPageRoute(
-                                                      builder: (context) => AuthWrapper(),
-                                                    ),
-                                                        (Route<dynamic> route) =>
-                                                    false, // Removes all previous routes
-                                                  );
-                                                }
-                                              );
-
+                                                  text:
+                                                      'Boarding House has been verified',
+                                                  onConfirmBtnTap: () {
+                                                    Navigator.of(context)
+                                                        .pushAndRemoveUntil(
+                                                      MaterialPageRoute(
+                                                        builder: (context) =>
+                                                            AuthWrapper(),
+                                                      ),
+                                                      (Route<dynamic> route) =>
+                                                          false, // Removes all previous routes
+                                                    );
+                                                  });
                                             } on FirebaseAuthException catch (e) {
                                               print(e);
                                               Navigator.pop(context);
@@ -648,8 +787,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                   context: (context),
                                                   type: QuickAlertType.error,
                                                   title: 'Error',
-                                                  text: '$e'
-                                              );
+                                                  text: '$e');
                                             }
                                           },
                                           context: context,

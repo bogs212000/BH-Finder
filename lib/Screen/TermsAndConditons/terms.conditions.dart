@@ -4,6 +4,8 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:async';
 
+import '../Loading/loading.bhouse.screen.dart';
+
 class TermsAndConditionsScreen extends StatefulWidget {
   const TermsAndConditionsScreen({super.key});
 
@@ -34,10 +36,7 @@ class _TermsAndConditionsScreenState extends State<TermsAndConditionsScreen> {
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // While fetching the web page, display a loading screen
-              return Center(
-                child: Lottie.asset('assets/lottie/loading.json',
-                    height: 100),
-              );
+              return LoadingBHouseScreen();
             } else {
               return WebView(
                 initialUrl: 'https://www.freeprivacypolicy.com/live/f6705f2c-e10e-4b0a-be43-93e479d708e8',

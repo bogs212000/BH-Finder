@@ -3,6 +3,7 @@
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:quickalert/quickalert.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 class ForgotPassScreen extends StatefulWidget {
@@ -73,7 +74,22 @@ class _ForgotPassScreenState extends State<ForgotPassScreen> {
                       child: ElevatedButton(
                         onPressed: () async {
                           try {
-                            await FirebaseAuth.instance.sendPasswordResetEmail(email: emailController.text.trim());
+                            QuickAlert.show(
+                                title: 'Loading',
+                                text: 'Please wait...',
+                                context: context,
+                                type: QuickAlertType.loading);
+                            await FirebaseAuth.instance.sendPasswordResetEmail(
+                                email: emailController.text.trim());
+                            Navigator.pop(context);
+                            QuickAlert.show(
+                                title: 'Success!',
+                                text: 'Password reset email sent.',
+                                onConfirmBtnTap: (){
+                                  Navigator.pop(context);
+                                },
+                                context: context,
+                                type: QuickAlertType.success);
                             print("Password reset email sent.");
                           } catch (e) {
                             print("Error sending password reset email: $e");

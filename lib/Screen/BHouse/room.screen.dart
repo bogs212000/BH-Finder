@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'package:bh_finder/Screen/BordersReservation/boarder.reservation.screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -18,7 +19,8 @@ import '../Loading/loading.bhouse.screen.dart';
 import 'bh.screen.dart';
 
 class RoomScreen extends StatefulWidget {
-  const RoomScreen({super.key});
+  final String? token;
+  const RoomScreen({super.key, this.token});
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -75,6 +77,8 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final args = ModalRoute.of(context)?.settings.arguments as Map?;
+    final token = args?['token'];
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot>(
         future: bHouseRoom,
@@ -331,39 +335,6 @@ class _RoomScreenState extends State<RoomScreen> {
                           ),
                         ),
                         Spacer(),
-                        currentUser != null
-                            ? Padding(
-                                padding: EdgeInsets.only(top: 40, right: 20),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      ownerEmail = data['Email'].toString();
-                                      bHouse =
-                                          data['BoardingHouseName'].toString();
-                                    });
-                                    print('$ownerEmail, $bHouse');
-                                    Navigator.pushNamed(context, '/ChatOwner');
-                                  },
-                                  child: Container(
-                                    height: 35,
-                                    width: 35,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      border: Border.all(
-                                          color: Colors.grey, width: 0.3),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.chat_outlined,
-                                        size: 20,
-                                        color: Colors.white,
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : SizedBox(),
                       ],
                     ),
                     Spacer(),
@@ -476,9 +447,13 @@ class _RoomScreenState extends State<RoomScreen> {
                                           confirmBtnColor: Colors.blue,
                                         );
                                       } else {
-                                        // If no issues, proceed with reservation
-                                        Navigator.pushNamed(context,
-                                            '/BoarderReservationScreen');
+                                        Navigator.push(
+                                            context,
+                                        MaterialPageRoute(
+                                          builder: (context) => BoarderReservationScreen(
+                                            token: token,
+                                          ),
+                                        ));
                                         setState(() {
                                           BhouseName = data['bHouseName'];
                                           roomPrice = data['price'];

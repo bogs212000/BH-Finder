@@ -25,7 +25,9 @@ import 'package:http/http.dart' as http;
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class BoarderReservationScreen extends StatefulWidget {
-  const BoarderReservationScreen({super.key});
+  final String? token;
+
+  const BoarderReservationScreen({super.key, this.token});
 
   @override
   State<BoarderReservationScreen> createState() =>
@@ -69,43 +71,42 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
       );
 
       final client =
-      await clientViaServiceAccount(serviceAccountCredentials, _scopes);
+          await clientViaServiceAccount(serviceAccountCredentials, _scopes);
       final accessToken = client.credentials.accessToken.data;
 
-        final response = await http.post(
-          Uri.parse(
-              'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $accessToken',
-          },
-          body: jsonEncode({
-            'message': {
-              'token': '',
-              // Send notification to all users subscribed to this topic
-              'notification': {
-                'body': body,
-                'title': title,
-              },
-              'data': {
-                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                'id': '1',
-                'status': 'done',
-                'body': body, // Include additional data if needed
-                'title': title,
-              },
+      final response = await http.post(
+        Uri.parse(
+            'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode({
+          'message': {
+            'token': widget.token,
+            // Send notification to all users subscribed to this topic
+            'notification': {
+              'body': body,
+              'title': title,
             },
-          }),
-        );
+            'data': {
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done',
+              'body': body, // Include additional data if needed
+              'title': title,
+            },
+          },
+        }),
+      );
 
-        if (response.statusCode == 200) {
-          print('Push notification sent successfully to all users');
-        } else {
-          print(
-              'Failed to send push notification. Status code: ${response.statusCode}');
-          print('Response body: ${response.body}');
-        }
-
+      if (response.statusCode == 200) {
+        print('Push notification sent successfully to all users');
+      } else {
+        print(
+            'Failed to send push notification. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
     } catch (e) {
       print("Error sending push notification: $e");
     }
@@ -156,9 +157,9 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                             padding: EdgeInsets.only(top: 40, left: 20),
                             child: GestureDetector(
                               onTap: () {
-                               setState(() {
-                                 reserved = false;
-                               });
+                                setState(() {
+                                  reserved = false;
+                                });
                                 Navigator.of(context).pushAndRemoveUntil(
                                   _toRoomScreen(),
                                   (Route<dynamic> route) => false,
@@ -352,55 +353,121 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                                         ),
                                         SizedBox(height: 20),
                                         GestureDetector(
-                                          onTap: () {
+                                          onTap: () async {
                                             String docID = Uuid().v4();
                                             QuickAlert.show(
                                               context: context,
                                               type: QuickAlertType.loading,
                                               title: 'Pleas wait...',
-                                              text: 'Reserving room on process.',
+                                              text:
+                                                  'Reserving room on process.',
                                             );
                                             try {
-                                              FirebaseFirestore.instance
-                                                  .collection('Reservations')
-                                                  .doc('$docID')
-                                                  .set({
-                                                'createdAt': DateTime.now(),
-                                                'docID': docID,
-                                                'roomNumber': roomNumber,
-                                                'status': 'pending',
-                                                'OwnerId': OwnerUuId,
-                                                'boarderUuId': bUuId,
-                                                'boarderEmail': FirebaseAuth.instance.currentUser?.email.toString(),
-                                                'roomId': roomId,
-                                                'message': _message.text,
-                                                'checkIn': checkIn,
-                                                'checkOut': checkOut,
-                                                'boardersName':
-                                                    '$fName $mName $lName',
-                                                'boardersConNumber':
-                                                    '$bPhoneNumber',
-                                                'boarderAddress': '',
-                                                'read': false,
-                                              });
-                                              QuickAlert.show(
-                                                context: context,
-                                                type:
-                                                QuickAlertType.success,
-                                                title: 'Room reserved successfully!',
-                                                text:
-                                                'Kindly review your reservation status on the homepage.',
-                                                onConfirmBtnTap: () {
-                                                  Navigator.of(context)
-                                                      .pushReplacement(
-                                                    MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            HomeScreen()), // Change NextScreen() to your desired screen
-                                                  );
-                                                },
-                                              );
+                                              // Query to find the document where 'boarderUuId' equals the user ID and 'roomId' equals the room
+                                              QuerySnapshot querySnapshot =
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection('Rooms')
+                                                      .where('boarderID',
+                                                          isEqualTo:
+                                                          bUuId)
+                                                      .get();
 
-                                            } on FirebaseAuthException catch (e) {
+                                              // Check if the document exists
+                                              if (querySnapshot
+                                                  .docs.isNotEmpty) {
+                                                Navigator.pop(context);
+                                                // Display alert that a reservation request already exists
+                                                QuickAlert.show(
+                                                  onCancelBtnTap: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  onConfirmBtnTap: () {
+                                                    Navigator.pop(context);
+                                                  },
+                                                  context: context,
+                                                  type: QuickAlertType.info,
+                                                  text:
+                                                      "You are currently renting a room right now!",
+                                                  titleAlignment:
+                                                      TextAlign.center,
+                                                  textAlignment:
+                                                      TextAlign.center,
+                                                  confirmBtnText: 'Ok',
+                                                  confirmBtnColor: Colors.blue,
+                                                );
+                                              } else {
+                                                try {
+                                                  String title = 'BH Finder';
+                                                  String body =
+                                                      'Someone wants to rent or reserve a room, check it now!';
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Reservations')
+                                                      .doc('$docID')
+                                                      .set({
+                                                    'createdAt': DateTime.now(),
+                                                    'docID': docID,
+                                                    'roomNumber': roomNumber,
+                                                    'status': 'pending',
+                                                    'OwnerId': OwnerUuId,
+                                                    'boarderUuId': bUuId,
+                                                    'boarderEmail': FirebaseAuth
+                                                        .instance
+                                                        .currentUser
+                                                        ?.email
+                                                        .toString(),
+                                                    'roomId': roomId,
+                                                    'message': _message.text,
+                                                    'checkIn': checkIn,
+                                                    'checkOut': checkOut,
+                                                    'boardersName':
+                                                        '$fName $mName $lName',
+                                                    'boardersConNumber':
+                                                        '$bPhoneNumber',
+                                                    'boarderAddress': '',
+                                                    'read': false,
+                                                    'token': myToken,
+                                                  });
+                                                  await FirebaseFirestore
+                                                      .instance
+                                                      .collection(
+                                                          'Notifications')
+                                                      .doc()
+                                                      .set({
+                                                    'boarderID': OwnerUuId,
+                                                    'createdAt': DateTime.now(),
+                                                    'message':
+                                                        '$fName $mName $lName want to reserve or rent Room $roomNumber',
+                                                    'status': true
+                                                  });
+                                                  sendPushMessage(body, title);
+                                                  QuickAlert.show(
+                                                    context: context,
+                                                    type:
+                                                        QuickAlertType.success,
+                                                    title:
+                                                        'Room reserved successfully!',
+                                                    text:
+                                                        'Kindly review your reservation status on the homepage.',
+                                                    onConfirmBtnTap: () {
+                                                      Navigator.of(context)
+                                                          .pushReplacement(
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                HomeScreen()), // Change NextScreen() to your desired screen
+                                                      );
+                                                    },
+                                                  );
+                                                } on FirebaseAuthException catch (e) {
+                                                  setState(() {
+                                                    loading = false;
+                                                  });
+                                                  print(e);
+                                                }
+                                              }
+                                            } catch (e) {
                                               setState(() {
                                                 loading = false;
                                               });

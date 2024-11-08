@@ -14,6 +14,7 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
+import 'package:velocity_x/velocity_x.dart';
 import '../../cons.dart';
 
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
@@ -23,7 +24,8 @@ class ChatOwner extends StatefulWidget {
   final String? emailOwner;
   final String? token;
 
-  ChatOwner({Key? key, this.ownerNumber, this.emailOwner, this.token}) : super(key: key);
+  ChatOwner({Key? key, this.ownerNumber, this.emailOwner, this.token})
+      : super(key: key);
 
   @override
   State<ChatOwner> createState() => _ChatOwnerState();
@@ -43,43 +45,42 @@ class _ChatOwnerState extends State<ChatOwner> {
       );
 
       final client =
-      await clientViaServiceAccount(serviceAccountCredentials, _scopes);
+          await clientViaServiceAccount(serviceAccountCredentials, _scopes);
       final accessToken = client.credentials.accessToken.data;
 
-        final response = await http.post(
-          Uri.parse(
-              'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
-          headers: <String, String>{
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer $accessToken',
-          },
-          body: jsonEncode({
-            'message': {
-              'token': widget.token,
-              // Send notification to all users subscribed to this topic
-              'notification': {
-                'body': body,
-                'title': title,
-              },
-              'data': {
-                'click_action': 'FLUTTER_NOTIFICATION_CLICK',
-                'id': '1',
-                'status': 'done',
-                'body': body, // Include additional data if needed
-                'title': title,
-              },
+      final response = await http.post(
+        Uri.parse(
+            'https://fcm.googleapis.com/v1/projects/bh-finder-50ccf/messages:send'),
+        headers: <String, String>{
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $accessToken',
+        },
+        body: jsonEncode({
+          'message': {
+            'token': widget.token,
+            // Send notification to all users subscribed to this topic
+            'notification': {
+              'body': body,
+              'title': title,
             },
-          }),
-        );
+            'data': {
+              'click_action': 'FLUTTER_NOTIFICATION_CLICK',
+              'id': '1',
+              'status': 'done',
+              'body': body, // Include additional data if needed
+              'title': title,
+            },
+          },
+        }),
+      );
 
-        if (response.statusCode == 200) {
-          print('Push notification sent successfully to all users');
-        } else {
-          print(
-              'Failed to send push notification. Status code: ${response.statusCode}');
-          print('Response body: ${response.body}');
-        }
-
+      if (response.statusCode == 200) {
+        print('Push notification sent successfully to all users');
+      } else {
+        print(
+            'Failed to send push notification. Status code: ${response.statusCode}');
+        print('Response body: ${response.body}');
+      }
     } catch (e) {
       print("Error sending push notification: $e");
     }
@@ -90,7 +91,7 @@ class _ChatOwnerState extends State<ChatOwner> {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     double screenWidth = MediaQuery.of(context).size.width;
 
-    _callNumber() async{
+    _callNumber() async {
       QuickAlert.show(
         onCancelBtnTap: () {
           Navigator.pop(context);
@@ -197,7 +198,7 @@ class _ChatOwnerState extends State<ChatOwner> {
                               child: Container(
                                 height: 40,
                                 width: 150,
-                                decoration: BoxDecoration(
+                                decoration: const BoxDecoration(
                                   color: Colors.grey,
                                   borderRadius: BorderRadius.only(
                                       topLeft: Radius.circular(20),
@@ -225,6 +226,42 @@ class _ChatOwnerState extends State<ChatOwner> {
                     sender: time,
                     text: messageText,
                     isMe: _auth.currentUser?.email == messageSender,
+                    onLongPress: () {
+                      if (messageSender !=
+                          FirebaseAuth.instance.currentUser?.email.toString()) {
+                      } else {
+                        showDialog(
+                          context: context,
+                          builder: (context) {
+                            return AlertDialog(
+                              title: Text('Delete Message'),
+                              content: Text(
+                                  'Are you sure you want to delete this message?'),
+                              actions: [
+                                TextButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Cancel'),
+                                ),
+                                TextButton(
+                                  onPressed: () async {
+                                    await _firestore
+                                        .collection('Chats')
+                                        .doc('$email+${widget.emailOwner}')
+                                        .collection('Chats')
+                                        .doc(message.id)
+                                        .delete();
+                                    Navigator.of(context).pop();
+                                  },
+                                  child: Text('Delete'),
+                                ),
+                              ],
+                            );
+                          },
+                        );
+                      }
+                    },
                   );
                   messageBubbles.add(messageBubble);
                 }
@@ -330,7 +367,6 @@ class _ChatOwnerState extends State<ChatOwner> {
       String title = "$fName $mName $lName";
       _messageController.clear();
       sendPushMessage(body, title);
-
     }
   }
 }
@@ -339,50 +375,59 @@ class MessageBubble extends StatelessWidget {
   final String sender;
   final String text;
   final bool isMe;
+  final VoidCallback? onLongPress;
 
-  MessageBubble({required this.sender, required this.text, required this.isMe});
+  MessageBubble({
+    required this.sender,
+    required this.text,
+    required this.isMe,
+    this.onLongPress,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: EdgeInsets.all(10),
-      child: Column(
-        crossAxisAlignment:
-            isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
-        children: [
-          Text(
-            sender,
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.grey[600],
+    return GestureDetector(
+      onLongPress: onLongPress,
+      child: Padding(
+        padding: EdgeInsets.all(10),
+        child: Column(
+          crossAxisAlignment:
+              isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+          children: [
+            Text(
+              sender,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+              ),
             ),
-          ),
-          Material(
-            borderRadius: isMe
-                ? const BorderRadius.only(
-                    topLeft: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
-                  )
-                : const BorderRadius.only(
-                    topRight: Radius.circular(20),
-                    bottomLeft: Radius.circular(20),
-                    bottomRight: Radius.circular(20),
+            Material(
+              borderRadius: isMe
+                  ? const BorderRadius.only(
+                      topLeft: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    )
+                  : const BorderRadius.only(
+                      topRight: Radius.circular(20),
+                      bottomLeft: Radius.circular(20),
+                      bottomRight: Radius.circular(20),
+                    ),
+              elevation: 5,
+              color: isMe ? Colors.blue : Colors.white,
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                child: Text(
+                  text,
+                  style: TextStyle(
+                    fontSize: 16,
+                    color: isMe ? Colors.white : Colors.black,
                   ),
-            elevation: 5,
-            color: isMe ? Colors.blue : Colors.white,
-            child: Padding(
-              padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-              child: Text(
-                text,
-                style: TextStyle(
-                  fontSize: 16,
-                  color: isMe ? Colors.white : Colors.black,
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

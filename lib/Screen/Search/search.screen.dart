@@ -181,6 +181,7 @@ class _SearchScreenState extends State<SearchScreen> {
                 padding:
                 const EdgeInsets.only(left: 5, right: 5, top: 10),
                 child: TextField(
+                  textCapitalization: TextCapitalization.words,
                   onChanged: (value) {
                     setState(() {
                       search = value;
