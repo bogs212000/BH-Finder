@@ -59,8 +59,10 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
 
     //IDs
     Future<void> _openImagePicker() async {
-      final XFile? pickedImage =
-          await _picker.pickImage(source: ImageSource.camera);
+      final XFile? pickedImage = await _picker.pickImage(
+        source: ImageSource.gallery,
+        imageQuality: 50,
+      );
       if (pickedImage != null) {
         setState(() {
           _imageID = File(pickedImage.path);
@@ -203,7 +205,7 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                   ),
                   Padding(
                     padding:
-                    const EdgeInsets.only(left: 5, right: 5, bottom: 20),
+                        const EdgeInsets.only(left: 5, right: 5, bottom: 20),
                     child: TextField(
                       controller: _homeAddress,
                       keyboardType: TextInputType.name,
@@ -323,7 +325,8 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                               ownerLastName = _ownerLastName.text.toString();
                               ownerContactNumber =
                                   _ownerContactNumber.text.toString();
-                              boardingHouseAddress = _ownerAddress.text.toString();
+                              boardingHouseAddress =
+                                  _ownerAddress.text.toString();
                             });
                             print(
                                 '$ownerFirstName $ownerMiddleName $ownerLastName - $ownerContactNumber');
@@ -406,8 +409,10 @@ class _OwnerSignupSecondState extends State<OwnerSignupSecond> {
 
   //IDs
   Future<void> _openImagePicker() async {
-    final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.camera);
+    final XFile? pickedImage = await _picker.pickImage(
+      source: ImageSource.gallery,
+      imageQuality: 50,
+    );
     if (pickedImage != null) {
       setState(() {
         _imageBldgPermit = File(pickedImage.path);
@@ -661,8 +666,8 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                   child: Column(
                     children: [
                       Padding(
-                        padding: const EdgeInsets.only(
-                            left: 5, right: 5, bottom: 5),
+                        padding:
+                            const EdgeInsets.only(left: 5, right: 5, bottom: 5),
                         child: TextField(
                           controller: _ownerEmail,
                           keyboardType: TextInputType.name,
@@ -773,12 +778,6 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                           height: 40,
                           child: ElevatedButton(
                             onPressed: () async {
-                              QuickAlert.show(
-                                context: context,
-                                type: QuickAlertType.loading,
-                                title: 'Loading...',
-                                text: 'Please Wait',
-                              );
                               if (_ownerEmail.text.isEmpty ||
                                   _ownerPassword.text.isEmpty ||
                                   _ownerConfirmPassword.text.isEmpty) {
@@ -820,6 +819,13 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                               } else {
                                 String ownerUId = Uuid().v4();
                                 print('Uuid : $ownerUId');
+                                QuickAlert.show(
+                                  barrierDismissible: false,
+                                  context: context,
+                                  type: QuickAlertType.loading,
+                                  title: 'Loading...',
+                                  text: 'Please Wait',
+                                );
                                 try {
                                   String url;
                                   String url2;
@@ -913,7 +919,6 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                   url2 = await (await uploadTask2)
                                       .ref
                                       .getDownloadURL();
-
                                   await FirebaseFirestore.instance
                                       .collection('Users')
                                       .doc(_ownerEmail.text.trim())
@@ -960,36 +965,36 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'gCashNum': '',
                                     'token': '',
                                   });
-                                  Navigator.of(context);
+                                  Navigator.pop(context);
                                   QuickAlert.show(
+                                    confirmBtnText: 'Confirm',
                                     barrierDismissible: false,
-                                    onConfirmBtnTap: () {
-                                      _ownerEmail.clear();
-                                      _ownerConfirmPassword.clear();
-                                      _ownerPassword.clear();
-                                      Navigator.of(context).pushReplacement(
-                                        MaterialPageRoute(
-                                            builder: (context) =>
-                                                AuthWrapper()), // Change NextScreen() to your desired screen
-                                      );
+                                    onConfirmBtnTap: () async {
+                                      Navigator.pop(context);
+                                        Future.delayed(Duration(seconds: 2), () {
+                                        Navigator.of(context).pushReplacement(
+                                          MaterialPageRoute(
+                                            builder: (context) => AuthWrapper(),
+                                          ),
+                                        );
+                                      });
                                     },
                                     context: context,
                                     type: QuickAlertType.success,
                                     title: 'Success!',
                                     text:
-                                        'Thank you for registering! Please allow some time for your account to be verified by the admin. We appreciate your patience.',
+                                        'Thank you for registering! Please Click Confirm and allow some time for your account to be verified by the admin. We appreciate your patience.',
                                   );
                                   await FirebaseAuth.instance
                                       .createUserWithEmailAndPassword(
-                                          email: _ownerEmail.text.trim(),
-                                          password: _ownerPassword.text.trim());
-                                  setState(() {
-                                    loading = false;
-                                  });
+                                      email: _ownerEmail.text.trim(),
+                                      password: _ownerPassword.text.trim());
+                                  _ownerEmail.clear();
+                                  _ownerConfirmPassword.clear();
+                                  _ownerPassword.clear();
+                                  _imageBldgPermit = null;
+                                  _imageID = null;
                                 } on FirebaseAuthException catch (e) {
-                                  setState(() {
-                                    loading = false;
-                                  });
                                   print(e);
                                 }
                               }

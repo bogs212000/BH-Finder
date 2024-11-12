@@ -449,7 +449,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                                       QuickAlert.show(
                                         barrierDismissible: false,
                                         onConfirmBtnTap: (){
-
                                           print("Verification email sent.");
                                           firstName.clear();
                                           middleName.clear();

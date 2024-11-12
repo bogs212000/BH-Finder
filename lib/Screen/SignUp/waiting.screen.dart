@@ -17,17 +17,15 @@ class WaitEmailVerify extends StatefulWidget {
 class _WaitEmailVerifyState extends State<WaitEmailVerify> {
   bool loading = false;
   String? message;
+
   @override
   void initState() {
     Navigator.of(context).popUntil((route) => route.isFirst);
-
     super.initState();
   }
   @override
   Widget build(BuildContext context) {
-    return loading
-        ? LoadingScreen()
-        : Scaffold(
+    return Scaffold(
             body: Container(
               padding: EdgeInsets.all(25),
               color: Colors.white,

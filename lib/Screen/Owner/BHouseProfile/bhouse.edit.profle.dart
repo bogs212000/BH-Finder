@@ -1,5 +1,7 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -27,6 +29,8 @@ class BHouseEditProfile extends StatefulWidget {
   final String? bHouseName;
   final String? rules;
   final String? OwnerUId;
+  final double? lat;
+  final double? long;
 
   const BHouseEditProfile(
       {super.key,
@@ -38,7 +42,7 @@ class BHouseEditProfile extends StatefulWidget {
       this.phoneNum,
       this.bHouseName,
       this.rules,
-      this.OwnerUId});
+      this.OwnerUId, this.lat, this.long});
 
   @override
   State<BHouseEditProfile> createState() => _BHouseEditProfileState();
@@ -55,6 +59,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
   String? message;
   bool _isChanged = false;
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
+  final Completer<GoogleMapController> _controller = Completer();
 
   @override
   void initState() {
@@ -147,6 +152,14 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
   Widget build(BuildContext context) {
     final _picker = ImagePicker();
 
+    final Marker targetMarker = Marker(
+      markerId: MarkerId("targetLocation"),
+      position: LatLng(widget.lat!, widget.long!),
+      infoWindow: InfoWindow(
+        title: "Target Location",
+        snippet: "Pinned Location",
+      ),
+    );
     //IDs
     Future<void> _openImagePicker() async {
       final XFile? pickedImage =
@@ -395,6 +408,42 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
                               labelText: '',
                             ),
                           ),
+                        ),
+                        Container(
+                          height: 100,
+                          child: GoogleMap(
+                            initialCameraPosition: CameraPosition(
+                                target: LatLng(widget.lat!, widget.long!),
+                                zoom: 16),
+                            myLocationEnabled: true,
+                            zoomControlsEnabled: false,
+                            zoomGesturesEnabled: true,
+                            tiltGesturesEnabled: true,
+                            scrollGesturesEnabled: true,
+                            rotateGesturesEnabled: true,
+                            markers: {targetMarker},
+                            mapType: MapType.normal,
+                            onMapCreated:
+                                (GoogleMapController controller) {
+                              _controller.complete(controller);
+                            },
+                          ),
+                        ),
+                        SizedBox(height: 5),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            ElevatedButton(
+                              style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.blue,
+                                  shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(10))),
+                              onPressed: () async {
+                                Navigator.pushNamed(context, '/BHouseAddress');
+                              },
+                              child: const Text("PICK LOCATION", style: TextStyle(color: Colors.white),),
+                            ),
+                          ],
                         ),
                         Container(
                           height: 200,

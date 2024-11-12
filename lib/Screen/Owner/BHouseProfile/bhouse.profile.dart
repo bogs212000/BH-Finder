@@ -247,6 +247,8 @@ class _BHouseProfileState extends State<BHouseProfile> {
                                 address: data['address'],
                                 email: data['Email'],
                                 phoneNum: data['PhoneNumber'],
+                                lat: data['Lat'],
+                                long: data['Long'],
                               ),
                             ),
                           );

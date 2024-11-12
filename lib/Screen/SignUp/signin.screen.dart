@@ -238,12 +238,10 @@ class _SignInScreenState extends State<SignInScreen> {
                                     password: _password.text.trim(),
                                   );
                                   Navigator.pop(context);
-                                  Navigator.of(context).popUntil((route) => route.isFirst);  // Close all pop-ups
-
                                   // Navigate to HomeScreen after closing pop-ups
                                   Navigator.pushReplacement(
                                     context,
-                                    MaterialPageRoute(builder: (context) => Wrapper()),  // Replace with your HomeScreen
+                                    MaterialPageRoute(builder: (context) => AuthWrapper()),  // Replace with your HomeScreen
                                   );
                                   QuickAlert.show(
                                     context: context,

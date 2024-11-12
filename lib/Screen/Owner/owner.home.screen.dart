@@ -206,53 +206,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: GestureDetector(
-          onTap: () {
-            Navigator.pushNamed(context, '/BHouseAddress');
-          },
-          child: Container(
-            padding: EdgeInsets.only(left: 5, right: 5),
-            height: 35,
-            width: addressLat != null ? 35 : 130,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey, width: 0.3),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  // Shadow color with opacity
-                  spreadRadius: 1,
-                  // Spread radius
-                  blurRadius: 1,
-                  // Blur radius
-                  offset: Offset(
-                      0, 1), // Position of the shadow (horizontal, vertical)
-                ),
-              ],
-            ),
-            child: addressLat == null
-                ? Shimmer.fromColors(
-                    baseColor: Colors.red,
-                    highlightColor: Colors.white,
-                    child: Center(
-                      child:
-                          'Add location'.text.color(Colors.red).size(12).make(),
-                    ),
-                  )
-                : Shimmer.fromColors(
-                    period: Duration(seconds: 10),
-                    baseColor: Colors.grey,
-                    highlightColor: Colors.white,
-                    child: Center(
-                      child: Icon(
-                        Icons.pin_drop_outlined,
-                        color: Colors.grey,
-                      ),
-                    ),
-                  ),
-          ),
-        ),
         actions: [
           searchActive == false
               ? Padding(

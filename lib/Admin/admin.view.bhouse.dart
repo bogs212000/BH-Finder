@@ -398,7 +398,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                   return Dialog(
                                                     child: InteractiveViewer(
                                                       child: CachedNetworkImage(
-                                                        imageUrl: datas['ImageIdPermit']!,
+                                                        imageUrl: datas['ImageID']!,
                                                         fit: BoxFit.contain,
                                                       ),
                                                     ),

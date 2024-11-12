@@ -57,6 +57,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
             'notification': {
               'body': body,
               'title': title,
+              'image': 'https://firebasestorage.googleapis.com/v0/b/bh-finder-50ccf.appspot.com/o/App%2Fic_launcher.png?alt=media&token=68ac0062-7cd4-4e43-a39f-0e40d612ad01',
             },
             'data': {
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',

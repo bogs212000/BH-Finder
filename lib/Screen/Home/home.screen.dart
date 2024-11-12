@@ -354,37 +354,6 @@ class _HomeScreenState extends State<HomeScreen> {
                                         Text(
                                             'Boarding House : ${data['bHouseName']}',
                                             style: TextStyle(fontSize: 12)), Spacer(),
-                              if(daysLeft > 3)
-                              SizedBox(
-                                height: 25,
-                                child: ElevatedButton(
-
-                                  onPressed: () {
-                                    Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ReceiptScreen(
-                                            roomId: data['roomDocId'],
-                                          ),
-                                        ));
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Color.fromRGBO(
-                                        26, 60, 105, 1.0),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius:
-                                      BorderRadius.circular(10),
-                                    ),
-                                  ),
-                                  child: Text(
-                                    'Re-rent room',
-                                    style: TextStyle(
-                                        color: Colors.white,
-                                        fontWeight:
-                                        FontWeight.bold),
-                                  ),
-                                ),
-                              ),
                                       ],
                                     ),
                                     Row(
@@ -404,6 +373,37 @@ class _HomeScreenState extends State<HomeScreen> {
                                                   : Colors.red),
                                         ),
                                         Spacer(),
+                                        if(daysLeft < 3)
+                                          SizedBox(
+                                            height: 25,
+                                            child: ElevatedButton(
+
+                                              onPressed: () {
+                                                Navigator.push(
+                                                    context,
+                                                    MaterialPageRoute(
+                                                      builder: (context) => ReceiptScreen(
+                                                        roomId: data['roomDocId'],
+                                                      ),
+                                                    ));
+                                              },
+                                              style: ElevatedButton.styleFrom(
+                                                backgroundColor: Color.fromRGBO(
+                                                    26, 60, 105, 1.0),
+                                                shape: RoundedRectangleBorder(
+                                                  borderRadius:
+                                                  BorderRadius.circular(10),
+                                                ),
+                                              ),
+                                              child: Text(
+                                                'Re-rent room',
+                                                style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontWeight:
+                                                    FontWeight.bold),
+                                              ),
+                                            ),
+                                          ),
                                       ],
                                     ),
                                   ],

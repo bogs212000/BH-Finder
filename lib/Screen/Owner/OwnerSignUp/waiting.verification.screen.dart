@@ -5,6 +5,8 @@ import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../../Auth/auth.wrapper.dart';
@@ -17,6 +19,12 @@ class WaitingVerificationScreen extends StatefulWidget {
 }
 
 class _WaitingVerificationScreenState extends State<WaitingVerificationScreen> {
+
+  @override
+  void initState() {
+    Navigator.of(context).popUntil((route) => route.isFirst);
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {

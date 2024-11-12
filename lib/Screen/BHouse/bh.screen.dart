@@ -574,6 +574,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                     'token': data['token'],
                                                   },
                                                 );
+                                                print(data['token']);
                                               },
                                               child: Container(
                                                 height: 90,
@@ -593,7 +594,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                                 .circular(10),
                                                         image: DecorationImage(
                                                           image: NetworkImage(
-                                                            data['roomImage'] ??
+                                                            datas['roomImage'] ??
                                                                 'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                                                           ),
                                                           fit: BoxFit.cover,
@@ -613,7 +614,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                                   .start,
                                                           children: [
                                                             Text(
-                                                              '${data['roomNameNumber']}',
+                                                              '${datas['roomNameNumber']}',
                                                               style: TextStyle(
                                                                 fontWeight:
                                                                     FontWeight
@@ -622,7 +623,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                               ),
                                                             ),
                                                             Text(
-                                                              data[
+                                                              datas[
                                                                   'roomStatus'],
                                                               style: TextStyle(
                                                                 color: Colors
@@ -652,7 +653,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                                     .end,
                                                             children: [
                                                               Text(
-                                                                '₱ ${data['price'] ?? '---'} per month',
+                                                                '₱ ${datas['price'] ?? '---'} per month',
                                                                 style:
                                                                     TextStyle(
                                                                   fontWeight:

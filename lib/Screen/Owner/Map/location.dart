@@ -5,6 +5,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 import '../../../cons.dart';
 
@@ -46,13 +48,21 @@ class _BHouseAddressState extends State<BHouseAddress> {
       'Lat': addressLat,
       'Long': addressLong,
     });
-    Navigator.pushAndRemoveUntil(
+    QuickAlert.show(
+      context: context,
+      type: QuickAlertType.success,
+      title: 'Success!',
+      text: 'Location has been updated.',
+      confirmBtnText: 'OK',
+    );
+    Future.delayed(Duration(seconds: 2),(){ Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => OwnerHomeScreen()),
       // Define your CheckoutPage widget here
-      (Route<dynamic> route) =>
-          false, // This condition removes all the previous routes
-    );
+          (Route<dynamic> route) =>
+      false, // This condition removes all the previous routes
+    );});
+
   }
 
   @override
@@ -98,7 +108,7 @@ class _BHouseAddressState extends State<BHouseAddress> {
                     onPressed: () async {
                       _pickLocation();
                     },
-                    child: const Text("PICK LOCATION"),
+                    child: const Text("PICK LOCATION", style: TextStyle(color: Colors.white),),
                   ),
                 ),
               ),
