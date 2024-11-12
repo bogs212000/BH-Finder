@@ -13,6 +13,7 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 
+import '../../../Auth/auth.wrapper.dart';
 import 'bhouse.edit.profle.dart';
 
 class BHouseProfile extends StatefulWidget {
@@ -44,42 +45,8 @@ class _BHouseProfileState extends State<BHouseProfile> {
     return loading
         ? LoadingScreen()
         : Scaffold(
-      appBar: AppBar(actions: [Padding(
-        padding: EdgeInsets.only(right: 10),
-        child: GestureDetector(
-          onTap: () {
-            // Navigator.of(context).pushAndRemoveUntil(
-            //   _toNotificationScreen(),
-            //       (Route<dynamic> route) => false,
-            // );
-          },
-          child: Container(
-            height: 35,
-            width: 35,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              border: Border.all(color: Colors.grey, width: 0.3),
-              borderRadius: BorderRadius.circular(20),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.grey.withOpacity(0.2),
-                  spreadRadius: 1,
-                  blurRadius: 1,
-                  offset: Offset(0, 1),
-                ),
-              ],
-            ),
-            child: Center(
-              child: Icon(
-                Icons.settings,
-                color: Colors.grey.withOpacity(0.8),
-              ),
-            ),
-          ),
-        ),
-      )],),
-      body: FutureBuilder<DocumentSnapshot>(
-        future: profile,
+      body: StreamBuilder<DocumentSnapshot>(
+        stream: FirebaseFirestore.instance.collection('BoardingHouses').doc(FirebaseAuth.instance.currentUser!.email.toString()).snapshots(),
         builder: (BuildContext context,
             AsyncSnapshot<DocumentSnapshot> snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
@@ -97,7 +64,6 @@ class _BHouseProfileState extends State<BHouseProfile> {
             padding: const EdgeInsets.only(left: 20, right: 20),
             child: Column(
               children: [
-
                 SizedBox(height: 20),
                 Container(
                   padding: EdgeInsets.all(20),
@@ -117,56 +83,84 @@ class _BHouseProfileState extends State<BHouseProfile> {
                   child: Column(
                     children: [
                       Row(
-                        children: ['Boarding House Profile'.text.bold.size(20).make()],
+                        children: [Flexible(child: data['BoardingHouseName'].toString().text.overflow(TextOverflow.ellipsis).bold.size(16).make())],
                       ),
                       Divider(),
-                      Row(
-                        children: [
-                          'Boarding House :'.text.light.size(15).make(),
-                          Spacer(),
-                          '${data['BoardingHouseName']}'
-                              .text
-                              .light
-                              .size(15)
-                              .make(),
-                        ],
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) => BHouseEditProfile(
+                                rules: data['Rules'],
+                                OwnerUId: data['OwnerUId'],
+                                bHouseName: data['BoardingHouseName'],
+                                first: data['FirstName'],
+                                middle: data['MiddleName'],
+                                last: data['LastName'],
+                                address: data['address'],
+                                email: data['Email'],
+                                phoneNum: data['PhoneNumber'],
+                                lat: data['Lat'],
+                                long: data['Long'],
+                              ),
+                            ),
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.house_rounded, size: 15),
+                            ' Manage info'.text.light.size(15).make(),
+                            Spacer(),
+                            Icon(Icons.navigate_next, size: 15),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          'Owner :'.text.light.size(15).make(),
-                          Spacer(),
-                          '${data['FirstName']} ${data['MiddleName']} ${data['LastName']}'
-                              .text
-                              .light
-                              .size(15)
-                              .make(),
-                        ],
+                      Divider(),
+                      GestureDetector(
+                        onTap: (){
+
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.pan_tool_alt, size: 12),
+                            ' Guide'.text.light.size(15).make(),
+                            Spacer(),
+                            Icon(Icons.navigate_next, size: 15),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          'Email :'.text.light.size(15).make(),
-                          Spacer(),
-                          '${data['Email']}'.text.light.size(15).make(),
-                        ],
+                      Divider(),
+                      GestureDetector(
+                        onTap: (){
+                          Navigator.pushNamed(
+                              context, '/TermsAndConditions');
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.book, size: 12),
+                            ' Terms and Conditions'.text.light.size(15).make(),
+                            Spacer(),
+                            Icon(Icons.navigate_next, size: 15),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          'Contact Number :'.text.light.size(15).make(),
-                          Spacer(),
-                          '${data['PhoneNumber']}'
-                              .text
-                              .light
-                              .size(15)
-                              .make(),
-                        ],
+                      Divider(),
+                      GestureDetector(
+                        onTap: (){
+
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.apps, size: 12),
+                            ' About'.text.light.size(15).make(),
+                            Spacer(),
+                            Icon(Icons.navigate_next, size: 15),
+                          ],
+                        ),
                       ),
-                      Row(
-                        children: [
-                          'Address :'.text.light.size(15).make(),
-                          Spacer(),
-                          '${data['address']}'.text.light.size(15).make(),
-                        ],
-                      ),
+                      Divider(),
+
                     ],
                   ),
                 ),
@@ -234,23 +228,42 @@ class _BHouseProfileState extends State<BHouseProfile> {
                       height: 40,
                       child: ElevatedButton(
                         onPressed: () async {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) => BHouseEditProfile(
-                                rules: data['Rules'],
-                                OwnerUId: data['OwnerUId'],
-                                bHouseName: data['BoardingHouseName'],
-                                first: data['FirstName'],
-                                middle: data['MiddleName'],
-                                last: data['LastName'],
-                                address: data['address'],
-                                email: data['Email'],
-                                phoneNum: data['PhoneNumber'],
-                                lat: data['Lat'],
-                                long: data['Long'],
-                              ),
+                          QuickAlert.show(
+                            onCancelBtnTap: () {
+                              Navigator.pop(context);
+                            },
+                            onConfirmBtnTap: () async {
+                              await FirebaseAuth.instance.signOut();
+                              setState(() {
+                                bUuId = null;
+                                ownerEmail = null;
+                                boardersEmail = null;
+                              });
+                              Navigator.pop(context);
+                              Navigator.of(context).pushAndRemoveUntil(
+                                MaterialPageRoute(
+                                  builder: (context) => AuthWrapper(),
+                                ),
+                                    (Route<dynamic> route) =>
+                                false, // Removes all previous routes
+                              );
+                            },
+                            context: context,
+                            type: QuickAlertType.confirm,
+                            text: 'Do you want to Log out?',
+                            titleAlignment: TextAlign.center,
+                            textAlignment: TextAlign.center,
+                            confirmBtnText: 'Yes',
+                            cancelBtnText: 'No',
+                            confirmBtnColor: Colors.blue,
+                            backgroundColor: Colors.white,
+                            headerBackgroundColor: Colors.grey,
+                            confirmBtnTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
                             ),
+                            titleColor: Colors.black,
+                            textColor: Colors.black,
                           );
                         },
                         style: ElevatedButton.styleFrom(
@@ -261,7 +274,7 @@ class _BHouseProfileState extends State<BHouseProfile> {
                                 25), // Rounded corners
                           ),
                         ),
-                        child: 'Edit Profile'
+                        child: 'Log out'
                             .text
                             .color(Colors.white)
                             .bold // Bold text
@@ -270,25 +283,6 @@ class _BHouseProfileState extends State<BHouseProfile> {
                     ),
                   ],
                 ),
-                Spacer(),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    GestureDetector(
-                        onTap: () {
-                          Navigator.pushNamed(context, '/TermsAndConditions');
-                        },
-                        child: 'Terms And Conditions'.text.light.make()),
-                  ],
-                ),
-                SizedBox(height: 10),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    'Users Guide'.text.light.make(),
-                  ],
-                ),
-                SizedBox(height: 20),
               ],
             ),
           );

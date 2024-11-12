@@ -4,6 +4,7 @@ import 'package:bh_finder/Admin/admin.home.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Loading/home.loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/waiting.verification.screen.dart';
+import 'package:bh_finder/Screen/Owner/owner.nav.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:bh_finder/Screen/SignUp/waiting.screen.dart';
 import 'package:flutter/material.dart';
@@ -57,7 +58,7 @@ class Wrapper extends StatelessWidget {
             ) {
               if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Owner")) {
-                return OwnerHomeScreen();
+                return OwnerNav();
               } else if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Boarder") &&
                   (user != null && !user.emailVerified)) {

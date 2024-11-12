@@ -27,15 +27,6 @@ class _OwnerChatListState extends State<OwnerChatList> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.white,
-          elevation: 0,
-          title: Row(
-            children: [
-              'Chat'.text.make(),
-            ],
-          ),
-        ),
         body: Container(
           color: Colors.white,
           width: double.infinity,

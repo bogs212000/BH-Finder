@@ -740,9 +740,9 @@ class _ViewRoomState extends State<ViewRoom> {
                           padding: EdgeInsets.only(top: 40, left: 20),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                _toListRoomsScreen(),
-                                (Route<dynamic> route) => false,
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) => ListRoomsScreen()),
                               );
                             },
                             child: Container(

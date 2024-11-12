@@ -964,6 +964,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'ratings': [0],
                                     'gCashNum': '',
                                     'token': '',
+                                    'notification': 0,
                                   });
                                   Navigator.pop(context);
                                   QuickAlert.show(

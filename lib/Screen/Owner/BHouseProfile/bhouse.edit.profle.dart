@@ -211,7 +211,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
                       children: [
                         Row(
                           children: [
-                            'Edit Boarding House Profile'
+                            'Edit Boarding House Info'
                                 .text
                                 .bold
                                 .size(20)

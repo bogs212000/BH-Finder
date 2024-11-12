@@ -7,10 +7,10 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 import '../../cons.dart';
 import '../Home/home.screen.dart';
-import 'owner.home.screen.dart';
 
 class OwnerNotificationScreen extends StatefulWidget {
-  const OwnerNotificationScreen({super.key,});
+  final String? boardersID;
+  const OwnerNotificationScreen({super.key, this.boardersID});
 
 
   @override
@@ -30,14 +30,14 @@ class _OwnerNotificationScreenState extends State<OwnerNotificationScreen> {
               .collection("Notifications")
               .where('boarderID',
               isEqualTo:
-              ownerID.toString()).orderBy('createdAt', descending: true)
+              OwnerUuId.toString()).orderBy('createdAt', descending: true)
               .snapshots(),
           builder:
               (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
             if (snapshot.hasError) {
-              return const Row(
+              return Row(
                 mainAxisAlignment: MainAxisAlignment.center,
-                children: [
+                children: const [
                   Text(
                     "Somthing went wrong!",
                     textAlign: TextAlign.center,
@@ -156,7 +156,7 @@ class _OwnerNotificationScreenState extends State<OwnerNotificationScreen> {
   }
   Route _toHomeScreen() {
     return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => OwnerHomeScreen(),
+      pageBuilder: (context, animation, anotherAnimation) => HomeScreen(),
       transitionDuration: Duration(milliseconds: 1000),
       reverseTransitionDuration: Duration(milliseconds: 200),
       transitionsBuilder: (context, animation, anotherAnimation, child) {
@@ -169,7 +169,7 @@ class _OwnerNotificationScreenState extends State<OwnerNotificationScreen> {
             position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
                 .animate(animation),
             // textDirection: TextDirection.rtl,
-            child: OwnerHomeScreen());
+            child: HomeScreen());
       },
     );
   }

@@ -204,188 +204,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        actions: [
-          searchActive == false
-              ? Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.of(context).pushAndRemoveUntil(
-                        _toNotificationScreen(),
-                        (Route<dynamic> route) => false,
-                      );
-                    },
-                    child: Container(
-                      height: 35,
-                      width: 35,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey, width: 0.3),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 1,
-                            blurRadius: 1,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: Center(
-                        child: Icon(
-                          Icons.notifications_active_outlined,
-                          color: Colors.grey.withOpacity(0.8),
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : SizedBox(),
-          searchActive == false
-              ? Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: GestureDetector(
-                    onTap: () async {
-                      await FirebaseFirestore.instance
-                          .collection('BoardingHouses')
-                          .doc(myEmail)
-                          .update({'chat': 0});
-                      Navigator.pushNamed(context, '/OwnerChatList');
-                      setState(() {
-                        chat = 0;
-                      });
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                          height: 35,
-                          width: 35,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            border: Border.all(color: Colors.grey, width: 0.3),
-                            borderRadius: BorderRadius.circular(20),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 1,
-                                offset: Offset(0, 1),
-                              ),
-                            ],
-                          ),
-                          child: Center(
-                            child: Icon(
-                              Icons.chat_outlined,
-                              color: Colors.grey.withOpacity(0.8),
-                            ),
-                          ),
-                        ),
-                        chat != 0
-                            ? Container(
-                                height: 35,
-                                width: 35,
-                                child: Column(
-                                  children: [
-                                    Row(
-                                      mainAxisAlignment: MainAxisAlignment.end,
-                                      children: [
-                                        CircleAvatar(
-                                          backgroundColor: Colors.red,
-                                          radius: 8,
-                                          child: Center(
-                                              child: chat != 0
-                                                  ? '$chat'
-                                                      .text
-                                                      .size(1)
-                                                      .color(Colors.white)
-                                                      .make()
-                                                  : ''
-                                                      .text
-                                                      .size(1)
-                                                      .color(Colors.white)
-                                                      .make()),
-                                        )
-                                      ],
-                                    ),
-                                  ],
-                                ),
-                              )
-                            : SizedBox(),
-                      ],
-                    ),
-                  ),
-                )
-              : SizedBox(),
-          Padding(
-            padding: EdgeInsets.only(right: 10),
-            child: GestureDetector(
-              onTap: () {
-                QuickAlert.show(
-                  onCancelBtnTap: () {
-                    Navigator.pop(context);
-                  },
-                  onConfirmBtnTap: () async {
-                    await FirebaseAuth.instance.signOut();
-                    setState(() {
-                      bUuId = null;
-                      ownerEmail = null;
-                    });
-                    Navigator.pop(context);
-                    Navigator.of(context).pushAndRemoveUntil(
-                      MaterialPageRoute(
-                        builder: (context) => AuthWrapper(),
-                      ),
-                      (Route<dynamic> route) =>
-                          false, // Removes all previous routes
-                    );
-                  },
-                  context: context,
-                  type: QuickAlertType.confirm,
-                  text: 'Going to signing out',
-                  titleAlignment: TextAlign.center,
-                  textAlignment: TextAlign.center,
-                  confirmBtnText: 'Yes',
-                  cancelBtnText: 'No',
-                  confirmBtnColor: Colors.blue,
-                  backgroundColor: Colors.white,
-                  headerBackgroundColor: Colors.grey,
-                  confirmBtnTextStyle: const TextStyle(
-                    color: Colors.white,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  titleColor: Colors.black,
-                  textColor: Colors.black,
-                );
-              },
-              child: Container(
-                height: 35,
-                width: 35,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(color: Colors.grey, width: 0.3),
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.grey.withOpacity(0.2),
-                      spreadRadius: 1,
-                      blurRadius: 1,
-                      offset: Offset(0, 1),
-                    ),
-                  ],
-                ),
-                child: Center(
-                  child: Icon(
-                    Icons.login,
-                    color: Colors.grey.withOpacity(0.8),
-                  ),
-                ),
-              ),
-            ),
-          )
-        ],
-      ),
       body: Container(
         color: Colors.white,
         height: double.infinity,
@@ -486,14 +304,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                               .color(Colors.grey)
                                               .make(),
                                           Spacer(),
-                                          GestureDetector(
-                                            onTap: () {
-                                              Navigator.pushNamed(
-                                                  context, '/BHouseProfile');
-                                            },
-                                            child: Icon(Icons.edit_note,
-                                                color: Colors.grey, size: 25),
-                                          )
                                         ],
                                       ),
                                     ],
@@ -508,12 +318,12 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                   },
                 ),
                 Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 15),
+                  padding: EdgeInsets.symmetric(horizontal: 15),
                   child: Container(
-                    padding: const EdgeInsets.all(20),
+                    padding:  EdgeInsets.all(15),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(10),
                       gradient: LinearGradient(
                         begin: Alignment.topLeft,
                         end: Alignment.bottomRight,
@@ -522,6 +332,17 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                     ),
                     child: Column(
                       children: [
+                        Row(
+                          children: [
+                            Icon(Icons.bed, color: Colors.white, size: 30),
+                            '  Rooms'.text.bold.color(Colors.white).size(20).make(),
+                            Spacer(),
+                            GestureDetector(
+                              onTap: () => Navigator.pushNamed(context, '/ListRoomsScreen'),
+                              child: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                            ),
+                          ],
+                        ),
                         // All Rooms Section
                         _buildRoomInfo(context, 'All Rooms',
                             fetchRoomsWithOwnersID(), '/ListRoomsScreen'),
@@ -1080,8 +901,7 @@ String _formatName(String name) {
               Text(
                 roomCount.toString(),
                 style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                    fontSize: 15,
                     color: Colors.white),
               ),
               Text(
@@ -1089,11 +909,7 @@ String _formatName(String name) {
                 style: TextStyle(fontSize: 16, color: Colors.white),
               ),
               Spacer(),
-              if (route != null)
-                GestureDetector(
-                  onTap: () => Navigator.pushNamed(context, route),
-                  child: Icon(Icons.arrow_forward_ios, color: Colors.white),
-                ),
+
             ],
           );
         } else {

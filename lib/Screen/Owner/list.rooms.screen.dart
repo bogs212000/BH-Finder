@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/owner.signup.data.dart';
 import 'package:bh_finder/Screen/Owner/owner.home.screen.dart';
+import 'package:bh_finder/Screen/Owner/owner.nav.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -49,18 +50,16 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
         ? LoadingScreen()
         : Scaffold(
             appBar: AppBar(
-              leading: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => OwnerHomeScreen(),
-                    ),
-                    (Route<dynamic> route) =>
-                        false, // Removes all previous routes
-                  );
-                },
-                child: Icon(Icons.arrow_back),
-              ),
+              leading: GestureDetector(onTap: (){
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        OwnerNav(),
+                  ),
+                      (Route<dynamic> route) =>
+                  false, // Removes all previous routes
+                );
+              }, child: Icon(Icons.arrow_back),),
               backgroundColor: Colors.white,
               elevation: 0,
               title: 'Rooms'.text.make(),
@@ -211,13 +210,37 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                                       Navigator.pop(context);
                                                     },
                                                     onConfirmBtnTap: () async {
-                                                      Navigator.pop(context);
                                                       try {
                                                         await FirebaseFirestore
                                                             .instance
                                                             .collection('Rooms')
                                                             .doc(docId)
                                                             .delete();
+                                                        Navigator.pop(context);
+                                                        QuickAlert.show(
+                                                          onCancelBtnTap: () {
+                                                            Navigator.pop(context);
+                                                          },
+                                                          onConfirmBtnTap: () {
+                                                            Navigator.pop(context);
+                                                          },
+                                                          context: context,
+                                                          type: QuickAlertType.success,
+                                                          text: 'Room deleted successfully!',
+                                                          titleAlignment: TextAlign.center,
+                                                          textAlignment: TextAlign.center,
+                                                          confirmBtnText: 'Ok',
+                                                          cancelBtnText: 'No',
+                                                          confirmBtnColor: Colors.blue,
+                                                          backgroundColor: Colors.white,
+                                                          headerBackgroundColor: Colors.grey,
+                                                          confirmBtnTextStyle: const TextStyle(
+                                                            color: Colors.white,
+                                                            fontWeight: FontWeight.bold,
+                                                          ),
+                                                          titleColor: Colors.black,
+                                                          textColor: Colors.black,
+                                                        );
                                                       } catch (e) {
                                                         print(e);
                                                       }
