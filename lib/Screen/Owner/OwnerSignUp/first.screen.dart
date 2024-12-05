@@ -676,6 +676,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                             fontSize: 15,
                             fontWeight: FontWeight.bold,
                           ),
+
                           decoration: InputDecoration(
                             filled: true,
                             fillColor: Colors.grey.withOpacity(0.1),
@@ -689,9 +690,11 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                             ),
                             labelText: 'Email',
                           ),
+
                           onChanged: (email) {
                             // Perform the check as the user types
                             checkEmailExists(email.trim());
+
                           },
                         ),
                       ),
@@ -988,7 +991,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                   );
                                   await FirebaseAuth.instance
                                       .createUserWithEmailAndPassword(
-                                      email: _ownerEmail.text.trim(),
+                                      email: _ownerEmail.text.trim().toLowerCase(),
                                       password: _ownerPassword.text.trim());
                                   _ownerEmail.clear();
                                   _ownerConfirmPassword.clear();

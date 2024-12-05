@@ -20,6 +20,7 @@ import 'bh.screen.dart';
 
 class RoomScreen extends StatefulWidget {
   final String? token;
+
   const RoomScreen({super.key, this.token});
 
   @override
@@ -369,18 +370,51 @@ class _RoomScreenState extends State<RoomScreen> {
                                       // Display alert that a reservation request already exists
                                       QuickAlert.show(
                                         onCancelBtnTap: () {
+                                          FirebaseFirestore.instance
+                                              .collection('Reservations')
+                                              .where('boarderEmail',
+                                                  isEqualTo: FirebaseAuth
+                                                      .instance
+                                                      .currentUser
+                                                      ?.email
+                                                      ?.toLowerCase())
+                                              .where('roomId', isEqualTo: room)
+                                              .where('status',
+                                                  isEqualTo: 'pending')
+                                              .get()
+                                              .then((querySnapshot) {
+                                            for (var doc
+                                                in querySnapshot.docs) {
+                                              doc.reference.update({
+                                                // Add the fields you want to update here
+                                                'status': 'canceled',
+                                              });
+                                            }
+                                          }).catchError((error) {
+                                            print(
+                                                "Failed to update documents: $error");
+                                          });
                                           Navigator.pop(context);
+
+                                          QuickAlert.show(
+                                            text: 'Your reservation has been successfully canceled.',
+                                              context: context,
+                                              type: QuickAlertType.success,
+                                              onConfirmBtnTap: () {
+                                                Navigator.pop(context);
+                                              });
                                         },
                                         onConfirmBtnTap: () {
                                           Navigator.pop(context);
                                         },
                                         context: context,
-                                        type: QuickAlertType.info,
+                                        type: QuickAlertType.confirm,
                                         text:
-                                            "You have already submitted a reservation request. Please wait for the owner's response.",
+                                            "You have already submitted a reservation request. Would you like to cancel it?",
                                         titleAlignment: TextAlign.center,
                                         textAlignment: TextAlign.center,
-                                        confirmBtnText: 'Ok',
+                                        confirmBtnText: 'No',
+                                        cancelBtnText: 'Yes',
                                         confirmBtnColor: Colors.blue,
                                       );
                                     } else {
@@ -428,7 +462,7 @@ class _RoomScreenState extends State<RoomScreen> {
                                           confirmBtnColor: Colors.blue,
                                         );
                                       } else if (bUuId == data['boarderID'] &&
-                                              currentUser != null) {
+                                          currentUser != null) {
                                         // If the user is already renting the room, notify them
                                         QuickAlert.show(
                                           onCancelBtnTap: () {
@@ -449,11 +483,12 @@ class _RoomScreenState extends State<RoomScreen> {
                                       } else {
                                         Navigator.push(
                                             context,
-                                        MaterialPageRoute(
-                                          builder: (context) => BoarderReservationScreen(
-                                            token: token,
-                                          ),
-                                        ));
+                                            MaterialPageRoute(
+                                              builder: (context) =>
+                                                  BoarderReservationScreen(
+                                                token: token,
+                                              ),
+                                            ));
                                         setState(() {
                                           BhouseName = data['bHouseName'];
                                           roomPrice = data['price'];
