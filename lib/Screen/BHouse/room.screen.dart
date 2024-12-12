@@ -7,6 +7,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:get/get.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -78,8 +79,6 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final args = ModalRoute.of(context)?.settings.arguments as Map?;
-    final token = args?['token'];
     return Scaffold(
       body: FutureBuilder<DocumentSnapshot>(
         future: bHouseRoom,
@@ -481,14 +480,15 @@ class _RoomScreenState extends State<RoomScreen> {
                                           confirmBtnColor: Colors.blue,
                                         );
                                       } else {
-                                        Navigator.push(
-                                            context,
-                                            MaterialPageRoute(
-                                              builder: (context) =>
-                                                  BoarderReservationScreen(
-                                                token: token,
-                                              ),
-                                            ));
+                                        Get.to(()=>BoarderReservationScreen(), arguments: [Get.arguments[0]]);
+                                        // Navigator.push(
+                                        //     context,
+                                        //     MaterialPageRoute(
+                                        //       builder: (context) =>
+                                        //           BoarderReservationScreen(
+                                        //         token: Get.arguments[0],
+                                        //       ),
+                                        //     ));
                                         setState(() {
                                           BhouseName = data['bHouseName'];
                                           roomPrice = data['price'];

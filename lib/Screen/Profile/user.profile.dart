@@ -2,6 +2,7 @@ import 'package:bh_finder/Auth/auth.wrapper.dart';
 import 'package:bh_finder/Screen/Loading/loading.bhouse.screen.dart';
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Profile/user.edit.profile.dart';
+import 'package:bh_finder/Screen/TermsAndConditons/terms.conditions.dart';
 import 'package:bh_finder/cons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -9,6 +10,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -185,19 +188,26 @@ class _UserProfileState extends State<UserProfile> {
                               Divider(),
                               GestureDetector(
                                 onTap: (){
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => UserEditProfile(
-                                          first: data['FirstName'],
-                                          middle: data['MiddleName'],
-                                          last: data['LastName'],
-                                          address: data['address'],
-                                          email: data['Email'],
-                                          phoneNum: data['PhoneNumber'],
-                                          profilePic: data['Image']),
-                                    ),
-                                  );
+                                  Get.to(()=>UserEditProfile(first: data['FirstName'],
+                                      middle: data['MiddleName'],
+                                      last: data['LastName'],
+                                      address: data['address'],
+                                      email: data['Email'],
+                                      phoneNum: data['PhoneNumber'],
+                                      profilePic: data['Image']));
+                                  // Navigator.push(
+                                  //   context,
+                                  //   MaterialPageRoute(
+                                  //     builder: (context) => UserEditProfile(
+                                  //         first: data['FirstName'],
+                                  //         middle: data['MiddleName'],
+                                  //         last: data['LastName'],
+                                  //         address: data['address'],
+                                  //         email: data['Email'],
+                                  //         phoneNum: data['PhoneNumber'],
+                                  //         profilePic: data['Image']),
+                                  //   ),
+                                  // );
                                 },
                                 child: Row(
                                   children: [
@@ -225,6 +235,7 @@ class _UserProfileState extends State<UserProfile> {
                               Divider(),
                               GestureDetector(
                                 onTap: (){
+                                  Get.to(()=>TermsAndConditionsScreen());
                                   Navigator.pushNamed(
                                       context, '/TermsAndConditions');
                                 },

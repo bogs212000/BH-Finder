@@ -12,6 +12,8 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -565,15 +567,15 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                       datas['roomDocId'];
                                                 });
                                                 print('room ID: $roomId');
-
-                                                Navigator.pushNamedAndRemoveUntil(
-                                                  context,
-                                                  '/RoomScreen',
-                                                      (Route<dynamic> route) => false, // Remove all previous routes
-                                                  arguments: {
-                                                    'token': data['token'],
-                                                  },
-                                                );
+                                                Get.to(()=>RoomScreen(), arguments: [data['token']]);
+                                                // Navigator.pushNamedAndRemoveUntil(
+                                                //   context,
+                                                //   '/RoomScreen',
+                                                //       (Route<dynamic> route) => false, // Remove all previous routes
+                                                //   arguments: {
+                                                //     'token': data['token'],
+                                                //   },
+                                                // );
                                                 print(data['token']);
                                               },
                                               child: Container(

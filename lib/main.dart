@@ -13,6 +13,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get_navigation/src/root/get_material_app.dart';
 import 'Auth/auth.wrapper.dart';
 import 'Screen/BHouse/bh.screen.dart';
 import 'Screen/BHouse/room.screen.dart';
@@ -84,7 +85,7 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return GetMaterialApp(
       title: 'BH Finder',
       home: const AuthWrapper(),
         navigatorObservers: [FlutterSmartDialog.observer],

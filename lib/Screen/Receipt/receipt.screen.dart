@@ -4,6 +4,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
@@ -25,7 +26,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
     super.initState();
     receipt = FirebaseFirestore.instance
         .collection('Rooms')
-        .doc(widget.roomId.toString())
+        .doc(Get.arguments[0].toString())
         .get();
   }
 
