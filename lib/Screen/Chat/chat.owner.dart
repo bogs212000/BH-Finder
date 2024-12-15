@@ -41,7 +41,7 @@ class _ChatOwnerState extends State<ChatOwner> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle.loadString(
-            'assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json'),
+            'assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
       );
 
       final client =

@@ -288,11 +288,17 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          '${data['BoardingHouseName']}'
-                                              .text
-                                              .bold
-                                              .size(20)
-                                              .make(),
+                                          GestureDetector(onTap: (){
+                                            setState(() {
+                                              selectedIndex = 3;
+                                            });
+                                          },
+                                            child: '${data['BoardingHouseName']}'
+                                                .text
+                                                .bold
+                                                .size(20)
+                                                .make(),
+                                          ),
                                         ],
                                       ),
                                       Row(

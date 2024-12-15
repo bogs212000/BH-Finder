@@ -89,698 +89,704 @@ class _BHouseScreenState extends State<BHouseScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<DocumentSnapshot>(
-        future: bHouseData,
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return LoadingBHouseScreen();
-          }
-          if (snapshot.hasError) {
-            return const Center(child: Text('Error fetching data'));
-          }
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('No Reservation found'));
-          }
-          Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
-          bUuId = data['OwnerUId'];
-          print(bUuId);
-          List<dynamic> ratings = data['ratings'];
-          double average = ratings.reduce((a, b) => a + b) / ratings.length;
-          double star = average;
-          double clampedRating = star.clamp(0.0, 5.0);
-          return Stack(
-            children: [
-              Container(
-                height: 450,
-                width: double.infinity,
-                child: FutureBuilder<List<String>>(
-                  future: _loadImage(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Shimmer.fromColors(
-                        baseColor: Colors.grey.shade200,
-                        highlightColor: Colors.white,
-                        child: Container(
-                          height: 450,
-                          width: 300,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text("Error loading images"));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text("No images found"));
-                    } else {
-                      List<String> images = snapshot.data!;
-                      return ImageSlideshow(
-                        width: double.infinity,
-                        height: 450,
-                        initialPage: 0,
-                        indicatorColor: Colors.blue,
-                        // You can customize the indicator color
-                        autoPlayInterval: 4000,
-                        // Time for auto-sliding in milliseconds (3 seconds)
-                        isLoop: true,
-                        // Enable looping of the slideshow
-                        children: images.map((imageUrl) {
-                          return CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            width: 300,
+    return WillPopScope(
+      onWillPop: () async { Get.back();
+      // Navigate back using GetX
+      return false; // Prevent default back button behavior
+      },
+      child: Scaffold(
+        body: FutureBuilder<DocumentSnapshot>(
+          future: bHouseData,
+          builder:
+              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return LoadingBHouseScreen();
+            }
+            if (snapshot.hasError) {
+              return const Center(child: Text('Error fetching data'));
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Center(child: Text('No Reservation found'));
+            }
+            Map<String, dynamic> data =
+                snapshot.data!.data() as Map<String, dynamic>;
+            bUuId = data['OwnerUId'];
+            print(bUuId);
+            List<dynamic> ratings = data['ratings'];
+            double average = ratings.reduce((a, b) => a + b) / ratings.length;
+            double star = average;
+            double clampedRating = star.clamp(0.0, 5.0);
+            return Stack(
+              children: [
+                Container(
+                  height: 450,
+                  width: double.infinity,
+                  child: FutureBuilder<List<String>>(
+                    future: _loadImage(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey.shade200,
+                          highlightColor: Colors.white,
+                          child: Container(
                             height: 450,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: Colors.grey.shade200,
-                              highlightColor: Colors.white,
-                              child: Container(
-                                height: 450,
-                                width: 300,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(20),
+                            width: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error loading images"));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text("No images found"));
+                      } else {
+                        List<String> images = snapshot.data!;
+                        return ImageSlideshow(
+                          width: double.infinity,
+                          height: 450,
+                          initialPage: 0,
+                          indicatorColor: Colors.blue,
+                          // You can customize the indicator color
+                          autoPlayInterval: 4000,
+                          // Time for auto-sliding in milliseconds (3 seconds)
+                          isLoop: true,
+                          // Enable looping of the slideshow
+                          children: images.map((imageUrl) {
+                            return CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              width: 300,
+                              height: 450,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey.shade200,
+                                highlightColor: Colors.white,
+                                child: Container(
+                                  height: 450,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
                                 ),
                               ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          );
-                        }).toList(),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: false,
-                  // Assuming no pull-up loading is needed
-                  controller: _refreshController,
-                  onRefresh: _onRefresh,
-                  header: WaterDropMaterialHeader(
-                    distance: 30,
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    },
                   ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(height: 400),
-                        Container(
-                          padding: EdgeInsets.only(
-                              top: 30, left: 20, right: 20, bottom: 0),
-                          height: 600,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: SmartRefresher(
+                    enablePullDown: true,
+                    enablePullUp: false,
+                    // Assuming no pull-up loading is needed
+                    controller: _refreshController,
+                    onRefresh: _onRefresh,
+                    header: WaterDropMaterialHeader(
+                      distance: 30,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: 400),
+                          Container(
+                            padding: EdgeInsets.only(
+                                top: 30, left: 20, right: 20, bottom: 0),
+                            height: 600,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
+                              ),
                             ),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
-                                      child: Column(
-                                        children: [
-                                          Row(
-                                            children: [
-                                              '$BhouseName'
-                                                  .text
-                                                  .bold
-                                                  .size(18)
-                                                  .make(),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              'Available room : '
-                                                  .text
-                                                  .light
-                                                  .size(15)
-                                                  .make(),
-                                              FutureBuilder<int>(
-                                                future: fetchRoomsAvailable(),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return Shimmer.fromColors(
-                                                      baseColor:
-                                                          Colors.grey.shade200,
-                                                      highlightColor:
-                                                          Colors.white,
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 5,
-                                                                right: 5),
-                                                        child: Container(
-                                                          height: 20,
-                                                          width: 40,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.grey,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ); // Show loading spinner while fetching data
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Center(
-                                                        child: Text(
-                                                            'Error fetching data')); // Handle error
-                                                  } else if (snapshot.hasData) {
-                                                    final int
-                                                        roomCountAvailable =
-                                                        snapshot.data ??
-                                                            0; // Get the count of rooms with the OwnersID
-                                                    return roomCountAvailable == null
-                                                        ? '0'
-                                                            .text
-                                                            .bold
-                                                            .size(25)
-                                                            .center
-                                                            .color(
-                                                                Colors.red[400])
-                                                            .make()
-                                                        : '$roomCountAvailable'
-                                                            .text
-                                                            .light
-                                                            .color(Colors.green)
-                                                            .size(15)
-                                                            .make();
-                                                  } else {
-                                                    return Center(
-                                                        child: Text(
-                                                            'No data available'));
-                                                  }
-                                                },
-                                              ),
-                                              FutureBuilder<int>(
-                                                future:
-                                                    fetchRoomsWithOwnersID(),
-                                                builder: (context, snapshot) {
-                                                  if (snapshot
-                                                          .connectionState ==
-                                                      ConnectionState.waiting) {
-                                                    return Shimmer.fromColors(
-                                                      baseColor:
-                                                          Colors.grey.shade200,
-                                                      highlightColor:
-                                                          Colors.white,
-                                                      child: Padding(
-                                                        padding:
-                                                            EdgeInsets.only(
-                                                                left: 5,
-                                                                right: 5),
-                                                        child: Container(
-                                                          height: 20,
-                                                          width: 40,
-                                                          decoration:
-                                                              BoxDecoration(
-                                                            color: Colors.grey,
-                                                            borderRadius:
-                                                                BorderRadius
-                                                                    .circular(
-                                                                        20),
-                                                          ),
-                                                        ),
-                                                      ),
-                                                    ); // Show loading spinner while fetching data
-                                                  } else if (snapshot
-                                                      .hasError) {
-                                                    return Center(
-                                                        child: Text(
-                                                            'Error fetching data')); // Handle error
-                                                  } else if (snapshot.hasData) {
-                                                    final int
-                                                        roomCountAvailable =
-                                                        snapshot.data ??
-                                                            0; // Get the count of rooms with the OwnersID
-                                                    return roomCountAvailable == null
-                                                        ? '0'
-                                                            .text
-                                                            .bold
-                                                            .size(25)
-                                                            .center
-                                                            .color(
-                                                                Colors.red[400])
-                                                            .make()
-                                                        : '/$roomCountAvailable'
-                                                            .text
-                                                            .light
-                                                            .color(Colors.green)
-                                                            .size(15)
-                                                            .make();
-                                                  } else {
-                                                    return Center(
-                                                        child: Text(
-                                                            'No data available'));
-                                                  }
-                                                },
-                                              ),
-                                            ],
-                                          ),
-                                          Row(
-                                            children: [
-                                              GestureDetector(
-                                                onTap: () {
-                                                  if (currentUser != null) {
-                                                    Navigator.pushNamed(
-                                                      context,
-                                                      '/ReviewSectionScreen',
-                                                      arguments: data['Email'],
-                                                    );
-                                                  }
-                                                },
-                                                child: Row(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.start,
-                                                  children:
-                                                      List.generate(5, (index) {
-                                                    if (index <
-                                                        clampedRating.toInt()) {
-                                                      // Filled star
-                                                      return const Icon(
-                                                          Icons.star,
-                                                          color: Colors.amber);
-                                                    } else if (index <
-                                                        clampedRating) {
-                                                      // Half star
-                                                      return const Icon(
-                                                          Icons.star_half,
-                                                          color: Colors.amber);
-                                                    } else {
-                                                      // Empty star
-                                                      return const Icon(
-                                                          Icons.star_border,
-                                                          color: Colors.amber);
-                                                    }
-                                                  }),
-                                                ),
-                                              ),
-                                              ' - $average'.text.light.make(),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 35,
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          bHouseLat = data['Lat'];
-                                          bHouseLong = data['Long'];
-                                        });
-                                        Navigator.of(context)
-                                            .pushAndRemoveUntil(
-                                          _toLocationScreen(),
-                                          (Route<dynamic> route) => false,
-                                        );
-                                      },
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
                                       child: Container(
-                                        height: 35,
-                                        width: 35,
-                                        decoration: BoxDecoration(
-                                          color: Colors.white,
-                                          border: Border.all(
-                                              color: Colors.grey, width: 0.3),
-                                          borderRadius:
-                                              BorderRadius.circular(20),
-                                          boxShadow: [
-                                            BoxShadow(
-                                              color:
-                                                  Colors.grey.withOpacity(0.2),
-                                              spreadRadius: 1,
-                                              blurRadius: 1,
-                                              offset: Offset(0, 1),
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                '$BhouseName'
+                                                    .text
+                                                    .bold
+                                                    .size(18)
+                                                    .make(),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                'Available room : '
+                                                    .text
+                                                    .light
+                                                    .size(15)
+                                                    .make(),
+                                                FutureBuilder<int>(
+                                                  future: fetchRoomsAvailable(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState.waiting) {
+                                                      return Shimmer.fromColors(
+                                                        baseColor:
+                                                            Colors.grey.shade200,
+                                                        highlightColor:
+                                                            Colors.white,
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 5,
+                                                                  right: 5),
+                                                          child: Container(
+                                                            height: 20,
+                                                            width: 40,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ); // Show loading spinner while fetching data
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return Center(
+                                                          child: Text(
+                                                              'Error fetching data')); // Handle error
+                                                    } else if (snapshot.hasData) {
+                                                      final int
+                                                          roomCountAvailable =
+                                                          snapshot.data ??
+                                                              0; // Get the count of rooms with the OwnersID
+                                                      return roomCountAvailable == null
+                                                          ? '0'
+                                                              .text
+                                                              .bold
+                                                              .size(25)
+                                                              .center
+                                                              .color(
+                                                                  Colors.red[400])
+                                                              .make()
+                                                          : '$roomCountAvailable'
+                                                              .text
+                                                              .light
+                                                              .color(Colors.green)
+                                                              .size(15)
+                                                              .make();
+                                                    } else {
+                                                      return Center(
+                                                          child: Text(
+                                                              'No data available'));
+                                                    }
+                                                  },
+                                                ),
+                                                FutureBuilder<int>(
+                                                  future:
+                                                      fetchRoomsWithOwnersID(),
+                                                  builder: (context, snapshot) {
+                                                    if (snapshot
+                                                            .connectionState ==
+                                                        ConnectionState.waiting) {
+                                                      return Shimmer.fromColors(
+                                                        baseColor:
+                                                            Colors.grey.shade200,
+                                                        highlightColor:
+                                                            Colors.white,
+                                                        child: Padding(
+                                                          padding:
+                                                              EdgeInsets.only(
+                                                                  left: 5,
+                                                                  right: 5),
+                                                          child: Container(
+                                                            height: 20,
+                                                            width: 40,
+                                                            decoration:
+                                                                BoxDecoration(
+                                                              color: Colors.grey,
+                                                              borderRadius:
+                                                                  BorderRadius
+                                                                      .circular(
+                                                                          20),
+                                                            ),
+                                                          ),
+                                                        ),
+                                                      ); // Show loading spinner while fetching data
+                                                    } else if (snapshot
+                                                        .hasError) {
+                                                      return Center(
+                                                          child: Text(
+                                                              'Error fetching data')); // Handle error
+                                                    } else if (snapshot.hasData) {
+                                                      final int
+                                                          roomCountAvailable =
+                                                          snapshot.data ??
+                                                              0; // Get the count of rooms with the OwnersID
+                                                      return roomCountAvailable == null
+                                                          ? '0'
+                                                              .text
+                                                              .bold
+                                                              .size(25)
+                                                              .center
+                                                              .color(
+                                                                  Colors.red[400])
+                                                              .make()
+                                                          : '/$roomCountAvailable'
+                                                              .text
+                                                              .light
+                                                              .color(Colors.green)
+                                                              .size(15)
+                                                              .make();
+                                                    } else {
+                                                      return Center(
+                                                          child: Text(
+                                                              'No data available'));
+                                                    }
+                                                  },
+                                                ),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                GestureDetector(
+                                                  onTap: () {
+                                                    if (currentUser != null) {
+                                                      Navigator.pushNamed(
+                                                        context,
+                                                        '/ReviewSectionScreen',
+                                                        arguments: data['Email'],
+                                                      );
+                                                    }
+                                                  },
+                                                  child: Row(
+                                                    mainAxisAlignment:
+                                                        MainAxisAlignment.start,
+                                                    children:
+                                                        List.generate(5, (index) {
+                                                      if (index <
+                                                          clampedRating.toInt()) {
+                                                        // Filled star
+                                                        return const Icon(
+                                                            Icons.star,
+                                                            color: Colors.amber);
+                                                      } else if (index <
+                                                          clampedRating) {
+                                                        // Half star
+                                                        return const Icon(
+                                                            Icons.star_half,
+                                                            color: Colors.amber);
+                                                      } else {
+                                                        // Empty star
+                                                        return const Icon(
+                                                            Icons.star_border,
+                                                            color: Colors.amber);
+                                                      }
+                                                    }),
+                                                  ),
+                                                ),
+                                                ' - $average'.text.light.make(),
+                                              ],
                                             ),
                                           ],
                                         ),
-                                        child: Center(
-                                          child: Icon(
-                                            Icons.pin_drop_outlined,
-                                            color: Colors.grey.withOpacity(0.5),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 35,
+                                      child: GestureDetector(
+                                        onTap: () {
+                                          setState(() {
+                                            bHouseLat = data['Lat'];
+                                            bHouseLong = data['Long'];
+                                          });
+                                          Navigator.of(context)
+                                              .pushAndRemoveUntil(
+                                            _toLocationScreen(),
+                                            (Route<dynamic> route) => false,
+                                          );
+                                        },
+                                        child: Container(
+                                          height: 35,
+                                          width: 35,
+                                          decoration: BoxDecoration(
+                                            color: Colors.white,
+                                            border: Border.all(
+                                                color: Colors.grey, width: 0.3),
+                                            borderRadius:
+                                                BorderRadius.circular(20),
+                                            boxShadow: [
+                                              BoxShadow(
+                                                color:
+                                                    Colors.grey.withOpacity(0.2),
+                                                spreadRadius: 1,
+                                                blurRadius: 1,
+                                                offset: Offset(0, 1),
+                                              ),
+                                            ],
+                                          ),
+                                          child: Center(
+                                            child: Icon(
+                                              Icons.pin_drop_outlined,
+                                              color: Colors.grey.withOpacity(0.5),
+                                            ),
                                           ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  'Description'.text.semiBold.size(16).make(),
-                                ],
-                              ),
-                              Row(
-                                children: [
-                                  Flexible(
-                                    child: '${data['Rules']}'
-                                        .text
-                                        .light
-                                        .overflow(TextOverflow.fade)
-                                        .maxLines(3)
-                                        .color(Colors.grey)
-                                        .size(13)
-                                        .make(),
-                                  ),
-                                ],
-                              ),
-                              SizedBox(height: 20),
-                              Row(
-                                children: [
-                                  'Rooms'.text.semiBold.size(16).make(),
-                                ],
-                              ),
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    'Description'.text.semiBold.size(16).make(),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Flexible(
+                                      child: '${data['Rules']}'
+                                          .text
+                                          .light
+                                          .overflow(TextOverflow.fade)
+                                          .maxLines(3)
+                                          .color(Colors.grey)
+                                          .size(13)
+                                          .make(),
+                                    ),
+                                  ],
+                                ),
+                                SizedBox(height: 20),
+                                Row(
+                                  children: [
+                                    'Rooms'.text.semiBold.size(16).make(),
+                                  ],
+                                ),
 
-                              //List rooms
-                              Expanded(
-                                child: Container(
-                                  width: double.infinity,
-                                  child: StreamBuilder(
-                                    stream: FirebaseFirestore.instance
-                                        .collection("Rooms")
-                                        .where('ownerUid', isEqualTo: OwnerUuId)
-                                        .snapshots(),
-                                    builder: (BuildContext context,
-                                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                                      // Check if the snapshot has an error
-                                      if (snapshot.hasError) {
-                                        return Center(
-                                          child: Text(
-                                            "Something went wrong!",
-                                            style: TextStyle(
-                                              fontSize: 15,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.redAccent,
+                                //List rooms
+                                Expanded(
+                                  child: Container(
+                                    width: double.infinity,
+                                    child: StreamBuilder(
+                                      stream: FirebaseFirestore.instance
+                                          .collection("Rooms")
+                                          .where('ownerUid', isEqualTo: OwnerUuId)
+                                          .snapshots(),
+                                      builder: (BuildContext context,
+                                          AsyncSnapshot<QuerySnapshot> snapshot) {
+                                        // Check if the snapshot has an error
+                                        if (snapshot.hasError) {
+                                          return Center(
+                                            child: Text(
+                                              "Something went wrong!",
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.redAccent,
+                                              ),
                                             ),
-                                          ),
-                                        );
-                                      }
+                                          );
+                                        }
 
-                                      // Show loading spinner while waiting for data
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.waiting) {
-                                        return Column(
-                                          children: [
-                                            Shimmer.fromColors(
-                                              baseColor: Colors.grey.shade200,
-                                              highlightColor: Colors.white,
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    left: 20, right: 20),
-                                                child: Container(
-                                                  height: 90,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
+                                        // Show loading spinner while waiting for data
+                                        if (snapshot.connectionState ==
+                                            ConnectionState.waiting) {
+                                          return Column(
+                                            children: [
+                                              Shimmer.fromColors(
+                                                baseColor: Colors.grey.shade200,
+                                                highlightColor: Colors.white,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 20, right: 20),
+                                                  child: Container(
+                                                    height: 90,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                            SizedBox(height: 20),
-                                            Shimmer.fromColors(
-                                              baseColor: Colors.grey.shade200,
-                                              highlightColor: Colors.white,
-                                              child: Padding(
-                                                padding: EdgeInsets.only(
-                                                    left: 20, right: 20),
-                                                child: Container(
-                                                  height: 90,
-                                                  width: double.infinity,
-                                                  decoration: BoxDecoration(
-                                                    color: Colors.grey,
-                                                    borderRadius:
-                                                        BorderRadius.circular(
-                                                            20),
+                                              SizedBox(height: 20),
+                                              Shimmer.fromColors(
+                                                baseColor: Colors.grey.shade200,
+                                                highlightColor: Colors.white,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 20, right: 20),
+                                                  child: Container(
+                                                    height: 90,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                    ),
                                                   ),
                                                 ),
                                               ),
-                                            ),
-                                          ],
-                                        );
-                                      }
+                                            ],
+                                          );
+                                        }
 
-                                      // Show message if no data is found
-                                      if (snapshot.data?.size == 0) {
-                                        return Center(
-                                          child: Text('Nothing to fetch here.'),
-                                        );
-                                      }
+                                        // Show message if no data is found
+                                        if (snapshot.data?.size == 0) {
+                                          return Center(
+                                            child: Text('Nothing to fetch here.'),
+                                          );
+                                        }
 
-                                      // Data is available, display it
-                                      return ListView.builder(
-                                        physics: BouncingScrollPhysics(),
-                                        itemCount: snapshot.data!.docs.length,
-                                        // Use the length of the fetched data
-                                        itemBuilder: (context, index) {
-                                          Map<String, dynamic> datas =
-                                              snapshot.data!.docs[index].data()!
-                                                  as Map<String, dynamic>;
-                                          return Padding(
-                                            padding: const EdgeInsets.only(
-                                                bottom: 10),
-                                            child: GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  rRoomsDocId =
-                                                      datas['roomDocId'];
-                                                });
-                                                print('room ID: $roomId');
-                                                Get.to(()=>RoomScreen(), arguments: [data['token']]);
-                                                // Navigator.pushNamedAndRemoveUntil(
-                                                //   context,
-                                                //   '/RoomScreen',
-                                                //       (Route<dynamic> route) => false, // Remove all previous routes
-                                                //   arguments: {
-                                                //     'token': data['token'],
-                                                //   },
-                                                // );
-                                                print(data['token']);
-                                              },
-                                              child: Container(
-                                                height: 90,
-                                                decoration: BoxDecoration(
-                                                  color: Colors.white,
-                                                  borderRadius:
-                                                      BorderRadius.circular(10),
-                                                ),
-                                                child: Row(
-                                                  children: [
-                                                    Container(
-                                                      width: 80,
-                                                      height: 90,
-                                                      decoration: BoxDecoration(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                        image: DecorationImage(
-                                                          image: NetworkImage(
-                                                            datas['roomImage'] ??
-                                                                'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                        // Data is available, display it
+                                        return ListView.builder(
+                                          physics: BouncingScrollPhysics(),
+                                          itemCount: snapshot.data!.docs.length,
+                                          // Use the length of the fetched data
+                                          itemBuilder: (context, index) {
+                                            Map<String, dynamic> datas =
+                                                snapshot.data!.docs[index].data()!
+                                                    as Map<String, dynamic>;
+                                            return Padding(
+                                              padding: const EdgeInsets.only(
+                                                  bottom: 10),
+                                              child: GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    rRoomsDocId =
+                                                        datas['roomDocId'];
+                                                  });
+                                                  print('room ID: $roomId');
+                                                  Get.to(()=>RoomScreen(), arguments: [data['token']]);
+                                                  // Navigator.pushNamedAndRemoveUntil(
+                                                  //   context,
+                                                  //   '/RoomScreen',
+                                                  //       (Route<dynamic> route) => false, // Remove all previous routes
+                                                  //   arguments: {
+                                                  //     'token': data['token'],
+                                                  //   },
+                                                  // );
+                                                  print(data['token']);
+                                                },
+                                                child: Container(
+                                                  height: 90,
+                                                  decoration: BoxDecoration(
+                                                    color: Colors.white,
+                                                    borderRadius:
+                                                        BorderRadius.circular(10),
+                                                  ),
+                                                  child: Row(
+                                                    children: [
+                                                      Container(
+                                                        width: 80,
+                                                        height: 90,
+                                                        decoration: BoxDecoration(
+                                                          borderRadius:
+                                                              BorderRadius
+                                                                  .circular(10),
+                                                          image: DecorationImage(
+                                                            image: NetworkImage(
+                                                              datas['roomImage'] ??
+                                                                  'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
+                                                            ),
+                                                            fit: BoxFit.cover,
                                                           ),
-                                                          fit: BoxFit.cover,
                                                         ),
                                                       ),
-                                                    ),
-                                                    SizedBox(width: 10),
-                                                    Expanded(
-                                                      child: Container(
-                                                        color: Colors.white,
-                                                        child: Column(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
-                                                          crossAxisAlignment:
-                                                              CrossAxisAlignment
-                                                                  .start,
-                                                          children: [
-                                                            Text(
-                                                              '${datas['roomNameNumber']}',
-                                                              style: TextStyle(
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
-                                                                fontSize: 15,
-                                                              ),
-                                                            ),
-                                                            Text(
-                                                              datas[
-                                                                  'roomStatus'],
-                                                              style: TextStyle(
-                                                                color: Colors
-                                                                    .orangeAccent,
-                                                                fontWeight:
-                                                                    FontWeight
-                                                                        .w300,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ),
-                                                    Container(
-                                                      width: 110,
-                                                      padding:
-                                                          EdgeInsets.symmetric(
-                                                              horizontal: 10),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        children: [
-                                                          Row(
+                                                      SizedBox(width: 10),
+                                                      Expanded(
+                                                        child: Container(
+                                                          color: Colors.white,
+                                                          child: Column(
                                                             mainAxisAlignment:
                                                                 MainAxisAlignment
-                                                                    .end,
+                                                                    .center,
+                                                            crossAxisAlignment:
+                                                                CrossAxisAlignment
+                                                                    .start,
                                                             children: [
                                                               Text(
-                                                                '₱ ${datas['price'] ?? '---'} per month',
-                                                                style:
-                                                                    TextStyle(
+                                                                '${datas['roomNameNumber']}',
+                                                                style: TextStyle(
                                                                   fontWeight:
                                                                       FontWeight
                                                                           .bold,
-                                                                  fontSize: 10,
+                                                                  fontSize: 15,
+                                                                ),
+                                                              ),
+                                                              Text(
+                                                                datas[
+                                                                    'roomStatus'],
+                                                                style: TextStyle(
+                                                                  color: Colors
+                                                                      .orangeAccent,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .w300,
                                                                 ),
                                                               ),
                                                             ],
                                                           ),
-                                                        ],
+                                                        ),
                                                       ),
-                                                    ),
-                                                  ],
+                                                      Container(
+                                                        width: 110,
+                                                        padding:
+                                                            EdgeInsets.symmetric(
+                                                                horizontal: 10),
+                                                        child: Column(
+                                                          mainAxisAlignment:
+                                                              MainAxisAlignment
+                                                                  .center,
+                                                          children: [
+                                                            Row(
+                                                              mainAxisAlignment:
+                                                                  MainAxisAlignment
+                                                                      .end,
+                                                              children: [
+                                                                Text(
+                                                                  '₱ ${datas['price'] ?? '---'} per month',
+                                                                  style:
+                                                                      TextStyle(
+                                                                    fontWeight:
+                                                                        FontWeight
+                                                                            .bold,
+                                                                    fontSize: 10,
+                                                                  ),
+                                                                ),
+                                                              ],
+                                                            ),
+                                                          ],
+                                                        ),
+                                                      ),
+                                                    ],
+                                                  ),
                                                 ),
                                               ),
-                                            ),
-                                          );
-                                        },
-                                      );
-                                    },
+                                            );
+                                          },
+                                        );
+                                      },
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
-                          ),
-                        )
-                      ],
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 40, left: 20),
-                          child: GestureDetector(
-                            onTap: () {
-                              if (currentUser != null) {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  _toHomeScreen(),
-                                  (Route<dynamic> route) => false,
-                                );
-                              } else {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  _toGuestScreen(),
-                                  (Route<dynamic> route) => false,
-                                );
-                              }
-                            },
-                            child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                border:
-                                    Border.all(color: Colors.grey, width: 0.3),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.white,
+                Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 40, left: 20),
+                            child: GestureDetector(
+                              onTap: () {
+                                if (currentUser != null) {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    _toHomeScreen(),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                } else {
+                                  Navigator.of(context).pushAndRemoveUntil(
+                                    _toGuestScreen(),
+                                    (Route<dynamic> route) => false,
+                                  );
+                                }
+                              },
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  border:
+                                      Border.all(color: Colors.grey, width: 0.3),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Spacer(),
-                        currentUser != null
-                            ? Padding(
-                                padding: EdgeInsets.only(top: 40, right: 20),
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      ownerEmail = data['Email'].toString();
-                                      bHouse =
-                                          data['BoardingHouseName'].toString();
-                                    });
-                                    print('$ownerEmail, $bHouse');
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatOwner(
-                                          emailOwner : data['Email'].toString(),
-                                          token: data['token'],
-                                          ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
+                          Spacer(),
+                          currentUser != null
+                              ? Padding(
+                                  padding: EdgeInsets.only(top: 40, right: 20),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        ownerEmail = data['Email'].toString();
+                                        bHouse =
+                                            data['BoardingHouseName'].toString();
+                                      });
+                                      print('$ownerEmail, $bHouse');
+                                      Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                          builder: (context) => ChatOwner(
+                                            emailOwner : data['Email'].toString(),
+                                            token: data['token'],
+                                            ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
+                                          ),
                                         ),
-                                      ),
-                                    );
+                                      );
 
-                                  },
-                                  child: Container(
-                                    height: 35,
-                                    width: 35,
-                                    decoration: BoxDecoration(
-                                      color: Colors.white.withOpacity(0.2),
-                                      border: Border.all(
-                                          color: Colors.grey, width: 0.3),
-                                      borderRadius: BorderRadius.circular(20),
-                                    ),
-                                    child: Center(
-                                      child: Icon(
-                                        Icons.chat_outlined,
-                                        size: 20,
-                                        color: Colors.white,
+                                    },
+                                    child: Container(
+                                      height: 35,
+                                      width: 35,
+                                      decoration: BoxDecoration(
+                                        color: Colors.white.withOpacity(0.2),
+                                        border: Border.all(
+                                            color: Colors.grey, width: 0.3),
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                      child: Center(
+                                        child: Icon(
+                                          Icons.chat_outlined,
+                                          size: 20,
+                                          color: Colors.white,
+                                        ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              )
-                            : SizedBox(),
-                      ],
-                    ),
-                  ],
-                ),
-              )
-            ],
-          );
-        },
+                                )
+                              : SizedBox(),
+                        ],
+                      ),
+                    ],
+                  ),
+                )
+              ],
+            );
+          },
+        ),
       ),
     );
   }

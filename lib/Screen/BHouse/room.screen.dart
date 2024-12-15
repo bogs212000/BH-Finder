@@ -79,464 +79,470 @@ class _RoomScreenState extends State<RoomScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: FutureBuilder<DocumentSnapshot>(
-        future: bHouseRoom,
-        builder:
-            (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const LoadingBHouseScreen();
-          }
-          if (snapshot.hasError) {
-            return const Center(child: Text('Error fetching data'));
-          }
-          if (!snapshot.hasData || !snapshot.data!.exists) {
-            return const Center(child: Text('No Reservation found'));
-          }
-          Map<String, dynamic> data =
-              snapshot.data!.data() as Map<String, dynamic>;
-          docID = data['roomDocId'];
-          room = data['roomDocId'];
-          return Stack(
-            children: [
-              Container(
-                height: 450,
-                width: double.infinity,
-                child: FutureBuilder<List<String>>(
-                  future: _loadImage(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Shimmer.fromColors(
-                        baseColor: Colors.grey.shade200,
-                        highlightColor: Colors.white,
-                        child: Container(
-                          height: 450,
-                          width: 300,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text("Error loading images"));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text("No images found"));
-                    } else {
-                      List<String> images = snapshot.data!;
-                      return ImageSlideshow(
-                        width: double.infinity,
-                        height: 450,
-                        initialPage: 0,
-                        indicatorColor: Colors.blue,
-                        // You can customize the indicator color
-                        autoPlayInterval: 4000,
-                        // Time for auto-sliding in milliseconds (3 seconds)
-                        isLoop: true,
-                        // Enable looping of the slideshow
-                        children: images.map((imageUrl) {
-                          return CachedNetworkImage(
-                            imageUrl: imageUrl,
-                            fit: BoxFit.cover,
-                            width: 300,
+    return WillPopScope(
+      onWillPop: () async { Get.back();
+      // Navigate back using GetX
+      return false; // Prevent default back button behavior
+      },
+      child: Scaffold(
+        body: FutureBuilder<DocumentSnapshot>(
+          future: bHouseRoom,
+          builder:
+              (BuildContext context, AsyncSnapshot<DocumentSnapshot> snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const LoadingBHouseScreen();
+            }
+            if (snapshot.hasError) {
+              return const Center(child: Text('Error fetching data'));
+            }
+            if (!snapshot.hasData || !snapshot.data!.exists) {
+              return const Center(child: Text('No Reservation found'));
+            }
+            Map<String, dynamic> data =
+                snapshot.data!.data() as Map<String, dynamic>;
+            docID = data['roomDocId'];
+            room = data['roomDocId'];
+            return Stack(
+              children: [
+                Container(
+                  height: 450,
+                  width: double.infinity,
+                  child: FutureBuilder<List<String>>(
+                    future: _loadImage(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return Shimmer.fromColors(
+                          baseColor: Colors.grey.shade200,
+                          highlightColor: Colors.white,
+                          child: Container(
                             height: 450,
-                            placeholder: (context, url) => Shimmer.fromColors(
-                              baseColor: Colors.grey.shade200,
-                              highlightColor: Colors.white,
-                              child: Container(
-                                height: 450,
-                                width: 300,
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(20),
+                            width: 300,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(20),
+                            ),
+                          ),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text("Error loading images"));
+                      } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                        return Center(child: Text("No images found"));
+                      } else {
+                        List<String> images = snapshot.data!;
+                        return ImageSlideshow(
+                          width: double.infinity,
+                          height: 450,
+                          initialPage: 0,
+                          indicatorColor: Colors.blue,
+                          // You can customize the indicator color
+                          autoPlayInterval: 4000,
+                          // Time for auto-sliding in milliseconds (3 seconds)
+                          isLoop: true,
+                          // Enable looping of the slideshow
+                          children: images.map((imageUrl) {
+                            return CachedNetworkImage(
+                              imageUrl: imageUrl,
+                              fit: BoxFit.cover,
+                              width: 300,
+                              height: 450,
+                              placeholder: (context, url) => Shimmer.fromColors(
+                                baseColor: Colors.grey.shade200,
+                                highlightColor: Colors.white,
+                                child: Container(
+                                  height: 450,
+                                  width: 300,
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey,
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
                                 ),
                               ),
-                            ),
-                            errorWidget: (context, url, error) =>
-                                Icon(Icons.error),
-                          );
-                        }).toList(),
-                      );
-                    }
-                  },
-                ),
-              ),
-              Container(
-                width: double.infinity,
-                height: double.infinity,
-                child: SmartRefresher(
-                  enablePullDown: true,
-                  enablePullUp: false,
-                  // Assuming no pull-up loading is needed
-                  controller: _refreshController,
-                  onRefresh: _onRefresh,
-                  header: WaterDropMaterialHeader(
-                    distance: 30,
+                              errorWidget: (context, url, error) =>
+                                  Icon(Icons.error),
+                            );
+                          }).toList(),
+                        );
+                      }
+                    },
                   ),
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        SizedBox(height: 400),
-                        Container(
-                          padding: EdgeInsets.only(
-                              top: 30, left: 20, right: 20, bottom: 0),
-                          height: 500,
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.only(
-                              topLeft: Radius.circular(30),
-                              topRight: Radius.circular(30),
+                ),
+                Container(
+                  width: double.infinity,
+                  height: double.infinity,
+                  child: SmartRefresher(
+                    enablePullDown: true,
+                    enablePullUp: false,
+                    // Assuming no pull-up loading is needed
+                    controller: _refreshController,
+                    onRefresh: _onRefresh,
+                    header: WaterDropMaterialHeader(
+                      distance: 30,
+                    ),
+                    child: SingleChildScrollView(
+                      child: Column(
+                        children: [
+                          SizedBox(height: 400),
+                          Container(
+                            padding: EdgeInsets.only(
+                                top: 30, left: 20, right: 20, bottom: 0),
+                            height: 500,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
+                              ),
                             ),
-                          ),
-                          child: Column(
-                            children: [
-                              Row(
-                                children: [
-                                  Expanded(
-                                    child: Container(
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
+                                        child: Column(
+                                          children: [
+                                            Row(
+                                              children: [
+                                                '${data['roomNameNumber']}'
+                                                    .text
+                                                    .bold
+                                                    .size(18)
+                                                    .make(),
+                                              ],
+                                            ),
+                                            Row(
+                                              children: [
+                                                '${data['address']}'
+                                                    .text
+                                                    .light
+                                                    .color(Colors.grey)
+                                                    .size(13)
+                                                    .make(),
+                                              ],
+                                            )
+                                          ],
+                                        ),
+                                      ),
+                                    ),
+                                    Container(
+                                      width: 100,
                                       child: Column(
                                         children: [
                                           Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
-                                              '${data['roomNameNumber']}'
+                                              'Price per Month'
                                                   .text
-                                                  .bold
-                                                  .size(18)
+                                                  .size(10)
                                                   .make(),
                                             ],
                                           ),
                                           Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.end,
                                             children: [
-                                              '${data['address']}'
+                                              '₱ ${data['price']}'
                                                   .text
-                                                  .light
-                                                  .color(Colors.grey)
-                                                  .size(13)
+                                                  .size(20)
+                                                  .bold
                                                   .make(),
                                             ],
-                                          )
+                                          ),
                                         ],
                                       ),
-                                    ),
-                                  ),
-                                  Container(
-                                    width: 100,
-                                    child: Column(
-                                      children: [
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            'Price per Month'
-                                                .text
-                                                .size(10)
-                                                .make(),
-                                          ],
-                                        ),
-                                        Row(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.end,
-                                          children: [
-                                            '₱ ${data['price']}'
-                                                .text
-                                                .size(20)
-                                                .bold
-                                                .make(),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  )
-                                ],
-                              ),
-                              SizedBox(height: 10),
-                              Row(
-                                children: [
-                                  'Description'.text.semiBold.size(16).make(),
-                                ],
-                              ),
-                              Padding(
-                                padding: const EdgeInsets.all(8.0),
-                                child: Row(
-                                  children: [
-                                    Flexible(
-                                      child: '${data['descriptions']}'
-                                          .text
-                                          .light
-                                          .overflow(TextOverflow.fade)
-                                          .maxLines(3)
-                                          .color(Colors.grey)
-                                          .size(13)
-                                          .make(),
-                                    ),
+                                    )
                                   ],
                                 ),
-                              ),
-                              Row(
-                                children: [
-                                  'Set a Check-in date'
-                                      .text
-                                      .size(18)
-                                      .bold
-                                      .make(),
-                                ],
-                              ),
-                              EasyDateTimeLine(
-                                initialDate: DateTime.now(),
-                                onDateChange: (newDate) {
-                                  setState(() {
-                                    selectedDateCheckIn = newDate;
-                                  });
-                                  print('$selectedDateCheckIn');
-                                },
-                              ),
-                              SizedBox(height: 20),
-                            ],
-                          ),
-                        )
-                      ],
+                                SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    'Description'.text.semiBold.size(16).make(),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: '${data['descriptions']}'
+                                            .text
+                                            .light
+                                            .overflow(TextOverflow.fade)
+                                            .maxLines(3)
+                                            .color(Colors.grey)
+                                            .size(13)
+                                            .make(),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    'Set a Check-in date'
+                                        .text
+                                        .size(18)
+                                        .bold
+                                        .make(),
+                                  ],
+                                ),
+                                EasyDateTimeLine(
+                                  initialDate: DateTime.now(),
+                                  onDateChange: (newDate) {
+                                    setState(() {
+                                      selectedDateCheckIn = newDate;
+                                    });
+                                    print('$selectedDateCheckIn');
+                                  },
+                                ),
+                                SizedBox(height: 20),
+                              ],
+                            ),
+                          )
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-              Container(
-                height: double.infinity,
-                width: double.infinity,
-                child: Column(
-                  children: [
-                    Row(
-                      children: [
-                        Padding(
-                          padding: EdgeInsets.only(top: 40, left: 20),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                _toBHouseScreen(),
-                                (Route<dynamic> route) => false,
-                              );
-                            },
-                            child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                border:
-                                    Border.all(color: Colors.grey, width: 0.3),
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Center(
-                                child: Icon(
-                                  Icons.arrow_back,
-                                  color: Colors.white,
+                Container(
+                  height: double.infinity,
+                  width: double.infinity,
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          Padding(
+                            padding: EdgeInsets.only(top: 40, left: 20),
+                            child: GestureDetector(
+                              onTap: () {
+                                Navigator.of(context).pushAndRemoveUntil(
+                                  _toBHouseScreen(),
+                                  (Route<dynamic> route) => false,
+                                );
+                              },
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  border:
+                                      Border.all(color: Colors.grey, width: 0.3),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.arrow_back,
+                                    color: Colors.white,
+                                  ),
                                 ),
                               ),
                             ),
                           ),
-                        ),
-                        Spacer(),
-                      ],
-                    ),
-                    Spacer(),
-                    Container(
-                      width: double.infinity,
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Row(
-                          children: [
-                            Expanded(
-                              child: GestureDetector(
-                                onTap: () async {
-                                  try {
-                                    CollectionReference collectionRef =
-                                        FirebaseFirestore.instance
-                                            .collection('Reservations');
-
-                                    // Query to find the document where 'boarderUuId' equals the user ID and 'roomId' equals the room
-                                    QuerySnapshot querySnapshot =
-                                        await collectionRef
-                                            .where('boarderEmail',
-                                                isEqualTo: FirebaseAuth
-                                                    .instance.currentUser?.email
-                                                    .toString())
-                                            .where('roomId', isEqualTo: room)
-                                            .where('status',
-                                                isEqualTo: 'pending')
-                                            .get();
-
-                                    // Check if the document exists
-                                    if (querySnapshot.docs.isNotEmpty) {
-                                      // Display alert that a reservation request already exists
-                                      QuickAlert.show(
-                                        onCancelBtnTap: () {
+                          Spacer(),
+                        ],
+                      ),
+                      Spacer(),
+                      Container(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.all(20.0),
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    try {
+                                      CollectionReference collectionRef =
                                           FirebaseFirestore.instance
-                                              .collection('Reservations')
+                                              .collection('Reservations');
+
+                                      // Query to find the document where 'boarderUuId' equals the user ID and 'roomId' equals the room
+                                      QuerySnapshot querySnapshot =
+                                          await collectionRef
                                               .where('boarderEmail',
                                                   isEqualTo: FirebaseAuth
-                                                      .instance
-                                                      .currentUser
-                                                      ?.email
-                                                      ?.toLowerCase())
+                                                      .instance.currentUser?.email
+                                                      .toString())
                                               .where('roomId', isEqualTo: room)
                                               .where('status',
                                                   isEqualTo: 'pending')
-                                              .get()
-                                              .then((querySnapshot) {
-                                            for (var doc
-                                                in querySnapshot.docs) {
-                                              doc.reference.update({
-                                                // Add the fields you want to update here
-                                                'status': 'canceled',
-                                              });
-                                            }
-                                          }).catchError((error) {
-                                            print(
-                                                "Failed to update documents: $error");
-                                          });
-                                          Navigator.pop(context);
+                                              .get();
 
-                                          QuickAlert.show(
-                                            text: 'Your reservation has been successfully canceled.',
-                                              context: context,
-                                              type: QuickAlertType.success,
-                                              onConfirmBtnTap: () {
-                                                Navigator.pop(context);
-                                              });
-                                        },
-                                        onConfirmBtnTap: () {
-                                          Navigator.pop(context);
-                                        },
-                                        context: context,
-                                        type: QuickAlertType.confirm,
-                                        text:
-                                            "You have already submitted a reservation request. Would you like to cancel it?",
-                                        titleAlignment: TextAlign.center,
-                                        textAlignment: TextAlign.center,
-                                        confirmBtnText: 'No',
-                                        cancelBtnText: 'Yes',
-                                        confirmBtnColor: Colors.blue,
-                                      );
-                                    } else {
-                                      User? currentUser =
-                                          FirebaseAuth.instance.currentUser;
-
-                                      if (currentUser == null ||
-                                          currentUser.email == null ||
-                                          currentUser.email!.isEmpty) {
-                                        // If the user is not signed in, prompt them to sign in
+                                      // Check if the document exists
+                                      if (querySnapshot.docs.isNotEmpty) {
+                                        // Display alert that a reservation request already exists
                                         QuickAlert.show(
                                           onCancelBtnTap: () {
+                                            FirebaseFirestore.instance
+                                                .collection('Reservations')
+                                                .where('boarderEmail',
+                                                    isEqualTo: FirebaseAuth
+                                                        .instance
+                                                        .currentUser
+                                                        ?.email
+                                                        ?.toLowerCase())
+                                                .where('roomId', isEqualTo: room)
+                                                .where('status',
+                                                    isEqualTo: 'pending')
+                                                .get()
+                                                .then((querySnapshot) {
+                                              for (var doc
+                                                  in querySnapshot.docs) {
+                                                doc.reference.update({
+                                                  // Add the fields you want to update here
+                                                  'status': 'canceled',
+                                                });
+                                              }
+                                            }).catchError((error) {
+                                              print(
+                                                  "Failed to update documents: $error");
+                                            });
                                             Navigator.pop(context);
+
+                                            QuickAlert.show(
+                                              text: 'Your reservation has been successfully canceled.',
+                                                context: context,
+                                                type: QuickAlertType.success,
+                                                onConfirmBtnTap: () {
+                                                  Navigator.pop(context);
+                                                });
                                           },
                                           onConfirmBtnTap: () {
-                                            Navigator.pushNamed(
-                                                context, '/SignInScreen');
+                                            Navigator.pop(context);
                                           },
                                           context: context,
                                           type: QuickAlertType.confirm,
-                                          text: 'Do you want to sign in first?',
-                                          titleAlignment: TextAlign.center,
-                                          textAlignment: TextAlign.center,
-                                          confirmBtnText: 'Yes',
-                                          cancelBtnText: 'No',
-                                          confirmBtnColor: Colors.blue,
-                                        );
-                                      } else if (data['roomStatus'] ==
-                                          'unavailable') {
-                                        // If the room is unavailable, show an alert
-                                        QuickAlert.show(
-                                          onCancelBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          onConfirmBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          context: context,
-                                          type: QuickAlertType.info,
                                           text:
-                                              'Room is currently unavailable as it is occupied by a guest at the moment.',
+                                              "You have already submitted a reservation request. Would you like to cancel it?",
                                           titleAlignment: TextAlign.center,
                                           textAlignment: TextAlign.center,
-                                          confirmBtnText: 'Ok',
-                                          confirmBtnColor: Colors.blue,
-                                        );
-                                      } else if (bUuId == data['boarderID'] &&
-                                          currentUser != null) {
-                                        // If the user is already renting the room, notify them
-                                        QuickAlert.show(
-                                          onCancelBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          onConfirmBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          context: context,
-                                          type: QuickAlertType.info,
-                                          text:
-                                              'You are currently renting this room.',
-                                          titleAlignment: TextAlign.center,
-                                          textAlignment: TextAlign.center,
-                                          confirmBtnText: 'Ok',
+                                          confirmBtnText: 'No',
+                                          cancelBtnText: 'Yes',
                                           confirmBtnColor: Colors.blue,
                                         );
                                       } else {
-                                        Get.to(()=>BoarderReservationScreen(), arguments: [Get.arguments[0]]);
-                                        // Navigator.push(
-                                        //     context,
-                                        //     MaterialPageRoute(
-                                        //       builder: (context) =>
-                                        //           BoarderReservationScreen(
-                                        //         token: Get.arguments[0],
-                                        //       ),
-                                        //     ));
-                                        setState(() {
-                                          BhouseName = data['bHouseName'];
-                                          roomPrice = data['price'];
-                                          roomNumber = data['roomNameNumber'];
-                                          roomId = data['roomDocId'];
-                                        });
+                                        User? currentUser =
+                                            FirebaseAuth.instance.currentUser;
+
+                                        if (currentUser == null ||
+                                            currentUser.email == null ||
+                                            currentUser.email!.isEmpty) {
+                                          // If the user is not signed in, prompt them to sign in
+                                          QuickAlert.show(
+                                            onCancelBtnTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            onConfirmBtnTap: () {
+                                              Navigator.pushNamed(
+                                                  context, '/SignInScreen');
+                                            },
+                                            context: context,
+                                            type: QuickAlertType.confirm,
+                                            text: 'Do you want to sign in first?',
+                                            titleAlignment: TextAlign.center,
+                                            textAlignment: TextAlign.center,
+                                            confirmBtnText: 'Yes',
+                                            cancelBtnText: 'No',
+                                            confirmBtnColor: Colors.blue,
+                                          );
+                                        } else if (data['roomStatus'] ==
+                                            'unavailable') {
+                                          // If the room is unavailable, show an alert
+                                          QuickAlert.show(
+                                            onCancelBtnTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            onConfirmBtnTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            context: context,
+                                            type: QuickAlertType.info,
+                                            text:
+                                                'Room is currently unavailable as it is occupied by a guest at the moment.',
+                                            titleAlignment: TextAlign.center,
+                                            textAlignment: TextAlign.center,
+                                            confirmBtnText: 'Ok',
+                                            confirmBtnColor: Colors.blue,
+                                          );
+                                        } else if (bUuId == data['boarderID'] &&
+                                            currentUser != null) {
+                                          // If the user is already renting the room, notify them
+                                          QuickAlert.show(
+                                            onCancelBtnTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            onConfirmBtnTap: () {
+                                              Navigator.pop(context);
+                                            },
+                                            context: context,
+                                            type: QuickAlertType.info,
+                                            text:
+                                                'You are currently renting this room.',
+                                            titleAlignment: TextAlign.center,
+                                            textAlignment: TextAlign.center,
+                                            confirmBtnText: 'Ok',
+                                            confirmBtnColor: Colors.blue,
+                                          );
+                                        } else {
+                                          Get.to(()=>BoarderReservationScreen(), arguments: [Get.arguments[0]]);
+                                          // Navigator.push(
+                                          //     context,
+                                          //     MaterialPageRoute(
+                                          //       builder: (context) =>
+                                          //           BoarderReservationScreen(
+                                          //         token: Get.arguments[0],
+                                          //       ),
+                                          //     ));
+                                          setState(() {
+                                            BhouseName = data['bHouseName'];
+                                            roomPrice = data['price'];
+                                            roomNumber = data['roomNameNumber'];
+                                            roomId = data['roomDocId'];
+                                          });
+                                        }
                                       }
+                                    } catch (e) {
+                                      // Handle any errors that occur during Firestore operations
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.error,
+                                        title: 'Error',
+                                        text:
+                                            'Something went wrong. Please try again later.',
+                                        confirmBtnColor: Colors.red,
+                                        confirmBtnText: 'Ok',
+                                      );
+                                      print(
+                                          'Error fetching document: $e'); // Log the error for debugging
                                     }
-                                  } catch (e) {
-                                    // Handle any errors that occur during Firestore operations
-                                    QuickAlert.show(
-                                      context: context,
-                                      type: QuickAlertType.error,
-                                      title: 'Error',
-                                      text:
-                                          'Something went wrong. Please try again later.',
-                                      confirmBtnColor: Colors.red,
-                                      confirmBtnText: 'Ok',
-                                    );
-                                    print(
-                                        'Error fetching document: $e'); // Log the error for debugging
-                                  }
-                                },
-                                child: Container(
-                                  height: 50,
-                                  decoration: BoxDecoration(
-                                      color: Color(0xFF31355C),
-                                      borderRadius: BorderRadius.circular(10)),
-                                  child: Center(
-                                      child: 'Reserve Now'
-                                          .text
-                                          .size(20)
-                                          .color(Colors.white)
-                                          .bold
-                                          .make()),
+                                  },
+                                  child: Container(
+                                    height: 50,
+                                    decoration: BoxDecoration(
+                                        color: Color(0xFF31355C),
+                                        borderRadius: BorderRadius.circular(10)),
+                                    child: Center(
+                                        child: 'Reserve Now'
+                                            .text
+                                            .size(20)
+                                            .color(Colors.white)
+                                            .bold
+                                            .make()),
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
-                      ),
-                    )
-                  ],
-                ),
-              )
-            ],
-          );
-        },
+                      )
+                    ],
+                  ),
+                )
+              ],
+            );
+          },
+        ),
       ),
     );
   }

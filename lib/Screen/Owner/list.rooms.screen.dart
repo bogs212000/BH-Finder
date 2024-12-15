@@ -36,7 +36,7 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
 
   Future<void> _openImagePicker() async {
     final XFile? pickedImage =
-        await _picker.pickImage(source: ImageSource.camera);
+        await _picker.pickImage(source: ImageSource.camera, imageQuality: 40);
     if (pickedImage != null) {
       setState(() {
         _image = File(pickedImage.path);

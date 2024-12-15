@@ -70,3 +70,6 @@ String? chatName;
 String? chatEmail;
 
 bool? reserved = false;
+
+//nav
+int selectedIndex = 0;

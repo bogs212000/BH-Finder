@@ -28,7 +28,7 @@ class OwnerNav extends StatefulWidget {
 }
 
 class _OwnerNavState extends State<OwnerNav> {
-  int _selectedIndex = 0;
+
   String? userEmail = FirebaseAuth.instance.currentUser?.email;
   late AndroidNotificationChannel channel;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -254,7 +254,7 @@ class _OwnerNavState extends State<OwnerNav> {
                       child: GestureDetector(
                         onTap: () async {
                           setState(() {
-                            _selectedIndex = 2;
+                            selectedIndex = 2;
                           });
                           await FirebaseFirestore.instance
                               .collection('BoardingHouses')
@@ -362,7 +362,7 @@ class _OwnerNavState extends State<OwnerNav> {
                 child: GestureDetector(
                   onTap: () async {
                     setState(() {
-                      _selectedIndex = 2;
+                      selectedIndex = 1;
                     });
                     await FirebaseFirestore.instance
                         .collection('BoardingHouses')
@@ -435,16 +435,16 @@ class _OwnerNavState extends State<OwnerNav> {
         ],
       ),
       body: Center(
-        child: tabItems[_selectedIndex],
+        child: tabItems[selectedIndex],
       ),
       bottomNavigationBar: FlashyTabBar(
         animationCurve: Curves.linear,
-        selectedIndex: _selectedIndex,
+        selectedIndex: selectedIndex,
         iconSize: 30,
         showElevation: false,
         // use this to remove appBar's elevation
         onItemSelected: (index) => setState(() {
-          _selectedIndex = index;
+          selectedIndex = index;
         }),
         items: [
           FlashyTabBarItem(
