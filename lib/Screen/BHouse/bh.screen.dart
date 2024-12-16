@@ -5,6 +5,7 @@ import 'dart:async';
 import 'package:bh_finder/Screen/BHouse/room.screen.dart';
 import 'package:bh_finder/Screen/Chat/chat.owner.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
+import 'package:bh_finder/Screen/Review/review.section.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -75,7 +76,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
   Future<List<String>> _loadImage() async {
     ListResult result = await storage
         .ref()
-        .child("BHouseImages/${bUuId.toString()}")
+        .child("BHouseImages/$bUuId")
         .listAll();
     List<String> imageUrls = [];
 
@@ -89,6 +90,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
 
   @override
   Widget build(BuildContext context) {
+
     return WillPopScope(
       onWillPop: () async { Get.back();
       // Navigate back using GetX
@@ -116,6 +118,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
             double average = ratings.reduce((a, b) => a + b) / ratings.length;
             double star = average;
             double clampedRating = star.clamp(0.0, 5.0);
+            int numberOfReviews = ratings.length > 1 ? ratings.length - 1 : 0;
+
             return Stack(
               children: [
                 Container(
@@ -364,11 +368,12 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                 GestureDetector(
                                                   onTap: () {
                                                     if (currentUser != null) {
-                                                      Navigator.pushNamed(
-                                                        context,
-                                                        '/ReviewSectionScreen',
-                                                        arguments: data['Email'],
-                                                      );
+                                                      Get.to(() => ReviewSectionScreen(), arguments: data['Email'].toString());
+                                                      // Navigator.pushNamed(
+                                                      //   context,
+                                                      //   '/ReviewSectionScreen',
+                                                      //   arguments: data['Email'],
+                                                      // );
                                                     }
                                                   },
                                                   child: Row(
@@ -397,9 +402,12 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                     }),
                                                   ),
                                                 ),
-                                                ' - $average'.text.light.make(),
+                                                 ' ${numberOfReviews.toString()} reviews'.text.bold.gray500.make(),
                                               ],
                                             ),
+                                            Row(children: [
+                                              ' $average'.text.bold.light.make(),
+                                            ],)
                                           ],
                                         ),
                                       ),
@@ -710,10 +718,11 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                     (Route<dynamic> route) => false,
                                   );
                                 } else {
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    _toGuestScreen(),
-                                    (Route<dynamic> route) => false,
-                                  );
+                                  Get.offAll(()=>GuestScreen());
+                                  // Navigator.of(context).pushAndRemoveUntil(
+                                  //   _toGuestScreen(),
+                                  //   (Route<dynamic> route) => false,
+                                  // );
                                 }
                               },
                               child: Container(

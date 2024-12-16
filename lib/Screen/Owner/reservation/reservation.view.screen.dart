@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:bh_finder/Screen/Chat/chat.boarders.dart';
+import 'package:bh_finder/Screen/Owner/owner.nav.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -25,8 +26,9 @@ final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class ViewReservationScreen extends StatefulWidget {
   final String? token;
+  final String? bName;
 
-  const ViewReservationScreen({Key? key, this.token}) : super(key: key);
+  const ViewReservationScreen({Key? key, this.token, this.bName}) : super(key: key);
 
   @override
   State<ViewReservationScreen> createState() => _ViewReservationScreenState();
@@ -48,7 +50,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle.loadString(
-            'assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json'),
+            'assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
       );
 
       final client =
@@ -343,7 +345,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                       'createdAt':
                                                           DateTime.now(),
                                                       'message':
-                                                          "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been rejected. If you have any questions or need assistance, please don't hesitate to reach out.",
+                                                          "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been rejected. If you have any questions or need assistance, please don't hesitate to reach out. - ${widget.bName}",
                                                       'boarderID':
                                                           data['boarderUuId'],
                                                       'status': false,
@@ -351,7 +353,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                     String title =
                                                         '$BhouseName';
                                                     String body =
-                                                        "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been rejected. If you have any questions or need assistance, please don't hesitate to reach out.";
+                                                        "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been rejected. If you have any questions or need assistance, please don't hesitate to reach out. - ${widget.bName}";
                                                     sendPushMessage(
                                                         body, title);
                                                     Navigator.pop(context);
@@ -458,14 +460,14 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                       .set({
                                                     'createdAt': DateTime.now(),
                                                     'message':
-                                                        "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been canceled. If you have any questions or need assistance, please don't hesitate to reach out.",
+                                                        "Hi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been canceled. If you have any questions or need assistance, please don't hesitate to reach out. - ${widget.bName}",
                                                     'boarderID':
                                                         data['boarderUuId'],
                                                     'status': false,
                                                   });
                                                   String title = '$BhouseName';
                                                   String body =
-                                                      "HHi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been canceled. If you have any questions or need assistance, please don't hesitate to reach out.";
+                                                      "HHi ${data['boardersName']}, unfortunately, we regret to inform you that your reservation for room ${data['roomNumber']} has been canceled. If you have any questions or need assistance, please don't hesitate to reach out. - ${widget.bName}";
                                                   sendPushMessage(body, title);
                                                   Navigator.pop(context);
 
@@ -484,7 +486,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                           .pushAndRemoveUntil(
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                OwnerHomeScreen()),
+                                                                OwnerNav()),
                                                         (Route<dynamic>
                                                                 route) =>
                                                             false, // Remove all previous routes

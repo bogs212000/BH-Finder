@@ -514,7 +514,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                                         context,
                                                     MaterialPageRoute(
                                                         builder: (context) => ViewReservationScreen(
-                                                          token: data['token'],
+                                                          token: data['token'], bName: data['BoardingHouseName'],
                                                         )));
                                                   },
                                                   child: Padding(
