@@ -73,3 +73,7 @@ bool? reserved = false;
 
 //nav
 int selectedIndex = 0;
+
+//gcash
+String? gcashNumber;
+String? fetchGcashEmail;

@@ -103,6 +103,7 @@ class _BHouseProfileState extends State<BHouseProfile> {
                                 phoneNum: data['PhoneNumber'],
                                 lat: data['Lat'],
                                 long: data['Long'],
+                                gcashNum: data['gcashNum'],
                               ),
                             ),
                           );

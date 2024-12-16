@@ -50,16 +50,18 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
         ? LoadingScreen()
         : Scaffold(
             appBar: AppBar(
-              leading: GestureDetector(onTap: (){
-                Navigator.of(context).pushAndRemoveUntil(
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        OwnerNav(),
-                  ),
-                      (Route<dynamic> route) =>
-                  false, // Removes all previous routes
-                );
-              }, child: Icon(Icons.arrow_back),),
+              leading: GestureDetector(
+                onTap: () {
+                  Navigator.of(context).pushAndRemoveUntil(
+                    MaterialPageRoute(
+                      builder: (context) => OwnerNav(),
+                    ),
+                    (Route<dynamic> route) =>
+                        false, // Removes all previous routes
+                  );
+                },
+                child: Icon(Icons.arrow_back),
+              ),
               backgroundColor: Colors.white,
               elevation: 0,
               title: 'Rooms'.text.make(),
@@ -121,8 +123,10 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                               onTap: () {
                                 Navigator.of(context).pushAndRemoveUntil(
                                   MaterialPageRoute(
-                                    builder: (context) =>
-                                        ViewRoom(viewRoomId: data['roomDocId'], boarderToken: data['boarderToken']),
+                                    builder: (context) => ViewRoom(
+                                        viewRoomId: data['roomDocId'],
+                                        boarderToken: data['boarderToken'],
+                                        bHouseName: data['bHouseName']),
                                   ),
                                   (Route<dynamic> route) =>
                                       false, // Removes all previous routes
@@ -219,27 +223,40 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                                         Navigator.pop(context);
                                                         QuickAlert.show(
                                                           onCancelBtnTap: () {
-                                                            Navigator.pop(context);
+                                                            Navigator.pop(
+                                                                context);
                                                           },
                                                           onConfirmBtnTap: () {
-                                                            Navigator.pop(context);
+                                                            Navigator.pop(
+                                                                context);
                                                           },
                                                           context: context,
-                                                          type: QuickAlertType.success,
-                                                          text: 'Room deleted successfully!',
-                                                          titleAlignment: TextAlign.center,
-                                                          textAlignment: TextAlign.center,
+                                                          type: QuickAlertType
+                                                              .success,
+                                                          text:
+                                                              'Room deleted successfully!',
+                                                          titleAlignment:
+                                                              TextAlign.center,
+                                                          textAlignment:
+                                                              TextAlign.center,
                                                           confirmBtnText: 'Ok',
                                                           cancelBtnText: 'No',
-                                                          confirmBtnColor: Colors.blue,
-                                                          backgroundColor: Colors.white,
-                                                          headerBackgroundColor: Colors.grey,
-                                                          confirmBtnTextStyle: const TextStyle(
+                                                          confirmBtnColor:
+                                                              Colors.blue,
+                                                          backgroundColor:
+                                                              Colors.white,
+                                                          headerBackgroundColor:
+                                                              Colors.grey,
+                                                          confirmBtnTextStyle:
+                                                              const TextStyle(
                                                             color: Colors.white,
-                                                            fontWeight: FontWeight.bold,
+                                                            fontWeight:
+                                                                FontWeight.bold,
                                                           ),
-                                                          titleColor: Colors.black,
-                                                          textColor: Colors.black,
+                                                          titleColor:
+                                                              Colors.black,
+                                                          textColor:
+                                                              Colors.black,
                                                         );
                                                       } catch (e) {
                                                         print(e);

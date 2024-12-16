@@ -320,6 +320,9 @@ class _HomeScreenState extends State<HomeScreen> {
                                             child: ElevatedButton(
       
                                               onPressed: () {
+                                                setState(() {
+                                                  fetchGcashEmail = data['Email'];
+                                                });
                                                 Get.to(()=>ReceiptScreen(), arguments: [data['roomDocId']]);
                                                 // Navigator.push(
                                                 //     context,

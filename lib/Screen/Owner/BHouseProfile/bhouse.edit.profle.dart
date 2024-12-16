@@ -29,6 +29,7 @@ class BHouseEditProfile extends StatefulWidget {
   final String? bHouseName;
   final String? rules;
   final String? OwnerUId;
+  final String? gcashNum;
   final double? lat;
   final double? long;
 
@@ -42,6 +43,7 @@ class BHouseEditProfile extends StatefulWidget {
       this.phoneNum,
       this.bHouseName,
       this.rules,
+      this.gcashNum,
       this.OwnerUId, this.lat, this.long});
 
   @override
@@ -56,6 +58,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
   late TextEditingController _pnumber;
   late TextEditingController _bHouseName;
   late TextEditingController _rules;
+  late TextEditingController _gcashNum;
   String? message;
   bool _isChanged = false;
   final RefreshController _refreshController = RefreshController(initialRefresh: false);
@@ -73,6 +76,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
     _pnumber = TextEditingController(text: widget.phoneNum);
     _bHouseName = TextEditingController(text: widget.bHouseName);
     _rules = TextEditingController(text: widget.rules);
+    _gcashNum = TextEditingController(text: widget.gcashNum);
 
     // Add listeners to detect changes
     _fname.addListener(_checkIfChanged);
@@ -82,6 +86,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
     _pnumber.addListener(_checkIfChanged);
     _bHouseName.addListener(_checkIfChanged);
     _rules.addListener(_checkIfChanged);
+    _gcashNum.addListener(_checkIfChanged);
   }
 
   FirebaseStorage storage = FirebaseStorage.instance;
@@ -109,6 +114,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
     _pnumber.dispose();
     _bHouseName.dispose();
     _rules.dispose();
+    _gcashNum.dispose();
     super.dispose();
   }
 
@@ -120,7 +126,9 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
         _address.text != (widget.address ?? "") ||
         _pnumber.text != (widget.phoneNum ?? "") ||
         _bHouseName.text != (widget.bHouseName ?? "") ||
-        _rules.text != (widget.rules ?? "")) {
+        _rules.text != (widget.rules ?? "" )||
+            _gcashNum.text != (widget.gcashNum ?? ""
+        )) {
       setState(() {
         _isChanged = true;
       });
@@ -350,6 +358,7 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
                             ),
                           ),
                         ),
+
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 5, right: 5, bottom: 20),
@@ -373,6 +382,32 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
                                 borderRadius: BorderRadius.circular(20),
                               ),
                               labelText: 'Contact Number',
+                            ),
+                          ),
+                        ),
+                        Padding(
+                          padding: const EdgeInsets.only(
+                              left: 5, right: 5, bottom: 20),
+                          child: TextField(
+                            controller: _gcashNum,
+                            keyboardType: TextInputType.number,
+                            textAlign: TextAlign.left,
+                            style: const TextStyle(
+                              fontSize: 15,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            decoration: InputDecoration(
+                              filled: true,
+                              fillColor: Colors.grey.withOpacity(0.1),
+                              focusedBorder: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(20),
+                                borderSide: BorderSide(color: Colors.white),
+                              ),
+                              enabledBorder: OutlineInputBorder(
+                                borderSide: BorderSide(color: Colors.white),
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              labelText: 'Gcash Number',
                             ),
                           ),
                         ),
@@ -792,6 +827,8 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
                                     'LastName': _lname.text,
                                     'address': _address.text,
                                     'PhoneNumber': _pnumber.text,
+                                    'Rules': _rules.text,
+                                    'gcashNum': _gcashNum.text,
                                   });
                                   setState(() {
                                     message = 'Save Changes!';

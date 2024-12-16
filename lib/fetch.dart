@@ -48,7 +48,28 @@ Future<void> fetchBoarderData(Function setState) async {
       bUuId = snapshot.data()?['UuId'];
       bAddress = snapshot.data()?['Address'];
       bPhoneNumber = snapshot.data()?['PhoneNumber'];
+      bPhoneNumber = snapshot.data()?['PhoneNumber'];
       print('$fName, $mName, $lName - $bUuId - $bPhoneNumber - $bAddress');
+      // fetchRoleError = false;
+    });
+    checkUserInRooms();
+  } catch (e) {
+    setState(() {
+      // fetchRoleError = true;
+    });
+  }
+}
+
+Future<void> fetchGcashNum(Function setState) async {
+  try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('BoardingHouses')
+        .doc(fetchGcashEmail)
+        .get();
+
+    setState(() {
+      gcashNumber = snapshot.data()?['gcashNum'];
+      print('$gcashNumber');
       // fetchRoleError = false;
     });
     checkUserInRooms();

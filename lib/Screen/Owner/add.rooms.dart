@@ -301,6 +301,7 @@ class _AddRoomsState extends State<AddRooms> {
                                       'contactNumber': OwnerPhone,
                                       'roomStatus': 'available',
                                       'descriptions': descriptions.text,
+                                      'Email': FirebaseAuth.instance.currentUser!.email.toString(),
                                       'rules': '',
                                       'rates': '',
                                       'paid?': false,

@@ -28,9 +28,10 @@ import 'package:http/http.dart' as http;
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class ViewRoom extends StatefulWidget {
-  final String? viewRoomId, boarderToken;
+  final String? viewRoomId, boarderToken, bHouseName;
 
-  const ViewRoom({super.key, this.viewRoomId, this.boarderToken});
+  const ViewRoom(
+      {super.key, this.viewRoomId, this.boarderToken, this.bHouseName});
 
   @override
   State<ViewRoom> createState() => _ViewRoomState();
@@ -88,12 +89,12 @@ class _ViewRoomState extends State<ViewRoom> {
   void sendPushMessage(String body, String title) async {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
-        await rootBundle.loadString(
-            'assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
+        await rootBundle
+            .loadString('assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
       );
 
       final client =
-      await clientViaServiceAccount(serviceAccountCredentials, _scopes);
+          await clientViaServiceAccount(serviceAccountCredentials, _scopes);
       final accessToken = client.credentials.accessToken.data;
 
       final response = await http.post(
@@ -110,7 +111,8 @@ class _ViewRoomState extends State<ViewRoom> {
             'notification': {
               'body': body,
               'title': title,
-              'image': 'https://firebasestorage.googleapis.com/v0/b/bh-finder-50ccf.appspot.com/o/App%2Fic_launcher.png?alt=media&token=68ac0062-7cd4-4e43-a39f-0e40d612ad01',
+              'image':
+                  'https://firebasestorage.googleapis.com/v0/b/bh-finder-50ccf.appspot.com/o/App%2Fic_launcher.png?alt=media&token=68ac0062-7cd4-4e43-a39f-0e40d612ad01',
             },
             'data': {
               'click_action': 'FLUTTER_NOTIFICATION_CLICK',
@@ -130,7 +132,6 @@ class _ViewRoomState extends State<ViewRoom> {
             'Failed to send push notification. Status code: ${response.statusCode}');
         print('Response body: ${response.body}');
       }
-
     } catch (e) {
       print("Error sending push notification: $e");
     }
@@ -405,13 +406,17 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       DateTime
                                                                           .now(),
                                                                   'message':
-                                                                      'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment.',
+                                                                      'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - ${widget.bHouseName}',
                                                                   'status':
                                                                       false,
                                                                 });
-                                                                String title = '$BhouseName';
-                                                                String body = 'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment.';
-                                                                sendPushMessage(body, title);
+                                                                String title =
+                                                                    '$BhouseName';
+                                                                String body =
+                                                                    'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - ${widget.bHouseName}';
+                                                                sendPushMessage(
+                                                                    body,
+                                                                    title);
                                                                 // Update notification count for the boarder
                                                                 await FirebaseFirestore
                                                                     .instance
@@ -571,9 +576,13 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       false,
                                                                 });
 
-                                                                String title = '$BhouseName';
-                                                                String body = 'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.';
-                                                                sendPushMessage(body, title);
+                                                                String title =
+                                                                    '$BhouseName';
+                                                                String body =
+                                                                    'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.';
+                                                                sendPushMessage(
+                                                                    body,
+                                                                    title);
                                                                 // Update notification count for the boarder
                                                                 await FirebaseFirestore
                                                                     .instance
@@ -661,9 +670,13 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                   'status':
                                                                       false,
                                                                 });
-                                                                String title = '$BhouseName';
-                                                                String body = 'Hi ${data['boardersName']}, thank you for settling your rent!';
-                                                                sendPushMessage(body, title);
+                                                                String title =
+                                                                    '$BhouseName';
+                                                                String body =
+                                                                    'Hi ${data['boardersName']}, thank you for settling your rent!';
+                                                                sendPushMessage(
+                                                                    body,
+                                                                    title);
                                                                 // Update notification count for the boarder
                                                                 await FirebaseFirestore
                                                                     .instance
@@ -742,7 +755,8 @@ class _ViewRoomState extends State<ViewRoom> {
                             onTap: () {
                               Navigator.push(
                                 context,
-                                MaterialPageRoute(builder: (context) => ListRoomsScreen()),
+                                MaterialPageRoute(
+                                    builder: (context) => ListRoomsScreen()),
                               );
                             },
                             child: Container(
@@ -838,42 +852,46 @@ class _ViewRoomState extends State<ViewRoom> {
                             ),
                           ),
                         ),
-                        Padding(
-                          padding: EdgeInsets.only(top: 40, right: 20),
-                          child: GestureDetector(
-                            onTap: () {
-                              Navigator.push( context,
-                                MaterialPageRoute(
-                                  builder: (context) => ChatBoarders(
-                                      token: data['token'],
-                                      boarderNumber: data['boardersConNumber'],
-                                      boarderEmail: data['boarderEmail'],
-                                      ownerToken: ownerToken,
-                                      name: data['boardersName'],
-                                      bhouseName: data['bHouseName'],
+                        data['boardersName'] == ''
+                            ? SizedBox()
+                            : Padding(
+                                padding: EdgeInsets.only(top: 40, right: 20),
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) => ChatBoarders(
+                                          token: data['token'],
+                                          boarderNumber:
+                                              data['boardersConNumber'],
+                                          boarderEmail: data['boarderEmail'],
+                                          ownerToken: ownerToken,
+                                          name: data['boardersName'],
+                                          bhouseName: data['bHouseName'],
+                                        ),
+                                      ),
+                                    );
+                                  },
+                                  child: Container(
+                                    height: 35,
+                                    width: 35,
+                                    decoration: BoxDecoration(
+                                      color: Colors.white.withOpacity(0.2),
+                                      border: Border.all(
+                                          color: Colors.grey, width: 0.3),
+                                      borderRadius: BorderRadius.circular(20),
+                                    ),
+                                    child: Center(
+                                      child: Icon(
+                                        size: 17,
+                                        Icons.chat,
+                                        color: Colors.white,
+                                      ),
+                                    ),
                                   ),
                                 ),
-                              );
-                            },
-                            child: Container(
-                              height: 35,
-                              width: 35,
-                              decoration: BoxDecoration(
-                                color: Colors.white.withOpacity(0.2),
-                                border:
-                                    Border.all(color: Colors.grey, width: 0.3),
-                                borderRadius: BorderRadius.circular(20),
                               ),
-                              child: Center(
-                                child: Icon(
-                                  size: 17,
-                                  Icons.chat,
-                                  color: Colors.white,
-                                ),
-                              ),
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                     Spacer(),

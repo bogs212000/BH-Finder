@@ -9,6 +9,8 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
@@ -92,7 +94,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                       Container(
                         padding: EdgeInsets.only(
                             top: 30, left: 20, right: 20, bottom: 0),
-                        height: 600,
+                        height: 700,
                         width: double.infinity,
                         decoration: BoxDecoration(
                           color: Colors.white,
@@ -480,9 +482,46 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                     // Show loading spinner while waiting for data
                                     if (snapshot.connectionState ==
                                         ConnectionState.waiting) {
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                            color: Colors.red),
+                                      return Column(
+                                        children: [
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey.shade200,
+                                            highlightColor: Colors.white,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: 20, right: 20),
+                                              child: Container(
+                                                height: 90,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey,
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                      20),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                          SizedBox(height: 20),
+                                          Shimmer.fromColors(
+                                            baseColor: Colors.grey.shade200,
+                                            highlightColor: Colors.white,
+                                            child: Padding(
+                                              padding: EdgeInsets.only(
+                                                  left: 20, right: 20),
+                                              child: Container(
+                                                height: 90,
+                                                width: double.infinity,
+                                                decoration: BoxDecoration(
+                                                  color: Colors.grey,
+                                                  borderRadius:
+                                                  BorderRadius.circular(
+                                                      20),
+                                                ),
+                                              ),
+                                            ),
+                                          ),
+                                        ],
                                       );
                                     }
 
@@ -499,30 +538,36 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                       itemCount: snapshot.data!.docs.length,
                                       // Use the length of the fetched data
                                       itemBuilder: (context, index) {
-                                        Map<String, dynamic> data =
-                                            snapshot.data!.docs[index].data()!
-                                                as Map<String, dynamic>;
+                                        Map<String, dynamic> datas =
+                                        snapshot.data!.docs[index].data()!
+                                        as Map<String, dynamic>;
                                         return Padding(
-                                          padding:
-                                              const EdgeInsets.only(bottom: 10),
+                                          padding: const EdgeInsets.only(
+                                              bottom: 10),
                                           child: GestureDetector(
                                             onTap: () {
                                               setState(() {
-                                                rRoomsDocId = data['roomDocId'];
+                                                rRoomsDocId =
+                                                datas['roomDocId'];
                                               });
                                               print('room ID: $roomId');
-
-                                              // Navigator.of(context).pushAndRemoveUntil(
-                                              //   _toRoomsScreen(),
-                                              //       (Route<dynamic> route) => false,
+                                              Get.to(()=>RoomScreen(), arguments: [data['token']]);
+                                              // Navigator.pushNamedAndRemoveUntil(
+                                              //   context,
+                                              //   '/RoomScreen',
+                                              //       (Route<dynamic> route) => false, // Remove all previous routes
+                                              //   arguments: {
+                                              //     'token': data['token'],
+                                              //   },
                                               // );
+                                              print(data['token']);
                                             },
                                             child: Container(
                                               height: 90,
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius:
-                                                    BorderRadius.circular(10),
+                                                BorderRadius.circular(10),
                                               ),
                                               child: Row(
                                                 children: [
@@ -531,11 +576,11 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                     height: 90,
                                                     decoration: BoxDecoration(
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              10),
+                                                      BorderRadius
+                                                          .circular(10),
                                                       image: DecorationImage(
                                                         image: NetworkImage(
-                                                          data['imageUrl'] ??
+                                                          datas['roomImage'] ??
                                                               'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                                                         ),
                                                         fit: BoxFit.cover,
@@ -548,29 +593,30 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                       color: Colors.white,
                                                       child: Column(
                                                         mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
+                                                        MainAxisAlignment
+                                                            .center,
                                                         crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
+                                                        CrossAxisAlignment
+                                                            .start,
                                                         children: [
                                                           Text(
-                                                            'Room ${index + 1}',
+                                                            '${datas['roomNameNumber']}',
                                                             style: TextStyle(
                                                               fontWeight:
-                                                                  FontWeight
-                                                                      .bold,
+                                                              FontWeight
+                                                                  .bold,
                                                               fontSize: 15,
                                                             ),
                                                           ),
                                                           Text(
-                                                            data['roomStatus'],
+                                                            datas[
+                                                            'roomStatus'],
                                                             style: TextStyle(
                                                               color: Colors
                                                                   .orangeAccent,
                                                               fontWeight:
-                                                                  FontWeight
-                                                                      .w300,
+                                                              FontWeight
+                                                                  .w300,
                                                             ),
                                                           ),
                                                         ],
@@ -580,50 +626,26 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                   Container(
                                                     width: 110,
                                                     padding:
-                                                        EdgeInsets.symmetric(
-                                                            horizontal: 10),
+                                                    EdgeInsets.symmetric(
+                                                        horizontal: 10),
                                                     child: Column(
                                                       mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .center,
+                                                      MainAxisAlignment
+                                                          .center,
                                                       children: [
                                                         Row(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
+                                                          MainAxisAlignment
+                                                              .end,
                                                           children: [
                                                             Text(
-                                                              '₱ ${data['price'] ?? '---'} per month',
-                                                              style: TextStyle(
+                                                              '₱ ${datas['price'] ?? '---'} per month',
+                                                              style:
+                                                              TextStyle(
                                                                 fontWeight:
-                                                                    FontWeight
-                                                                        .bold,
+                                                                FontWeight
+                                                                    .bold,
                                                                 fontSize: 10,
-                                                              ),
-                                                            ),
-                                                          ],
-                                                        ),
-                                                        Row(
-                                                          mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .end,
-                                                          children: [
-                                                            Icon(
-                                                              Icons.star,
-                                                              color:
-                                                                  Colors.amber,
-                                                              size: 20,
-                                                            ),
-                                                            SizedBox(width: 4),
-                                                            Text(
-                                                              data['rating']
-                                                                      ?.toString() ??
-                                                                  '4.8',
-                                                              // Use data for rating
-                                                              style: TextStyle(
-                                                                color:
-                                                                    Colors.grey,
-                                                                fontSize: 12,
                                                               ),
                                                             ),
                                                           ],

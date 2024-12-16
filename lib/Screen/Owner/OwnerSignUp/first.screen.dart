@@ -957,6 +957,7 @@ class _OwnerSignupThirdState extends State<OwnerSignupThird> {
                                     'chat': 0,
                                     'createdAt': DateTime.now(),
                                     'Email': _ownerEmail.text.trim(),
+                                    'gcashNum': '',
                                     'FirstName': ownerFirstName,
                                     'MiddleName': ownerMiddleName,
                                     'LastName': ownerLastName,

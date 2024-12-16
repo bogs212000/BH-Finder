@@ -9,6 +9,8 @@ import 'package:url_launcher/url_launcher.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 
+import '../../fetch.dart';
+
 class ReceiptScreen extends StatefulWidget {
   final String? roomId;
 
@@ -24,6 +26,7 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
   @override
   void initState() {
     super.initState();
+    fetchGcashNum(setState);
     receipt = FirebaseFirestore.instance
         .collection('Rooms')
         .doc(Get.arguments[0].toString())
@@ -153,18 +156,20 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                           ? SizedBox()
                           : Row(
                               children: [
-                                'Gcash #: ${data['boardersConNumber']}'
-                                    .text
-                                    .make(),
+                                gcashNumber == null || gcashNumber == ''
+                                    ? SizedBox()
+                                    : 'Gcash #: $gcashNumber'.text.make(),
                                 Spacer(),
-                                GestureDetector(
-                                  onTap: () {
-                                    Clipboard.setData(ClipboardData(
-                                        text: data['boardersConNumber']));
-                                    _toast();
-                                  },
-                                  child: Icon(Icons.copy),
-                                ),
+                                gcashNumber == null || gcashNumber == ''
+                                    ? SizedBox()
+                                    : GestureDetector(
+                                        onTap: () {
+                                          Clipboard.setData(ClipboardData(
+                                              text: '$gcashNumber'));
+                                          _toast();
+                                        },
+                                        child: Icon(Icons.copy),
+                                      ),
                               ],
                             ),
                       Divider(),
@@ -191,33 +196,37 @@ class _ReceiptScreenState extends State<ReceiptScreen> {
                 ),
                 SizedBox(height: 10),
                 data['paid?'] == false
-                    ? Row(mainAxisAlignment: MainAxisAlignment.end, children: [
-                        SizedBox(
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              String gcashUrl = 'https://www.gcash.com/';
-                              if (await canLaunch(gcashUrl)) {
-                                await launch(gcashUrl);
-                              } else {
-                                throw 'Could not launch $gcashUrl';
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Colors.blue,
-                              // Custom background color
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(
-                                    25), // Rounded corners
-                              ),
-                            ),
-                            child: 'Pay with Gcash'
+                    ? Column(mainAxisAlignment: MainAxisAlignment.end, children: [
+                        gcashNumber == null || gcashNumber == ''
+                            ? "The boarding house owner does not have a GCash account."
                                 .text
-                                .color(Colors.white)
-                                .bold // Bold text
-                                .make(),
-                          ),
-                        ),
+                                .make()
+                            : SizedBox(
+                                height: 40,
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    String gcashUrl = 'https://www.gcash.com/';
+                                    if (await canLaunch(gcashUrl)) {
+                                      await launch(gcashUrl);
+                                    } else {
+                                      throw 'Could not launch $gcashUrl';
+                                    }
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.blue,
+                                    // Custom background color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          25), // Rounded corners
+                                    ),
+                                  ),
+                                  child: 'Pay with Gcash'
+                                      .text
+                                      .color(Colors.white)
+                                      .bold // Bold text
+                                      .make(),
+                                ),
+                              ),
                       ])
                     : SizedBox(),
               ],

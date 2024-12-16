@@ -193,75 +193,9 @@ class _NavHomeState extends State<NavHome> {
       // ),
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: GestureDetector(
-          onTap: () {
-            // Navigator.of(context).pushAndRemoveUntil(
-            //   _toNearMeMapScreen(),
-            //       (Route<dynamic> route) => false,
-            // );
-          },
-          child: userLat != null
-              ? Container(
-                  padding: EdgeInsets.only(left: 5, right: 5),
-                  height: 35,
-                  width: 150,
-                  decoration: BoxDecoration(
-                    color: Colors.white.withOpacity(0.2),
-                    border: Border.all(color: Colors.grey, width: 0.3),
-                    borderRadius: BorderRadius.circular(20),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.grey.withOpacity(0.2),
-                        // Shadow color with opacity
-                        spreadRadius: 1,
-                        // Spread radius
-                        blurRadius: 1,
-                        // Blur radius
-                        offset: Offset(0,
-                            1), // Position of the shadow (horizontal, vertical)
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.pin_drop_outlined,
-                            color: Colors.white.withOpacity(0.8),
-                          ),
-                          SizedBox(width: 5),
-                          'Street'
-                              .text
-                              .color(Colors.white.withOpacity(0.8))
-                              .size(12)
-                              .bold
-                              .make()
-                        ],
-                      ),
-                    ],
-                  ),
-                )
-              : Row(
-                  children: [
-                    Shimmer.fromColors(
-                      baseColor: Colors.grey.shade200,
-                      highlightColor: Colors.white,
-                      child: Padding(
-                        padding: EdgeInsets.only(left: 5, right: 5),
-                        child: Container(
-                          height: 40,
-                          width: 130,
-                          decoration: BoxDecoration(
-                            color: Colors.grey,
-                            borderRadius: BorderRadius.circular(20),
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        title: Image.asset(
+          'assets/logo.png',
+          scale: 6,
         ),
         flexibleSpace: Container(
           decoration: BoxDecoration(
