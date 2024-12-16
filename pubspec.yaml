@@ -4,8 +4,12 @@ description: "A new Flutter project."
 # pub.dev using `flutter pub publish`. This is preferred for private packages.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 
-#Dart SDK version: 3.4.0 (stable) (Mon May 6 07:59:58 2024 -0700) on "windows_x64"
-#Flutter 3.22.0 • channel stable • https://github.com/flutter/flutter.git
+# classpath "com.android.tools.build:gradle:7.0.4"
+# Android Studio Koala Feature Drop | 2024.1.2 Patch 1
+# ext.kotlin_version = '1.9.10' // Kotlin version should be here
+# distributionUrl=https\://services.gradle.org/distributions/gradle-7.6.3-all.zip
+# Dart SDK version: 3.4.0 (stable) (Mon May 6 07:59:58 2024 -0700) on "windows_x64"
+# Flutter 3.22.0 • channel stable • https://github.com/flutter/flutter.git
 # The following defines the version and build number for your application.
 # A version number is three numbers separated by dots, like 1.2.43
 # followed by an optional build number separated by a +.
