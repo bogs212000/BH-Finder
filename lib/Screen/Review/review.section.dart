@@ -127,7 +127,7 @@ class _ReviewSectionScreenState extends State<ReviewSectionScreen> {
         });
 
         Navigator.pop(context);
-
+        // await Get.snackbar('Success', 'Review has been posted successfully!', backgroundColor: Colors.green, margin: EdgeInsets.all(10));
         QuickAlert.show(
           context: context,
           type: QuickAlertType.success,
@@ -139,6 +139,10 @@ class _ReviewSectionScreenState extends State<ReviewSectionScreen> {
           rating = null;
           isSubmitting = false;
         });
+        _checkUserReviewStatus();
+        setState(() {
+        });
+        // Get.back();
       } catch (e) {
         setState(() {
           isSubmitting = false;

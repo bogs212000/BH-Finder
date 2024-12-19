@@ -1,5 +1,6 @@
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Profile/user.edit.profile.dart';
+import 'package:bh_finder/Screen/about/about.screen.dart';
 import 'package:bh_finder/cons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -7,6 +8,8 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -149,7 +152,7 @@ class _BHouseProfileState extends State<BHouseProfile> {
                       Divider(),
                       GestureDetector(
                         onTap: (){
-
+                          Get.to(()=>AboutScreen());
                         },
                         child: Row(
                           children: [
@@ -161,6 +164,106 @@ class _BHouseProfileState extends State<BHouseProfile> {
                         ),
                       ),
                       Divider(),
+                      GestureDetector(
+                        onTap: () {
+                          QuickAlert.show(
+                            context: context,
+                            type: QuickAlertType.confirm,
+                            text: "Are you sure you want to delete this account?",
+                            titleAlignment: TextAlign.center,
+                            textAlignment: TextAlign.center,
+                            confirmBtnText: 'No',
+                            cancelBtnText: 'Yes',
+                            confirmBtnColor: Colors.red,
+                            backgroundColor: Colors.white,
+                            headerBackgroundColor: Colors.grey,
+                            confirmBtnTextStyle: const TextStyle(
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                            titleColor: Colors.black,
+                            textColor: Colors.black,
+                            onConfirmBtnTap: () {
+                              Navigator.pop(context); // Close dialog on "No"
+                            },
+                            onCancelBtnTap: () async {
+                              Navigator.pop(context); // Close dialog on "Yes"
+
+                              // Show loading dialog
+                              QuickAlert.show(
+                                barrierDismissible: false,
+                                context: context,
+                                type: QuickAlertType.loading,
+                                title: 'Deleting account',
+                                text: 'Please wait...',
+                              );
+
+                              try {
+                                // Backup current user info
+                                final user = FirebaseAuth.instance.currentUser;
+                                final userEmail = user?.email ?? "";
+
+                                // Delete Firestore documents
+                                if (userEmail.isNotEmpty) {
+                                  await FirebaseFirestore.instance
+                                      .collection('BoardingHouses')
+                                      .doc(userEmail)
+                                      .delete();
+                                  await FirebaseFirestore.instance
+                                      .collection('Users')
+                                      .doc(userEmail)
+                                      .delete();
+                                }
+
+                                // Delete Firebase Authentication account
+                                await user?.delete();
+
+                                // Navigate to AuthWrapper
+                                Get.offAll(() => AuthWrapper());
+                              } on FirebaseAuthException catch (e) {
+                                Navigator.pop(context); // Close loading dialog
+                                if (e.code == 'requires-recent-login') {
+                                  // Re-authentication required
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: 'Re-authentication needed',
+                                    text: 'Please log in again to delete your account.',
+                                  );
+                                } else {
+                                  QuickAlert.show(
+                                    context: context,
+                                    type: QuickAlertType.error,
+                                    title: 'Error',
+                                    text: e.message ?? "An unknown error occurred.",
+                                  );
+                                }
+                              } catch (e) {
+                                Navigator.pop(context); // Close loading dialog
+                                QuickAlert.show(
+                                  context: context,
+                                  type: QuickAlertType.error,
+                                  title: 'Error',
+                                  text: "Failed to delete the account. Try again later.",
+                                );
+                              } finally {
+                                _toast(); // Custom toast notification
+                              }
+                            },
+                          );
+                        },
+                        child: Row(
+                          children: [
+                            Icon(Icons.person, size: 12),
+                            ' Delete account'.text.light.red600.size(15).make(),
+                            Spacer(),
+                            Icon(Icons.delete_outline, color: Colors.red, size: 15),
+                          ],
+                        ),
+                      ),
+
+                      Divider(),
+
 
                     ],
                   ),

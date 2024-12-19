@@ -571,7 +571,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       DateTime
                                                                           .now(),
                                                                   'message':
-                                                                      'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.',
+                                                                      'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- ${widget.bHouseName}',
                                                                   'status':
                                                                       false,
                                                                 });
@@ -579,7 +579,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                 String title =
                                                                     '$BhouseName';
                                                                 String body =
-                                                                    'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.';
+                                                                    'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- ${widget.bHouseName}';
                                                                 sendPushMessage(
                                                                     body,
                                                                     title);
@@ -690,7 +690,16 @@ class _ViewRoomState extends State<ViewRoom> {
 
                                                                 Navigator.pop(
                                                                     context); // Close the loading dialog
-
+                                                                await FirebaseFirestore.instance.collection('Payment logs').doc().set({
+                                                                  'ownerUid': data['ownerUid'],
+                                                                  'boardersName': data['boardersName'],
+                                                                  'boardersIn': data['boardersIn'],
+                                                                  'boardersOut': data['boardersOut'],
+                                                                  'price': data['price'],
+                                                                  'contactNumber': data['contactNumber'],
+                                                                  'bHouseName': data['bHouseName'],
+                                                                  'createdAt': DateTime.now(),
+                                                                });
                                                                 QuickAlert.show(
                                                                   context:
                                                                       context,
@@ -810,6 +819,9 @@ class _ViewRoomState extends State<ViewRoom> {
                                         title: 'Cleaning successful',
                                         context: (context),
                                         type: QuickAlertType.success);
+                                    setState(() {
+                                    });
+                                    _onRefresh();
                                   } catch (e) {
                                     print(e);
                                   }

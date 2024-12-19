@@ -3,10 +3,13 @@ import 'dart:io';
 
 import 'package:bh_finder/Screen/Chat/chat.boarders.dart';
 import 'package:bh_finder/Screen/Owner/owner.nav.dart';
+import 'package:bh_finder/Screen/Owner/reservation/view.user.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:image_picker/image_picker.dart';
@@ -196,6 +199,21 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                   userRole == 'Boarder'
                                       ? SizedBox()
                                       : GestureDetector(
+                                    onTap: () async {
+                                      Get.to(()=>ViewUser(), arguments: [data['boarderEmail'], data['boarderUuId']]);
+                                    },
+                                    child: const CircleAvatar(
+                                      radius: 15,
+                                      child: Icon(
+                                        Icons.person,
+                                        size: 15,
+                                      ),
+                                    ),
+                                  ),
+                                  10.widthBox,
+                                  userRole == 'Boarder'
+                                      ? SizedBox()
+                                      : GestureDetector(
                                           onTap: () async {
                                             FlutterPhoneDirectCaller.callNumber(
                                                 '${data['boardersConNumber']}');
@@ -214,15 +232,20 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                               const SizedBox(height: 5),
                               Row(
                                 children: [
-                                  'Boarding House :'.text.size(15).light.make(),
+                                  'Name :'.text.size(15).light.make(),
                                   const Spacer(),
-                                  Flexible(
-                                    child: '${data['boardersName']}'
-                                        .text
-                                        .overflow(TextOverflow.fade)
-                                        .size(15)
-                                        .light
-                                        .make(),
+                                  GestureDetector(
+                                    onTap: (){
+                                      Get.to(()=>ViewUser(), arguments: [data['boarderEmail'], data['boarderUuId']]);
+                                    },
+                                    child: Flexible(
+                                      child: '${data['boardersName']}'
+                                          .text
+                                          .overflow(TextOverflow.fade)
+                                          .size(15)
+                                          .light
+                                          .make(),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -258,7 +281,10 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                 ],
                               ),
                               Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
+                                  'Contact No. :'.text.size(15).light.make(),
+                                  const Spacer(),
                                   '${data['boardersConNumber']}'
                                       .text
                                       .size(15)
@@ -373,7 +399,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                             .pushAndRemoveUntil(
                                                           MaterialPageRoute(
                                                               builder: (context) =>
-                                                                  OwnerHomeScreen()),
+                                                                  OwnerNav()),
                                                           (Route<dynamic>
                                                                   route) =>
                                                               false, // Remove all previous routes
@@ -600,14 +626,14 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                       .set({
                                                     'createdAt': DateTime.now(),
                                                     'message':
-                                                        "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you!",
+                                                        "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you! - ${widget.bName}",
                                                     'boarderID':
                                                         data['boarderUuId'],
                                                     'status': false,
                                                   });
                                                   String title = '$BhouseName';
                                                   String body =
-                                                      "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you!";
+                                                      "Hi ${data['boardersName']}, great news! Your reservation for room ${data['roomNumber']} has been confirmed. You're all set to check in on the expected date. We look forward to welcoming you! - ${widget.bName}";
                                                   sendPushMessage(body, title);
                                                   // Update the 'read' field for all reservations where boarderUuId is not equal to the given ID
                                                   QuerySnapshot querySnapshot =
@@ -649,7 +675,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                                           .pushAndRemoveUntil(
                                                         MaterialPageRoute(
                                                             builder: (context) =>
-                                                                OwnerHomeScreen()),
+                                                                OwnerNav()),
                                                         (Route<dynamic>
                                                                 route) =>
                                                             false, // Remove all previous routes

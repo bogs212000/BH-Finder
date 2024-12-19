@@ -31,6 +31,7 @@ class AdminBHouseScreen extends StatefulWidget {
 class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
   late Future<DocumentSnapshot> bHouseData;
   User? currentUser = FirebaseAuth.instance.currentUser;
+  bool isSwitched = false;
 
   @override
   void initState() {
@@ -105,6 +106,54 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                         ),
                         child: Column(
                           children: [
+                            Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                SizedBox(
+                                  height: 30,
+                                  child: Switch(
+                                    value: isSwitched,
+                                    onChanged: (value) async {
+                                      setState(() {
+                                        isSwitched =
+                                            value; // Update the local state of the switch
+                                      });
+
+                                      // Update data in Firestore
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection(
+                                                'BoardingHouses') // Replace with your collection name
+                                            .doc(data[
+                                                'Email']) // Replace with your document ID
+                                            .update({
+                                          'verified': value
+                                        }); // Replace 'switchState' with your field name
+
+                                        // Optional: Show a confirmation message
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Switch state updated successfully!')),
+                                        );
+                                      } catch (e) {
+                                        // Handle errors
+                                        print("Failed to update data: $e");
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Failed to update switch state!')),
+                                        );
+                                      }
+                                    },
+                                    activeTrackColor: Colors.lightGreenAccent,
+                                    activeColor: Colors.green,
+                                  ),
+                                ),
+                              ],
+                            ),
                             Row(
                               children: [
                                 Expanded(
@@ -393,14 +442,16 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                       Row(
                                         children: [
                                           GestureDetector(
-                                            onTap: (){
+                                            onTap: () {
                                               showDialog(
                                                 context: context,
-                                                builder: (BuildContext context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   return Dialog(
                                                     child: InteractiveViewer(
                                                       child: CachedNetworkImage(
-                                                        imageUrl: datas['ImageID']!,
+                                                        imageUrl:
+                                                            datas['ImageID']!,
                                                         fit: BoxFit.contain,
                                                       ),
                                                     ),
@@ -417,14 +468,16 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                           ),
                                           SizedBox(width: 5),
                                           GestureDetector(
-                                            onTap: (){
+                                            onTap: () {
                                               showDialog(
                                                 context: context,
-                                                builder: (BuildContext context) {
+                                                builder:
+                                                    (BuildContext context) {
                                                   return Dialog(
                                                     child: InteractiveViewer(
                                                       child: CachedNetworkImage(
-                                                        imageUrl: datas['ImageIdPermit']!,
+                                                        imageUrl: datas[
+                                                            'ImageIdPermit']!,
                                                         fit: BoxFit.contain,
                                                       ),
                                                     ),
@@ -435,13 +488,13 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                             child: Container(
                                               height: 100,
                                               child: CachedNetworkImage(
-                                                imageUrl: datas['ImageIdPermit'],
+                                                imageUrl:
+                                                    datas['ImageIdPermit'],
                                               ),
                                             ),
                                           ),
                                         ],
                                       ),
-
                                     ],
                                   ),
                                 );
@@ -496,8 +549,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey,
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      20),
+                                                      BorderRadius.circular(20),
                                                 ),
                                               ),
                                             ),
@@ -515,8 +567,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                 decoration: BoxDecoration(
                                                   color: Colors.grey,
                                                   borderRadius:
-                                                  BorderRadius.circular(
-                                                      20),
+                                                      BorderRadius.circular(20),
                                                 ),
                                               ),
                                             ),
@@ -539,19 +590,20 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                       // Use the length of the fetched data
                                       itemBuilder: (context, index) {
                                         Map<String, dynamic> datas =
-                                        snapshot.data!.docs[index].data()!
-                                        as Map<String, dynamic>;
+                                            snapshot.data!.docs[index].data()!
+                                                as Map<String, dynamic>;
                                         return Padding(
-                                          padding: const EdgeInsets.only(
-                                              bottom: 10),
+                                          padding:
+                                              const EdgeInsets.only(bottom: 10),
                                           child: GestureDetector(
                                             onTap: () {
                                               setState(() {
                                                 rRoomsDocId =
-                                                datas['roomDocId'];
+                                                    datas['roomDocId'];
                                               });
                                               print('room ID: $roomId');
-                                              Get.to(()=>RoomScreen(), arguments: [data['token']]);
+                                              Get.to(() => RoomScreen(),
+                                                  arguments: [data['token']]);
                                               // Navigator.pushNamedAndRemoveUntil(
                                               //   context,
                                               //   '/RoomScreen',
@@ -567,7 +619,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius:
-                                                BorderRadius.circular(10),
+                                                    BorderRadius.circular(10),
                                               ),
                                               child: Row(
                                                 children: [
@@ -576,8 +628,8 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                     height: 90,
                                                     decoration: BoxDecoration(
                                                       borderRadius:
-                                                      BorderRadius
-                                                          .circular(10),
+                                                          BorderRadius.circular(
+                                                              10),
                                                       image: DecorationImage(
                                                         image: NetworkImage(
                                                           datas['roomImage'] ??
@@ -593,30 +645,29 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                       color: Colors.white,
                                                       child: Column(
                                                         mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
+                                                            MainAxisAlignment
+                                                                .center,
                                                         crossAxisAlignment:
-                                                        CrossAxisAlignment
-                                                            .start,
+                                                            CrossAxisAlignment
+                                                                .start,
                                                         children: [
                                                           Text(
                                                             '${datas['roomNameNumber']}',
                                                             style: TextStyle(
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                               fontSize: 15,
                                                             ),
                                                           ),
                                                           Text(
-                                                            datas[
-                                                            'roomStatus'],
+                                                            datas['roomStatus'],
                                                             style: TextStyle(
                                                               color: Colors
                                                                   .orangeAccent,
                                                               fontWeight:
-                                                              FontWeight
-                                                                  .w300,
+                                                                  FontWeight
+                                                                      .w300,
                                                             ),
                                                           ),
                                                         ],
@@ -626,25 +677,24 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                                   Container(
                                                     width: 110,
                                                     padding:
-                                                    EdgeInsets.symmetric(
-                                                        horizontal: 10),
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10),
                                                     child: Column(
                                                       mainAxisAlignment:
-                                                      MainAxisAlignment
-                                                          .center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                       children: [
                                                         Row(
                                                           mainAxisAlignment:
-                                                          MainAxisAlignment
-                                                              .end,
+                                                              MainAxisAlignment
+                                                                  .end,
                                                           children: [
                                                             Text(
                                                               '₱ ${datas['price'] ?? '---'} per month',
-                                                              style:
-                                                              TextStyle(
+                                                              style: TextStyle(
                                                                 fontWeight:
-                                                                FontWeight
-                                                                    .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                                 fontSize: 10,
                                                               ),
                                                             ),

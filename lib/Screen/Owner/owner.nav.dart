@@ -3,6 +3,7 @@ import 'package:bh_finder/Screen/Chat/owner.chat.list.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Owner/BHouseProfile/bhouse.profile.dart';
 import 'package:bh_finder/Screen/Owner/owner.home.screen.dart';
+import 'package:bh_finder/Screen/Owner/payment.logs.dart';
 import 'package:bh_finder/Screen/Profile/user.profile.dart';
 import 'package:bh_finder/Screen/Search/search.screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -13,6 +14,8 @@ import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -37,7 +40,7 @@ class _OwnerNavState extends State<OwnerNav> {
   List<Widget> tabItems = [
     OwnerHomeScreen(),
     OwnerChatList(),
-    OwnerNotificationScreen(),
+    PaymentLogs(),
     BHouseProfile(),
   ];
 
@@ -254,7 +257,7 @@ class _OwnerNavState extends State<OwnerNav> {
                       child: GestureDetector(
                         onTap: () async {
                           setState(() {
-                            selectedIndex = 2;
+                           Get.to(()=>OwnerNotificationScreen());
                           });
                           await FirebaseFirestore.instance
                               .collection('BoardingHouses')
@@ -456,8 +459,8 @@ class _OwnerNavState extends State<OwnerNav> {
             title: Text('Chats'),
           ),
           FlashyTabBarItem(
-            icon: Icon(Icons.notifications_active),
-            title: Text('Notifications'),
+            icon: Icon(Icons.featured_play_list),
+            title: Text('Logs'),
           ),
           FlashyTabBarItem(
             icon: Icon(Icons.account_circle),

@@ -165,7 +165,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
       /// default FCM channel to enable heads up notifications.
       await flutterLocalNotificationsPlugin
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.createNotificationChannel(channel);
 
       /// Update the iOS foreground notification presentation options to allow
@@ -288,16 +288,18 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                     children: [
                                       Row(
                                         children: [
-                                          GestureDetector(onTap: (){
-                                            setState(() {
-                                              selectedIndex = 3;
-                                            });
-                                          },
-                                            child: '${data['BoardingHouseName']}'
-                                                .text
-                                                .bold
-                                                .size(20)
-                                                .make(),
+                                          GestureDetector(
+                                            onTap: () {
+                                              setState(() {
+                                                selectedIndex = 3;
+                                              });
+                                            },
+                                            child:
+                                                '${data['BoardingHouseName']}'
+                                                    .text
+                                                    .bold
+                                                    .size(20)
+                                                    .make(),
                                           ),
                                         ],
                                       ),
@@ -326,7 +328,7 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 15),
                   child: Container(
-                    padding:  EdgeInsets.all(15),
+                    padding: EdgeInsets.all(15),
                     width: double.infinity,
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(10),
@@ -341,11 +343,18 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                         Row(
                           children: [
                             Icon(Icons.bed, color: Colors.white, size: 30),
-                            '  Rooms'.text.bold.color(Colors.white).size(20).make(),
+                            '  Rooms'
+                                .text
+                                .bold
+                                .color(Colors.white)
+                                .size(20)
+                                .make(),
                             Spacer(),
                             GestureDetector(
-                              onTap: () => Navigator.pushNamed(context, '/ListRoomsScreen'),
-                              child: Icon(Icons.arrow_forward_ios, color: Colors.white),
+                              onTap: () => Navigator.pushNamed(
+                                  context, '/ListRoomsScreen'),
+                              child: Icon(Icons.arrow_forward_ios,
+                                  color: Colors.white),
                             ),
                           ],
                         ),
@@ -401,6 +410,8 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                                   isEqualTo: OwnerUuId)
                                               .where('status',
                                                   isEqualTo: 'pending')
+                                              .where('status',
+                                                  isEqualTo: 're-rent')
                                               .orderBy('createdAt',
                                                   descending: true)
                                               .snapshots(),
@@ -512,10 +523,14 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                                     print(rBHouseDocId);
                                                     Navigator.push(
                                                         context,
-                                                    MaterialPageRoute(
-                                                        builder: (context) => ViewReservationScreen(
-                                                          token: data['token'], bName: data['BoardingHouseName'],
-                                                        )));
+                                                        MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                ViewReservationScreen(
+                                                                  token: data[
+                                                                      'token'],
+                                                                  bName: data[
+                                                                      'BoardingHouseName'],
+                                                                )));
                                                   },
                                                   child: Padding(
                                                     padding:
@@ -734,107 +749,100 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
         ),
       ),
     );
-
   }
 
-
-
-
-
-
-    void _showToast() async {
-      print('Showing Toast'); // Debugging
-      SmartDialog.showToast(
-        'This is a test toast message.',
-      );
-    }
-
-    void _getLocationSuc() async {
-      print('Showing Toast'); // Debugging
-      SmartDialog.showToast(
-        maskColor: Colors.green,
-        'Success fetching location.',
-      );
-    }
-
-    Route _toBhouseScreen() {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, anotherAnimation) => BHouseScreen(),
-        transitionDuration: Duration(milliseconds: 1000),
-        reverseTransitionDuration: Duration(milliseconds: 200),
-        transitionsBuilder: (context, animation, anotherAnimation, child) {
-          animation = CurvedAnimation(
-              parent: animation,
-              reverseCurve: Curves.fastOutSlowIn,
-              curve: Curves.fastLinearToSlowEaseIn);
-
-          return SlideTransition(
-              position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-                  .animate(animation),
-              child: BHouseScreen());
-        },
-      );
-    }
-
-    Route _toNotificationScreen() {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, anotherAnimation) =>
-            OwnerNotificationScreen(),
-        transitionDuration: Duration(milliseconds: 1000),
-        reverseTransitionDuration: Duration(milliseconds: 200),
-        transitionsBuilder: (context, animation, anotherAnimation, child) {
-          animation = CurvedAnimation(
-              parent: animation,
-              reverseCurve: Curves.fastOutSlowIn,
-              curve: Curves.fastLinearToSlowEaseIn);
-
-          return SlideTransition(
-              position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-                  .animate(animation),
-              child: OwnerNotificationScreen());
-        },
-      );
-    }
-
-    Route _toRoomsOwnerScreen() {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, anotherAnimation) =>
-            RoomsOwnerScreen(),
-        transitionDuration: Duration(milliseconds: 1000),
-        reverseTransitionDuration: Duration(milliseconds: 200),
-        transitionsBuilder: (context, animation, anotherAnimation, child) {
-          animation = CurvedAnimation(
-              parent: animation,
-              reverseCurve: Curves.fastOutSlowIn,
-              curve: Curves.fastLinearToSlowEaseIn);
-
-          return SlideTransition(
-              position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-                  .animate(animation),
-              child: RoomsOwnerScreen());
-        },
-      );
-    }
-
-    Route _toMapScreen() {
-      return PageRouteBuilder(
-        pageBuilder: (context, animation, anotherAnimation) => BHouseAddress(),
-        transitionDuration: Duration(milliseconds: 1000),
-        reverseTransitionDuration: Duration(milliseconds: 200),
-        transitionsBuilder: (context, animation, anotherAnimation, child) {
-          animation = CurvedAnimation(
-              parent: animation,
-              reverseCurve: Curves.fastOutSlowIn,
-              curve: Curves.fastLinearToSlowEaseIn);
-
-          return SlideTransition(
-              position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-                  .animate(animation),
-              child: BHouseAddress());
-        },
-      );
-    }
+  void _showToast() async {
+    print('Showing Toast'); // Debugging
+    SmartDialog.showToast(
+      'This is a test toast message.',
+    );
   }
+
+  void _getLocationSuc() async {
+    print('Showing Toast'); // Debugging
+    SmartDialog.showToast(
+      maskColor: Colors.green,
+      'Success fetching location.',
+    );
+  }
+
+  Route _toBhouseScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) => BHouseScreen(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: BHouseScreen());
+      },
+    );
+  }
+
+  Route _toNotificationScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) =>
+          OwnerNotificationScreen(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: OwnerNotificationScreen());
+      },
+    );
+  }
+
+  Route _toRoomsOwnerScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) => RoomsOwnerScreen(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: RoomsOwnerScreen());
+      },
+    );
+  }
+
+  Route _toMapScreen() {
+    return PageRouteBuilder(
+      pageBuilder: (context, animation, anotherAnimation) => BHouseAddress(),
+      transitionDuration: Duration(milliseconds: 1000),
+      reverseTransitionDuration: Duration(milliseconds: 200),
+      transitionsBuilder: (context, animation, anotherAnimation, child) {
+        animation = CurvedAnimation(
+            parent: animation,
+            reverseCurve: Curves.fastOutSlowIn,
+            curve: Curves.fastLinearToSlowEaseIn);
+
+        return SlideTransition(
+            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
+                .animate(animation),
+            child: BHouseAddress());
+      },
+    );
+  }
+}
 
 // Method to mask the user's name
 String _formatName(String name) {
@@ -853,77 +861,72 @@ String _formatName(String name) {
   return formattedName; // Ensure to return the formatted name
 }
 
+// Loading shimmer for when data is loading
+Widget _buildLoadingShimmer() {
+  return ListView.builder(
+    physics: BouncingScrollPhysics(),
+    itemCount: 6,
+    itemBuilder: (context, index) {
+      return Padding(
+        padding: const EdgeInsets.all(10.0),
+        child: Shimmer.fromColors(
+          baseColor: Colors.grey.withOpacity(0.3),
+          highlightColor: Colors.white.withOpacity(0.2),
+          child: Container(
+            height: 100,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(10),
+            ),
+          ),
+        ),
+      );
+    },
+  );
+}
 
-
-
-  // Loading shimmer for when data is loading
-  Widget _buildLoadingShimmer() {
-    return ListView.builder(
-      physics: BouncingScrollPhysics(),
-      itemCount: 6,
-      itemBuilder: (context, index) {
-        return Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Shimmer.fromColors(
-            baseColor: Colors.grey.withOpacity(0.3),
-            highlightColor: Colors.white.withOpacity(0.2),
-            child: Container(
-              height: 100,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(10),
-              ),
+Widget _buildRoomInfo(
+    BuildContext context, String label, Future<int> future, String? route) {
+  return FutureBuilder<int>(
+    future: future,
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return Shimmer.fromColors(
+          baseColor: Colors.grey.shade200.withOpacity(0.5),
+          highlightColor: Colors.white.withOpacity(0.3),
+          child: Container(
+            height: 30,
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.grey,
+              borderRadius: BorderRadius.circular(20),
             ),
           ),
         );
-      },
-    );
-  }
-  Widget _buildRoomInfo(
-      BuildContext context, String label, Future<int> future, String? route) {
-    return FutureBuilder<int>(
-      future: future,
-      builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey.shade200.withOpacity(0.5),
-            highlightColor: Colors.white.withOpacity(0.3),
-            child: Container(
-              height: 30,
-              width: double.infinity,
-              decoration: BoxDecoration(
-                color: Colors.grey,
-                borderRadius: BorderRadius.circular(20),
-              ),
+      } else if (snapshot.hasError) {
+        return Center(child: Text('Error fetching data'));
+      } else if (snapshot.hasData) {
+        final int roomCount = snapshot.data ?? 0;
+        return Row(
+          children: [
+            Text(
+              roomCount.toString(),
+              style: TextStyle(fontSize: 15, color: Colors.white),
             ),
-          );
-        } else if (snapshot.hasError) {
-          return Center(child: Text('Error fetching data'));
-        } else if (snapshot.hasData) {
-          final int roomCount = snapshot.data ?? 0;
-          return Row(
-            children: [
-              Text(
-                roomCount.toString(),
-                style: TextStyle(
-                    fontSize: 15,
-                    color: Colors.white),
-              ),
-              Text(
-                ' - $label',
-                style: TextStyle(fontSize: 16, color: Colors.white),
-              ),
-              Spacer(),
-
-            ],
-          );
-        } else {
-          return Center(child: Text('No data available'));
-        }
-      },
-    );
-  }
+            Text(
+              ' - $label',
+              style: TextStyle(fontSize: 16, color: Colors.white),
+            ),
+            Spacer(),
+          ],
+        );
+      } else {
+        return Center(child: Text('No data available'));
+      }
+    },
+  );
+}
 
 // Method to create a review tile
 Widget _buildReviewTile(String name, String date, String review, double rate) {

@@ -3,6 +3,7 @@ import 'package:bh_finder/Screen/Loading/loading.bhouse.screen.dart';
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Profile/user.edit.profile.dart';
 import 'package:bh_finder/Screen/TermsAndConditons/terms.conditions.dart';
+import 'package:bh_finder/Screen/about/about.screen.dart';
 import 'package:bh_finder/cons.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -251,7 +252,7 @@ class _UserProfileState extends State<UserProfile> {
                               Divider(),
                               GestureDetector(
                                 onTap: (){
-
+                                  Get.to(()=>AboutScreen());
                                 },
                                 child: Row(
                                   children: [

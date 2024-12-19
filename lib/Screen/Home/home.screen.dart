@@ -1,6 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
 import 'dart:async';
+import 'package:bh_finder/Screen/Home/rerent.dart';
 import 'package:bh_finder/Screen/Home/tab.widget.dart';
 import 'package:bh_finder/Screen/Receipt/receipt.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
@@ -189,7 +190,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   padding:
                   const EdgeInsets.only(left: 20, right: 20, top: 10),
                   child: TextField(
-                    textCapitalization: TextCapitalization.words,
+                    textCapitalization: TextCapitalization.sentences,
                     onChanged: (value) {
                       setState(() {
                         search = value;
@@ -388,15 +389,11 @@ class _HomeScreenState extends State<HomeScreen> {
                                             SizedBox(
                                               height: 25,
                                               child: ElevatedButton(
-      
                                                 onPressed: () {
-                                                  Navigator.push(
-                                                      context,
-                                                      MaterialPageRoute(
-                                                        builder: (context) => ReceiptScreen(
-                                                          roomId: data['roomDocId'],
-                                                        ),
-                                                      ));
+                                                  setState(() {
+                                                    rerentOwnerId = data['ownerUid'];
+                                                  });
+                                                      Get.to(()=>RerentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
                                                 },
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor: Color.fromRGBO(
@@ -566,7 +563,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                                         print(
                                                             "$OwnerUuId, $rBHouseDocId");
                                                       });
-                                                      Get.to(()=>BHouseScreen(), arguments: [data['OwnerUId'],data['Email'] ]);
+                                                      Get.to(()=>BHouseScreen(), arguments: [data['OwnerUId'],data['Email'], data["OwnerUId"] ]);
                                                       // Navigator.of(context)
                                                       //     .pushAndRemoveUntil(
                                                       //   _toBhouseScreen(),

@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:bh_finder/Auth/auth.wrapper.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
+import 'package:bh_finder/Screen/about/about.screen.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -298,28 +299,51 @@ class _SignInScreenState extends State<SignInScreen> {
                             ),
                           ),
                         ),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/SignUpScreen');
-                          },
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              "Don't have an account?  ".text.light.make(),
-                              "Sign up".text.bold.make(),
-                            ],
-                          ),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/SignUpScreen');
+                              },
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  "Don't have an account?  ".text.light.make(),
+                                  "Sign up".text.bold.make(),
+                                ],
+                              ),
+                            ),
+                          ],
                         ),
-                        SizedBox(height: 20),
-                        GestureDetector(
-                          onTap: () {
-                            Navigator.pushNamed(context, '/TermsAndConditions');
-                          },
-                          child: 'Terms and Conditions'
-                              .text
-                              .light
-                              .color(Colors.black)
-                              .make(),
+                        SizedBox(height: 15),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Navigator.pushNamed(context, '/TermsAndConditions');
+                              },
+                              child: 'Terms and Conditions'
+                                  .text
+                                  .light
+                                  .color(Colors.black)
+                                  .make(),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 15),
+                        Row(
+                          children: [
+                            GestureDetector(
+                              onTap: () {
+                                Get.to(()=> AboutScreen());
+                              },
+                              child: 'About'
+                                  .text
+                                  .light
+                                  .color(Colors.black)
+                                  .make(),
+                            ),
+                          ],
                         ),
                         Spacer(),
                         GestureDetector(

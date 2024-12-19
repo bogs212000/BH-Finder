@@ -36,7 +36,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
   late Future<DocumentSnapshot> bHouseData;
   User? currentUser = FirebaseAuth.instance.currentUser;
   final RefreshController _refreshController =
-      RefreshController(initialRefresh: false);
+  RefreshController(initialRefresh: false);
   double? rating;
 
   @override
@@ -111,7 +111,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
               return const Center(child: Text('No Reservation found'));
             }
             Map<String, dynamic> data =
-                snapshot.data!.data() as Map<String, dynamic>;
+            snapshot.data!.data() as Map<String, dynamic>;
             bUuId = data['OwnerUId'];
             print(bUuId);
             List<dynamic> ratings = data['ratings'];
@@ -240,28 +240,28 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                   future: fetchRoomsAvailable(),
                                                   builder: (context, snapshot) {
                                                     if (snapshot
-                                                            .connectionState ==
+                                                        .connectionState ==
                                                         ConnectionState.waiting) {
                                                       return Shimmer.fromColors(
                                                         baseColor:
-                                                            Colors.grey.shade200,
+                                                        Colors.grey.shade200,
                                                         highlightColor:
-                                                            Colors.white,
+                                                        Colors.white,
                                                         child: Padding(
                                                           padding:
-                                                              EdgeInsets.only(
-                                                                  left: 5,
-                                                                  right: 5),
+                                                          EdgeInsets.only(
+                                                              left: 5,
+                                                              right: 5),
                                                           child: Container(
                                                             height: 20,
                                                             width: 40,
                                                             decoration:
-                                                                BoxDecoration(
+                                                            BoxDecoration(
                                                               color: Colors.grey,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  20),
                                                             ),
                                                           ),
                                                         ),
@@ -273,24 +273,24 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                               'Error fetching data')); // Handle error
                                                     } else if (snapshot.hasData) {
                                                       final int
-                                                          roomCountAvailable =
+                                                      roomCountAvailable =
                                                           snapshot.data ??
                                                               0; // Get the count of rooms with the OwnersID
                                                       return roomCountAvailable == null
                                                           ? '0'
-                                                              .text
-                                                              .bold
-                                                              .size(25)
-                                                              .center
-                                                              .color(
-                                                                  Colors.red[400])
-                                                              .make()
+                                                          .text
+                                                          .bold
+                                                          .size(25)
+                                                          .center
+                                                          .color(
+                                                          Colors.red[400])
+                                                          .make()
                                                           : '$roomCountAvailable'
-                                                              .text
-                                                              .light
-                                                              .color(Colors.green)
-                                                              .size(15)
-                                                              .make();
+                                                          .text
+                                                          .light
+                                                          .color(Colors.green)
+                                                          .size(15)
+                                                          .make();
                                                     } else {
                                                       return Center(
                                                           child: Text(
@@ -300,31 +300,31 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                 ),
                                                 FutureBuilder<int>(
                                                   future:
-                                                      fetchRoomsWithOwnersID(),
+                                                  fetchRoomsWithOwnersID(),
                                                   builder: (context, snapshot) {
                                                     if (snapshot
-                                                            .connectionState ==
+                                                        .connectionState ==
                                                         ConnectionState.waiting) {
                                                       return Shimmer.fromColors(
                                                         baseColor:
-                                                            Colors.grey.shade200,
+                                                        Colors.grey.shade200,
                                                         highlightColor:
-                                                            Colors.white,
+                                                        Colors.white,
                                                         child: Padding(
                                                           padding:
-                                                              EdgeInsets.only(
-                                                                  left: 5,
-                                                                  right: 5),
+                                                          EdgeInsets.only(
+                                                              left: 5,
+                                                              right: 5),
                                                           child: Container(
                                                             height: 20,
                                                             width: 40,
                                                             decoration:
-                                                                BoxDecoration(
+                                                            BoxDecoration(
                                                               color: Colors.grey,
                                                               borderRadius:
-                                                                  BorderRadius
-                                                                      .circular(
-                                                                          20),
+                                                              BorderRadius
+                                                                  .circular(
+                                                                  20),
                                                             ),
                                                           ),
                                                         ),
@@ -336,24 +336,24 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                               'Error fetching data')); // Handle error
                                                     } else if (snapshot.hasData) {
                                                       final int
-                                                          roomCountAvailable =
+                                                      roomCountAvailable =
                                                           snapshot.data ??
                                                               0; // Get the count of rooms with the OwnersID
                                                       return roomCountAvailable == null
                                                           ? '0'
-                                                              .text
-                                                              .bold
-                                                              .size(25)
-                                                              .center
-                                                              .color(
-                                                                  Colors.red[400])
-                                                              .make()
+                                                          .text
+                                                          .bold
+                                                          .size(25)
+                                                          .center
+                                                          .color(
+                                                          Colors.red[400])
+                                                          .make()
                                                           : '/$roomCountAvailable'
-                                                              .text
-                                                              .light
-                                                              .color(Colors.green)
-                                                              .size(15)
-                                                              .make();
+                                                          .text
+                                                          .light
+                                                          .color(Colors.green)
+                                                          .size(15)
+                                                          .make();
                                                     } else {
                                                       return Center(
                                                           child: Text(
@@ -378,9 +378,9 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                   },
                                                   child: Row(
                                                     mainAxisAlignment:
-                                                        MainAxisAlignment.start,
+                                                    MainAxisAlignment.start,
                                                     children:
-                                                        List.generate(5, (index) {
+                                                    List.generate(5, (index) {
                                                       if (index <
                                                           clampedRating.toInt()) {
                                                         // Filled star
@@ -402,7 +402,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                     }),
                                                   ),
                                                 ),
-                                                 ' ${numberOfReviews.toString()} reviews'.text.bold.gray500.make(),
+                                                ' ${numberOfReviews.toString()} reviews'.text.bold.gray500.make(),
                                               ],
                                             ),
                                             Row(children: [
@@ -423,7 +423,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                           Navigator.of(context)
                                               .pushAndRemoveUntil(
                                             _toLocationScreen(),
-                                            (Route<dynamic> route) => false,
+                                                (Route<dynamic> route) => false,
                                           );
                                         },
                                         child: Container(
@@ -434,11 +434,11 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                             border: Border.all(
                                                 color: Colors.grey, width: 0.3),
                                             borderRadius:
-                                                BorderRadius.circular(20),
+                                            BorderRadius.circular(20),
                                             boxShadow: [
                                               BoxShadow(
                                                 color:
-                                                    Colors.grey.withOpacity(0.2),
+                                                Colors.grey.withOpacity(0.2),
                                                 spreadRadius: 1,
                                                 blurRadius: 1,
                                                 offset: Offset(0, 1),
@@ -525,8 +525,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                     decoration: BoxDecoration(
                                                       color: Colors.grey,
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
+                                                      BorderRadius.circular(
+                                                          20),
                                                     ),
                                                   ),
                                                 ),
@@ -544,8 +544,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                     decoration: BoxDecoration(
                                                       color: Colors.grey,
                                                       borderRadius:
-                                                          BorderRadius.circular(
-                                                              20),
+                                                      BorderRadius.circular(
+                                                          20),
                                                     ),
                                                   ),
                                                 ),
@@ -568,8 +568,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                           // Use the length of the fetched data
                                           itemBuilder: (context, index) {
                                             Map<String, dynamic> datas =
-                                                snapshot.data!.docs[index].data()!
-                                                    as Map<String, dynamic>;
+                                            snapshot.data!.docs[index].data()!
+                                            as Map<String, dynamic>;
                                             return Padding(
                                               padding: const EdgeInsets.only(
                                                   bottom: 10),
@@ -577,7 +577,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                 onTap: () {
                                                   setState(() {
                                                     rRoomsDocId =
-                                                        datas['roomDocId'];
+                                                    datas['roomDocId'];
                                                   });
                                                   print('room ID: $roomId');
                                                   Get.to(()=>RoomScreen(), arguments: [data['token']]);
@@ -596,7 +596,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                   decoration: BoxDecoration(
                                                     color: Colors.white,
                                                     borderRadius:
-                                                        BorderRadius.circular(10),
+                                                    BorderRadius.circular(10),
                                                   ),
                                                   child: Row(
                                                     children: [
@@ -605,8 +605,8 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                         height: 90,
                                                         decoration: BoxDecoration(
                                                           borderRadius:
-                                                              BorderRadius
-                                                                  .circular(10),
+                                                          BorderRadius
+                                                              .circular(10),
                                                           image: DecorationImage(
                                                             image: NetworkImage(
                                                               datas['roomImage'] ??
@@ -622,30 +622,30 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                           color: Colors.white,
                                                           child: Column(
                                                             mainAxisAlignment:
-                                                                MainAxisAlignment
-                                                                    .center,
+                                                            MainAxisAlignment
+                                                                .center,
                                                             crossAxisAlignment:
-                                                                CrossAxisAlignment
-                                                                    .start,
+                                                            CrossAxisAlignment
+                                                                .start,
                                                             children: [
                                                               Text(
                                                                 '${datas['roomNameNumber']}',
                                                                 style: TextStyle(
                                                                   fontWeight:
-                                                                      FontWeight
-                                                                          .bold,
+                                                                  FontWeight
+                                                                      .bold,
                                                                   fontSize: 15,
                                                                 ),
                                                               ),
                                                               Text(
                                                                 datas[
-                                                                    'roomStatus'],
+                                                                'roomStatus'],
                                                                 style: TextStyle(
                                                                   color: Colors
                                                                       .orangeAccent,
                                                                   fontWeight:
-                                                                      FontWeight
-                                                                          .w300,
+                                                                  FontWeight
+                                                                      .w300,
                                                                 ),
                                                               ),
                                                             ],
@@ -655,25 +655,25 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                                       Container(
                                                         width: 110,
                                                         padding:
-                                                            EdgeInsets.symmetric(
-                                                                horizontal: 10),
+                                                        EdgeInsets.symmetric(
+                                                            horizontal: 10),
                                                         child: Column(
                                                           mainAxisAlignment:
-                                                              MainAxisAlignment
-                                                                  .center,
+                                                          MainAxisAlignment
+                                                              .center,
                                                           children: [
                                                             Row(
                                                               mainAxisAlignment:
-                                                                  MainAxisAlignment
-                                                                      .end,
+                                                              MainAxisAlignment
+                                                                  .end,
                                                               children: [
                                                                 Text(
                                                                   '₱ ${datas['price'] ?? '---'} per month',
                                                                   style:
-                                                                      TextStyle(
+                                                                  TextStyle(
                                                                     fontWeight:
-                                                                        FontWeight
-                                                                            .bold,
+                                                                    FontWeight
+                                                                        .bold,
                                                                     fontSize: 10,
                                                                   ),
                                                                 ),
@@ -715,7 +715,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                 if (currentUser != null) {
                                   Navigator.of(context).pushAndRemoveUntil(
                                     _toHomeScreen(),
-                                    (Route<dynamic> route) => false,
+                                        (Route<dynamic> route) => false,
                                   );
                                 } else {
                                   Get.offAll(()=>GuestScreen());
@@ -731,7 +731,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.white.withOpacity(0.2),
                                   border:
-                                      Border.all(color: Colors.grey, width: 0.3),
+                                  Border.all(color: Colors.grey, width: 0.3),
                                   borderRadius: BorderRadius.circular(20),
                                 ),
                                 child: Center(
@@ -746,46 +746,46 @@ class _BHouseScreenState extends State<BHouseScreen> {
                           Spacer(),
                           currentUser != null
                               ? Padding(
-                                  padding: EdgeInsets.only(top: 40, right: 20),
-                                  child: GestureDetector(
-                                    onTap: () {
-                                      setState(() {
-                                        ownerEmail = data['Email'].toString();
-                                        bHouse =
-                                            data['BoardingHouseName'].toString();
-                                      });
-                                      print('$ownerEmail, $bHouse');
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => ChatOwner(
-                                            emailOwner : data['Email'].toString(),
-                                            token: data['token'],
-                                            ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
-                                          ),
-                                        ),
-                                      );
-
-                                    },
-                                    child: Container(
-                                      height: 35,
-                                      width: 35,
-                                      decoration: BoxDecoration(
-                                        color: Colors.white.withOpacity(0.2),
-                                        border: Border.all(
-                                            color: Colors.grey, width: 0.3),
-                                        borderRadius: BorderRadius.circular(20),
-                                      ),
-                                      child: Center(
-                                        child: Icon(
-                                          Icons.chat_outlined,
-                                          size: 20,
-                                          color: Colors.white,
-                                        ),
-                                      ),
+                            padding: EdgeInsets.only(top: 40, right: 20),
+                            child: GestureDetector(
+                              onTap: () {
+                                setState(() {
+                                  ownerEmail = data['Email'].toString();
+                                  bHouse =
+                                      data['BoardingHouseName'].toString();
+                                });
+                                print('$ownerEmail, $bHouse');
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => ChatOwner(
+                                      emailOwner : data['Email'].toString(),
+                                      token: data['token'],
+                                      ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
                                     ),
                                   ),
-                                )
+                                );
+
+                              },
+                              child: Container(
+                                height: 35,
+                                width: 35,
+                                decoration: BoxDecoration(
+                                  color: Colors.white.withOpacity(0.2),
+                                  border: Border.all(
+                                      color: Colors.grey, width: 0.3),
+                                  borderRadius: BorderRadius.circular(20),
+                                ),
+                                child: Center(
+                                  child: Icon(
+                                    Icons.chat_outlined,
+                                    size: 20,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          )
                               : SizedBox(),
                         ],
                       ),

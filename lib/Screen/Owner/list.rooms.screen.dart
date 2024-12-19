@@ -207,7 +207,7 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.end,
                                             children: [
-                                              GestureDetector(
+                                              data['roomStatus'] != "unavailable" ? GestureDetector(
                                                 onTap: () {
                                                   QuickAlert.show(
                                                     onCancelBtnTap: () {
@@ -294,7 +294,7 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                                   color: Colors.grey,
                                                   size: 25,
                                                 ),
-                                              ),
+                                              ) : SizedBox(),
                                             ],
                                           ),
                                         ],

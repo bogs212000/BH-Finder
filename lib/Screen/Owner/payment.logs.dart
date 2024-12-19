@@ -9,31 +9,26 @@ import '../../cons.dart';
 import '../Home/home.screen.dart';
 import 'owner.home.screen.dart';
 
-class OwnerNotificationScreen extends StatefulWidget {
-  const OwnerNotificationScreen({super.key,});
+class PaymentLogs extends StatefulWidget {
+  const PaymentLogs({super.key,});
 
 
   @override
-  State<OwnerNotificationScreen> createState() => _OwnerNotificationScreenState();
+  State<PaymentLogs> createState() => _PaymentLogsState();
 }
 
-class _OwnerNotificationScreenState extends State<OwnerNotificationScreen> {
+class _PaymentLogsState extends State<PaymentLogs> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: "Notifications".text.make(),
-        centerTitle: true,
-      ),
       body: Container(
         color: Colors.white,
         width: double.infinity,
         height: double.infinity,
         child: StreamBuilder(
           stream: FirebaseFirestore.instance
-              .collection("Notifications")
-              .where('boarderID',
+              .collection("Payment logs")
+              .where('ownerUid',
               isEqualTo:
               ownerID.toString()).orderBy('createdAt', descending: true)
               .snapshots(),
@@ -129,16 +124,26 @@ class _OwnerNotificationScreenState extends State<OwnerNotificationScreen> {
                           Row(
                             children: [
                               Flexible(
-                                child: '${data['message']}'
-                                    .text.overflow(TextOverflow.fade)
+                                child: '${data['boardersName']}'
+                                    .text.bold.overflow(TextOverflow.fade)
                                     .color(Colors.black)
                                     .make(),
                               ),
                             ],
                           ),
+                          Row(children: [
+                            'Paid : ₱${data['price']} '.text.make(),
+                          ],),
                           Row(
                             children: [
                               '$formattedDate'
+                                  .text
+                                  .size(12)
+                                  .light
+                                  .color(Colors.grey)
+                                  .make(),
+                              Spacer(),
+                              data['contactNumber'].toString()
                                   .text
                                   .size(12)
                                   .light

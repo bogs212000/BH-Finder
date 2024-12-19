@@ -32,6 +32,7 @@ String? roomDescriptions;
 String? roomPrice;
 
 DateTime selectedDateCheckIn = DateTime.now();
+DateTime? selectedDateCheckInRerent;
 
 //Boarders
 String? fName;
@@ -77,3 +78,6 @@ int selectedIndex = 0;
 //gcash
 String? gcashNumber;
 String? fetchGcashEmail;
+
+//
+String? rerentOwnerId;
