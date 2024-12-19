@@ -283,8 +283,6 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                               Row(
                                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                 children: [
-                                  'Contact No. :'.text.size(15).light.make(),
-                                  const Spacer(),
                                   '${data['boardersConNumber']}'
                                       .text
                                       .size(15)

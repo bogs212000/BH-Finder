@@ -410,8 +410,6 @@ class _OwnerHomeScreenState extends State<OwnerHomeScreen> {
                                                   isEqualTo: OwnerUuId)
                                               .where('status',
                                                   isEqualTo: 'pending')
-                                              .where('status',
-                                                  isEqualTo: 're-rent')
                                               .orderBy('createdAt',
                                                   descending: true)
                                               .snapshots(),
