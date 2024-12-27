@@ -1,4 +1,5 @@
 import 'package:bh_finder/Screen/about/about.content.dart';
+import 'package:bh_finder/assets/images.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:velocity_x/velocity_x.dart';
@@ -15,7 +16,7 @@ class _AboutScreenState extends State<AboutScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: ''.text.bold.make(),
+        title: 'About App'.text.bold.make(),
         centerTitle: true,
         foregroundColor: Colors.black,
         backgroundColor: Colors.white,
@@ -24,16 +25,40 @@ class _AboutScreenState extends State<AboutScreen> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              aboutContent.about_us.text.bold.make(),
+              SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    Expanded(child: Image.asset(AboutApp.about_us)),
+                    Expanded(child: VxBox(child: aboutContent.about_us.text.bold.size(20).make(),).make())
+                  ],
+                ),
+              ),
               5.heightBox,
               aboutContent.about_us_content_welcome.text.make(),
               aboutContent.about_us_content.text.make(),
               10.heightBox,
-              aboutContent.our_mission.text.bold.make(),
+              SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    Expanded(child: Image.asset(AboutApp.mission)),
+                    Expanded(child: VxBox(child: aboutContent.our_mission.text.bold.size(20).make(),).make())
+                  ],
+                ),
+              ),
               5.heightBox,
               aboutContent.our_mission_content.text.make(),
               10.heightBox,
-              aboutContent.key_feature.text.bold.make(),
+              SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    Expanded(child: Image.asset(AboutApp.feature)),
+                    Expanded(child: VxBox(child: aboutContent.key_feature.text.bold.size(20).make(),).make())
+                  ],
+                ),
+              ),
               5.heightBox,
               Row(
                 children: [
@@ -60,11 +85,20 @@ class _AboutScreenState extends State<AboutScreen> {
                   aboutContent.key_f5.text.start.make(),
                 ],
               ),
-              10.heightBox,
-              aboutContent.for_property_owner.text.bold.make(),
+              20.heightBox,
+              SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    Expanded(child: Image.asset(AboutApp.property_owner)),
+                    Expanded(child: VxBox(child: aboutContent.for_property_owner.text.bold.size(20).make(),).make())
+                  ],
+                ),
+              ),
               5.heightBox,
               aboutContent.for_property_owner_content.text.make(),
               10.heightBox,
+              Image.asset(AboutApp.why, height: 150,),
               aboutContent.choose_us.text.bold.make(),
               5.heightBox,
               aboutContent.choose_us_1.text.make(),

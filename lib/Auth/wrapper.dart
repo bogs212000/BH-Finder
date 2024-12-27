@@ -7,6 +7,7 @@ import 'package:bh_finder/Screen/Owner/OwnerSignUp/waiting.verification.screen.d
 import 'package:bh_finder/Screen/Owner/owner.nav.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:bh_finder/Screen/SignUp/waiting.screen.dart';
+import 'package:bh_finder/Screen/guest/home.guest.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -82,12 +83,12 @@ class Wrapper extends StatelessWidget {
               } else if ((userData.data!['role'] == "Client")) {
                 return NavHome();
               } else {
-                return GuestScreen();
+                return HomeGuest();
               }
             },
           );
         } else {
-          return SignInScreen();
+          return HomeGuest();
         }
       },
     );

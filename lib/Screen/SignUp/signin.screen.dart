@@ -5,6 +5,8 @@ import 'dart:async';
 import 'package:bh_finder/Auth/auth.wrapper.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/about/about.screen.dart';
+import 'package:bh_finder/assets/fonts.dart';
+import 'package:bh_finder/assets/images.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
@@ -52,57 +54,63 @@ class _SignInScreenState extends State<SignInScreen> {
               return false; // Prevent default back button behavior
             },
             child: Scaffold(
+              appBar: AppBar(
+                backgroundColor: Colors.white,
+              ),
               backgroundColor: Colors.white,
               body: Stack(
                 children: [
                   Container(
                     padding: EdgeInsets.only(left: 25, right: 25),
-                    width: double.infinity,
-                    height: double.infinity,
+                    width: MediaQuery.of(context).size.width,
+                    height: MediaQuery.of(context).size.height,
                     child: Column(
                       children: [
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            Image.asset(
-                              'assets/logo.png',
-                              scale: 3,
-                            ),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            'Discover your'
-                                .text
-                                .light
-                                .color(Colors.grey)
-                                .size(25)
-                                .make(),
-                          ],
-                        ),
-                        Row(
-                          children: [
-                            'perfect place to stay'
-                                .text
-                                .bold
-                                .color(Colors.black)
-                                .size(25)
-                                .make(),
-                          ],
-                        ),
-                        Container(
-                          padding: EdgeInsets.only(left: 10, right: 10),
-                          width: double.infinity,
-                          child: Center(
-                            child: Text(
-                              '',
-                              style: TextStyle(color: Colors.red),
-                            ),
+                        SizedBox(
+                          height: 150,
+                          child: Row(
+                            children: [
+                              Expanded(
+                                child: Image.asset(
+                                  AppImages.sign_in,
+                                ),
+                              ),
+                              Expanded(
+                                  child: VxBox(
+                                      child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      'Discover'
+                                          .text
+                                          .bold
+                                          .blue900
+                                          .size(30)
+                                          .make(),
+                                    ],
+                                  ),
+                                  'your perfect place to stay'
+                                      .text
+                                      .fontFamily(AppFonts.quicksand)
+                                      .color(Colors.black)
+                                      .size(25)
+                                      .make(),
+                                ],
+                              )).make())
+                            ],
                           ),
-                        )
-                            .animate()
-                            .fadeIn(curve: Curves.fastOutSlowIn)
-                            .move(delay: 100.ms, duration: 1000.ms),
+                        ),
+
+                        Row(
+                          children: [
+                            'Sign in to continue'
+                                .text
+                            .fontFamily(AppFonts.quicksand)
+                                .size(15)
+                                .make(),
+                          ],
+                        ),
+                        10.heightBox,
                         Padding(
                           padding: const EdgeInsets.only(
                               left: 5, right: 5, bottom: 20),
@@ -320,7 +328,8 @@ class _SignInScreenState extends State<SignInScreen> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Navigator.pushNamed(context, '/TermsAndConditions');
+                                Navigator.pushNamed(
+                                    context, '/TermsAndConditions');
                               },
                               child: 'Terms and Conditions'
                                   .text
@@ -335,13 +344,10 @@ class _SignInScreenState extends State<SignInScreen> {
                           children: [
                             GestureDetector(
                               onTap: () {
-                                Get.to(()=> AboutScreen());
+                                Get.to(() => AboutScreen());
                               },
-                              child: 'About'
-                                  .text
-                                  .light
-                                  .color(Colors.black)
-                                  .make(),
+                              child:
+                                  'About'.text.light.color(Colors.black).make(),
                             ),
                           ],
                         ),

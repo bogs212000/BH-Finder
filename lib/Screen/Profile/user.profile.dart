@@ -10,6 +10,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -78,262 +79,265 @@ class _UserProfileState extends State<UserProfile> {
                 distance: 30,
               ),
               // Custom loading header
-              child: StreamBuilder<DocumentSnapshot>(
-                stream: FirebaseFirestore.instance
-                    .collection('Users')
-                    .doc('$userEmail')
-                    .snapshots(),
-                builder: (BuildContext context,
-                    AsyncSnapshot<DocumentSnapshot> snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const LoadingBHouseScreen();
-                  }
-                  if (snapshot.hasError) {
-                    return const Center(child: Text('Error fetching data'));
-                  }
-                  if (!snapshot.hasData || !snapshot.data!.exists) {
-                    return const Center(child: Text('No Reservation found'));
-                  }
-                  Map<String, dynamic> data =
-                      snapshot.data!.data() as Map<String, dynamic>;
-                  return Padding(
-                    padding: const EdgeInsets.only(left: 20, right: 20),
-                    child: Column(
-                      children: [
-                        SizedBox(height: 20),
-                        Row(
-                          children: [
-                            data['Image'] != ''
-                                ? CircleAvatar(
-                                    radius: 50,
-                                    backgroundImage: CachedNetworkImageProvider(
-                                        '${data['Image']}'), // Path to your image
-                                  )
-                                : const CircleAvatar(
-                                    radius: 50,
-                                    child: Center(
-                                      child: Icon(
-                                        size: 50,
-                                        Icons.account_circle_outlined,
-                                        color: Colors.grey,
+              child: Column(
+                children: [
+                  70.heightBox,
+                  Expanded(
+                    child: StreamBuilder<DocumentSnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('Users')
+                          .doc('$userEmail')
+                          .snapshots(),
+                      builder: (BuildContext context,
+                          AsyncSnapshot<DocumentSnapshot> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return const LoadingBHouseScreen();
+                        }
+                        if (snapshot.hasError) {
+                          return const Center(child: Text('Error fetching data'));
+                        }
+                        if (!snapshot.hasData || !snapshot.data!.exists) {
+                          return const Center(child: Text('No Reservation found'));
+                        }
+                        Map<String, dynamic> data =
+                            snapshot.data!.data() as Map<String, dynamic>;
+                        return Padding(
+                          padding: const EdgeInsets.only(left: 20, right: 20),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 20),
+                              Row(
+                                children: [
+                                  data['Image'] != ''
+                                      ? CircleAvatar(
+                                          radius: 50,
+                                          backgroundImage: CachedNetworkImageProvider(
+                                              '${data['Image']}'), // Path to your image
+                                        )
+                                      : const CircleAvatar(
+                                          radius: 50,
+                                          child: Center(
+                                            child: Icon(
+                                              size: 50,
+                                              Icons.account_circle_outlined,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                        ),
+                                  Expanded(
+                                    child: Container(
+                                      padding: EdgeInsets.all(10),
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              '${data['FirstName']} ${data['MiddleName']} ${data['LastName']}'
+                                                  .text
+                                                  .size(15)
+                                                  .make(),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              '${data['Email']}'
+                                                  .text
+                                                  .light
+                                                  .size(12)
+                                                  .make(),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              '${data['PhoneNumber']}'
+                                                  .text
+                                                  .light
+                                                  .size(12)
+                                                  .make(),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              '${data['address']}'
+                                                  .text
+                                                  .light
+                                                  .size(12)
+                                                  .make(),
+                                            ],
+                                          ),
+                                        ],
                                       ),
                                     ),
-                                  ),
-                            Expanded(
-                              child: Container(
-                                padding: EdgeInsets.all(10),
+                                  )
+                                ],
+                              ),
+                              SizedBox(height: 20),
+                              Container(
+                                padding: EdgeInsets.all(20),
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(10),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color: Colors.grey.withOpacity(0.2),
+                                      spreadRadius: 1,
+                                      blurRadius: 3,
+                                      offset: Offset(0, 0.5),
+                                    ),
+                                  ],
+                                ),
                                 child: Column(
                                   children: [
                                     Row(
-                                      children: [
-                                        '${data['FirstName']} ${data['MiddleName']} ${data['LastName']}'
-                                            .text
-                                            .size(15)
-                                            .make(),
-                                      ],
+                                      children: ['Profile'.text.bold.size(25).make()],
                                     ),
-                                    Row(
-                                      children: [
-                                        '${data['Email']}'
-                                            .text
-                                            .light
-                                            .size(12)
-                                            .make(),
-                                      ],
+                                    Divider(),
+                                    GestureDetector(
+                                      onTap: (){
+                                        Get.to(()=>UserEditProfile(first: data['FirstName'],
+                                            middle: data['MiddleName'],
+                                            last: data['LastName'],
+                                            address: data['address'],
+                                            email: data['Email'],
+                                            phoneNum: data['PhoneNumber'],
+                                            profilePic: data['Image']));
+                                        // Navigator.push(
+                                        //   context,
+                                        //   MaterialPageRoute(
+                                        //     builder: (context) => UserEditProfile(
+                                        //         first: data['FirstName'],
+                                        //         middle: data['MiddleName'],
+                                        //         last: data['LastName'],
+                                        //         address: data['address'],
+                                        //         email: data['Email'],
+                                        //         phoneNum: data['PhoneNumber'],
+                                        //         profilePic: data['Image']),
+                                        //   ),
+                                        // );
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.edit, size: 12),
+                                          ' Edit profile'.text.light.size(15).make(),
+                                          Spacer(),
+                                          Icon(Icons.navigate_next, size: 15),
+                                        ],
+                                      ),
                                     ),
-                                    Row(
-                                      children: [
-                                        '${data['PhoneNumber']}'
-                                            .text
-                                            .light
-                                            .size(12)
-                                            .make(),
-                                      ],
+                                    Divider(),
+                                    GestureDetector(
+                                      onTap: (){
+                    
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.pan_tool_alt, size: 12),
+                                          ' Guide'.text.light.size(15).make(),
+                                          Spacer(),
+                                          Icon(Icons.navigate_next, size: 15),
+                                        ],
+                                      ),
                                     ),
-                                    Row(
-                                      children: [
-                                        '${data['address']}'
-                                            .text
-                                            .light
-                                            .size(12)
-                                            .make(),
-                                      ],
+                                    Divider(),
+                                    GestureDetector(
+                                      onTap: (){
+                                        Get.to(()=>TermsAndConditionsScreen());
+                                        Navigator.pushNamed(
+                                            context, '/TermsAndConditions');
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.book, size: 12),
+                                          ' Terms and Conditions'.text.light.size(15).make(),
+                                          Spacer(),
+                                          Icon(Icons.navigate_next, size: 15),
+                                        ],
+                                      ),
                                     ),
+                                    Divider(),
+                                    GestureDetector(
+                                      onTap: (){
+                                        Get.to(()=>AboutScreen());
+                                      },
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.apps, size: 12),
+                                          ' About'.text.light.size(15).make(),
+                                          Spacer(),
+                                          Icon(Icons.navigate_next, size: 15),
+                                        ],
+                                      ),
+                                    ),
+                                    Divider(),
+                    
                                   ],
                                 ),
                               ),
-                            )
-                          ],
-                        ),
-                        SizedBox(height: 20),
-                        Container(
-                          padding: EdgeInsets.all(20),
-                          width: double.infinity,
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(10),
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.2),
-                                spreadRadius: 1,
-                                blurRadius: 3,
-                                offset: Offset(0, 0.5),
-                              ),
-                            ],
-                          ),
-                          child: Column(
-                            children: [
+                              SizedBox(height: 10),
                               Row(
-                                children: ['Profile'.text.bold.size(25).make()],
+                                mainAxisAlignment: MainAxisAlignment.end,
+                                children: [
+                                  SizedBox(
+                                    height: 40,
+                                    child: GlowButton(
+                                      borderRadius: BorderRadius.circular(20),
+                                      onPressed: () async {
+                                        QuickAlert.show(
+                                          onCancelBtnTap: () {
+                                            Navigator.pop(context);
+                                          },
+                                          onConfirmBtnTap: () async {
+                                            await FirebaseAuth.instance.signOut();
+                                            setState(() {
+                                              bUuId = null;
+                                              ownerEmail = null;
+                                              boardersEmail = null;
+                                            });
+                                            Navigator.pop(context);
+                                            Navigator.of(context).pushAndRemoveUntil(
+                                              MaterialPageRoute(
+                                                builder: (context) => AuthWrapper(),
+                                              ),
+                                              (Route<dynamic> route) =>
+                                                  false, // Removes all previous routes
+                                            );
+                                          },
+                                          context: context,
+                                          type: QuickAlertType.confirm,
+                                          text: 'Do you want to Log out?',
+                                          titleAlignment: TextAlign.center,
+                                          textAlignment: TextAlign.center,
+                                          confirmBtnText: 'Yes',
+                                          cancelBtnText: 'No',
+                                          confirmBtnColor: Colors.blue,
+                                          backgroundColor: Colors.white,
+                                          headerBackgroundColor: Colors.grey,
+                                          confirmBtnTextStyle: const TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          titleColor: Colors.black,
+                                          textColor: Colors.black,
+                                        );
+                                      },
+                                      child: 
+                                      'Log out'
+                                          .text
+                                          .color(Colors.white)
+                                          .bold
+                                          .make(),
+                                    ),
+                                  ),
+                                ],
                               ),
-                              Divider(),
-                              GestureDetector(
-                                onTap: (){
-                                  Get.to(()=>UserEditProfile(first: data['FirstName'],
-                                      middle: data['MiddleName'],
-                                      last: data['LastName'],
-                                      address: data['address'],
-                                      email: data['Email'],
-                                      phoneNum: data['PhoneNumber'],
-                                      profilePic: data['Image']));
-                                  // Navigator.push(
-                                  //   context,
-                                  //   MaterialPageRoute(
-                                  //     builder: (context) => UserEditProfile(
-                                  //         first: data['FirstName'],
-                                  //         middle: data['MiddleName'],
-                                  //         last: data['LastName'],
-                                  //         address: data['address'],
-                                  //         email: data['Email'],
-                                  //         phoneNum: data['PhoneNumber'],
-                                  //         profilePic: data['Image']),
-                                  //   ),
-                                  // );
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.edit, size: 12),
-                                    ' Edit profile'.text.light.size(15).make(),
-                                    Spacer(),
-                                    Icon(Icons.navigate_next, size: 15),
-                                  ],
-                                ),
-                              ),
-                              Divider(),
-                              GestureDetector(
-                                onTap: (){
-
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.pan_tool_alt, size: 12),
-                                    ' Guide'.text.light.size(15).make(),
-                                    Spacer(),
-                                    Icon(Icons.navigate_next, size: 15),
-                                  ],
-                                ),
-                              ),
-                              Divider(),
-                              GestureDetector(
-                                onTap: (){
-                                  Get.to(()=>TermsAndConditionsScreen());
-                                  Navigator.pushNamed(
-                                      context, '/TermsAndConditions');
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.book, size: 12),
-                                    ' Terms and Conditions'.text.light.size(15).make(),
-                                    Spacer(),
-                                    Icon(Icons.navigate_next, size: 15),
-                                  ],
-                                ),
-                              ),
-                              Divider(),
-                              GestureDetector(
-                                onTap: (){
-                                  Get.to(()=>AboutScreen());
-                                },
-                                child: Row(
-                                  children: [
-                                    Icon(Icons.apps, size: 12),
-                                    ' About'.text.light.size(15).make(),
-                                    Spacer(),
-                                    Icon(Icons.navigate_next, size: 15),
-                                  ],
-                                ),
-                              ),
-                              Divider(),
-
+                              SizedBox(height: 10),
                             ],
                           ),
-                        ),
-                        SizedBox(height: 10),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.end,
-                          children: [
-                            SizedBox(
-                              height: 40,
-                              child: ElevatedButton(
-                                onPressed: () async {
-                                  QuickAlert.show(
-                                    onCancelBtnTap: () {
-                                      Navigator.pop(context);
-                                    },
-                                    onConfirmBtnTap: () async {
-                                      await FirebaseAuth.instance.signOut();
-                                      setState(() {
-                                        bUuId = null;
-                                        ownerEmail = null;
-                                        boardersEmail = null;
-                                      });
-                                      Navigator.pop(context);
-                                      Navigator.of(context).pushAndRemoveUntil(
-                                        MaterialPageRoute(
-                                          builder: (context) => AuthWrapper(),
-                                        ),
-                                        (Route<dynamic> route) =>
-                                            false, // Removes all previous routes
-                                      );
-                                    },
-                                    context: context,
-                                    type: QuickAlertType.confirm,
-                                    text: 'Do you want to Log out?',
-                                    titleAlignment: TextAlign.center,
-                                    textAlignment: TextAlign.center,
-                                    confirmBtnText: 'Yes',
-                                    cancelBtnText: 'No',
-                                    confirmBtnColor: Colors.blue,
-                                    backgroundColor: Colors.white,
-                                    headerBackgroundColor: Colors.grey,
-                                    confirmBtnTextStyle: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                    titleColor: Colors.black,
-                                    textColor: Colors.black,
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.blue,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(25),
-                                  ),
-                                ),
-                                child: 'Log out'
-                                    .text
-                                    .color(Colors.white)
-                                    .bold
-                                    .make(),
-                              ),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 10),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
+                  ),
+                ],
               ),
             ),
           );

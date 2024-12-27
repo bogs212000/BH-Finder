@@ -4,6 +4,7 @@ import 'package:bh_finder/Auth/wrapper.dart';
 import 'package:bh_finder/Screen/Home/guest.home.screen.dart';
 import 'package:bh_finder/Screen/SignUp/guest.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
+import 'package:bh_finder/Screen/guest/home.guest.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -31,7 +32,7 @@ class AuthWrapper extends StatelessWidget {
             } else if (snapshot.hasData) {
               return Wrapper();
             } else {
-              return GuestScreen();
+              return HomeGuest();
 
             }
           }),

@@ -80,6 +80,7 @@ dependencies:
   firebase_messaging: ^14.1.2
   flutter_local_notifications: ^13.0.0
   get: ^4.6.6
+  flutter_glow: ^0.3.2
 
 
 #  geolocator: ^9.0.2
@@ -111,6 +112,8 @@ flutter:
   assets:
      - assets/lottie/
      - assets/
+     - assets/images/
+     - assets/fonts/
      - assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json
      - assets/firebase/bh-finder-50ccf-24e13bbe3c81.json
   #   - images/a_dot_ham.jpeg
@@ -126,10 +129,10 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
-  # fonts:
-  #   - family: Schyler
-  #     fonts:
-  #       - asset: fonts/Schyler-Regular.ttf
+  fonts:
+    - family: Quicksand
+      fonts:
+        - asset: assets/fonts/Quicksand-VariableFont_wght.ttf
   #       - asset: fonts/Schyler-Italic.ttf
   #         style: italic
   #   - family: Trajan Pro

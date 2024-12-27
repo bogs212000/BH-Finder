@@ -15,6 +15,8 @@ import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
+import '../../assets/fonts.dart';
+import '../../assets/images.dart';
 import '../../fetch.dart';
 import '../BHouse/bh.screen.dart';
 import '../Loading/loading.bhouse.screen.dart';
@@ -177,9 +179,44 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           child: Column(
             children: [
+              70.heightBox,
+              SizedBox(
+                height: 100,
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: VxBox(child: Image.asset(HomeImages.search))
+                            .white
+                            .make()),
+                    Expanded(
+                      child: VxBox(
+                        child: Column(
+                          children: [
+                            Row(
+                              children: [
+                                'Search'.text.size(30).blue900.bold.make(),
+                              ],
+                            ),
+                            Row(
+                              children: [
+                                'and Discover'
+                                    .text
+                                    .fontFamily(AppFonts.quicksand)
+                                    .size(20)
+                                    .bold
+                                    .make(),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ).white.make(),
+                    ),
+                  ],
+                ),
+              ),
               Padding(
                 padding:
-                const EdgeInsets.only(left: 5, right: 5, top: 10),
+                const EdgeInsets.only(left: 20, right: 20),
                 child: TextField(
                   textCapitalization: TextCapitalization.sentences,
                   onChanged: (value) {
@@ -227,12 +264,11 @@ class _SearchScreenState extends State<SearchScreen> {
                       TextStyle(color: Colors.grey.withOpacity(0.9))),
                 ),
               ),
-
               //List BH
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.only(
-                      right: 5, left: 5, top: 10),
+                      right: 20, left: 20, top: 10),
                   child: Container(
                     width: double.infinity,
                     child: StreamBuilder<QuerySnapshot>(

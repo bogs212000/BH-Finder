@@ -16,6 +16,7 @@ import '../../cons.dart';
 import '../../fetch.dart';
 import '../../main.dart';
 import '../notification/notification.screen.dart';
+import 'new.home.dart';
 
 class NavHome extends StatefulWidget {
   @override
@@ -30,7 +31,7 @@ class _NavHomeState extends State<NavHome> {
   User? currentUser = FirebaseAuth.instance.currentUser;
   late Future<DocumentSnapshot> notification;
   List<Widget> tabItems = [
-    HomeScreen(),
+    Home(),
     ChatList(),
     SearchScreen(),
     UserProfile(),
@@ -160,6 +161,7 @@ class _NavHomeState extends State<NavHome> {
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     return Scaffold(
+      backgroundColor: Colors.transparent,
       // drawer: Drawer(
       //   backgroundColor: Colors.white,
       //   child: ListView(
@@ -192,27 +194,8 @@ class _NavHomeState extends State<NavHome> {
       //   ),
       // ),
       appBar: AppBar(
-        backgroundColor: Colors.white,
-        title: Image.asset(
-          'assets/logo.png',
-          scale: 6,
-        ),
-        flexibleSpace: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-              colors: [
-                brightness == Brightness.light
-                    ? Colors.blue.shade500
-                    : Colors.blue.shade900,
-                brightness == Brightness.light
-                    ? Colors.green.shade300
-                    : Colors.green.shade800,
-              ],
-            ),
-          ),
-        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
         actions: [
           currentUser != null && userEmail != null
               ? StreamBuilder<DocumentSnapshot>(
@@ -285,7 +268,7 @@ class _NavHomeState extends State<NavHome> {
                               child: const Center(
                                 child: Icon(
                                   Icons.notifications_active_outlined,
-                                  color: Colors.white,
+                                  color: Colors.black,
                                 ),
                               ),
                             ),
@@ -323,44 +306,10 @@ class _NavHomeState extends State<NavHome> {
                   },
                 )
               : SizedBox(),
-          currentUser != null
-              ? Padding(
-                  padding: EdgeInsets.only(right: 10),
-                  child: GestureDetector(
-                    onTap: () {
-                      setState(() {
-                        _selectedIndex = 1;
-                      });
-                    },
-                    child: Container(
-                      height: 35,
-                      width: 35,
-                      decoration: BoxDecoration(
-                        color: Colors.white.withOpacity(0.5),
-                        border: Border.all(color: Colors.grey, width: 0.3),
-                        borderRadius: BorderRadius.circular(20),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.grey.withOpacity(0.2),
-                            spreadRadius: 1,
-                            blurRadius: 1,
-                            offset: Offset(0, 1),
-                          ),
-                        ],
-                      ),
-                      child: const Center(
-                        child: Icon(
-                          Icons.chat_outlined,
-                          color: Colors.white,
-                          size: 20,
-                        ),
-                      ),
-                    ),
-                  ),
-                )
-              : SizedBox(),
         ],
       ),
+      extendBodyBehindAppBar: true,
+      drawer: Drawer(),
       body: Center(
         child: tabItems[_selectedIndex],
       ),
