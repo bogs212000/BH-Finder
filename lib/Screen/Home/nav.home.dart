@@ -2,6 +2,7 @@ import 'package:bh_finder/Screen/Chat/chat.list.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Profile/user.profile.dart';
 import 'package:bh_finder/Screen/Search/search.screen.dart';
+import 'package:bh_finder/assets/images.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
@@ -199,7 +200,10 @@ class _NavHomeState extends State<NavHome> {
         actions: [
           currentUser != null && userEmail != null
               ? StreamBuilder<DocumentSnapshot>(
-              stream: FirebaseFirestore.instance.collection('Users').doc(userEmail).snapshots(),
+                  stream: FirebaseFirestore.instance
+                      .collection('Users')
+                      .doc(userEmail)
+                      .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> snapshot) {
                     if (snapshot.connectionState == ConnectionState.waiting) {
@@ -309,7 +313,45 @@ class _NavHomeState extends State<NavHome> {
         ],
       ),
       extendBodyBehindAppBar: true,
-      drawer: Drawer(),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            20.heightBox,
+            Row(
+              children: [
+                10.widthBox,
+                Image.asset(
+                  AppImages.logo,
+                  height: 70,
+                ),
+                'BH Finder'.text.bold.size(20).make(),
+              ],
+            ),
+            20.heightBox,
+            ListTile(
+              leading: Icon(
+                Icons.account_circle, color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Profile'.text.size(15).make(),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.book_outlined, color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'User guide'.text.size(15).make(),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.security, color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Privacy policy'.text.size(15).make(),
+            ),
+          ],
+        ),
+      ),
       body: Center(
         child: tabItems[_selectedIndex],
       ),

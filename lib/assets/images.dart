@@ -10,6 +10,7 @@ class AppImages {
   static const empty = 'assets/images/undraw_empty-street_3ogh.png';
   static const welcome = 'assets/images/undraw_well-done_kqud.png';
   static const sign_in = 'assets/images/undraw_fingerprint-login_19qv.png';
+  static const logo = 'assets/logo.png';
 }
 
 class AboutApp{

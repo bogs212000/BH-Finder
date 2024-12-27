@@ -33,7 +33,8 @@ class _HomeGuestState extends State<HomeGuest> {
               40.heightBox,
               Row(
                 children: [
-                  'Version 1.1'
+                  Image.asset(AppImages.logo, height: 50),
+                  'BH Finder Version 1.1'
                       .text
                       .size(13)
                       .fontFamily(AppFonts.quicksand)

@@ -10,6 +10,7 @@ import 'package:bh_finder/assets/images.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_animate/flutter_animate.dart';
+import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -67,7 +68,7 @@ class _SignInScreenState extends State<SignInScreen> {
                     child: Column(
                       children: [
                         SizedBox(
-                          height: 150,
+                          height: 170,
                           child: Row(
                             children: [
                               Expanded(
@@ -79,6 +80,11 @@ class _SignInScreenState extends State<SignInScreen> {
                                   child: VxBox(
                                       child: Column(
                                 children: [
+                                  Row(
+                                    children: [
+                                      Image.asset(AppImages.logo, height: 50),
+                                    ],
+                                  ),
                                   Row(
                                     children: [
                                       'Discover'
@@ -100,7 +106,7 @@ class _SignInScreenState extends State<SignInScreen> {
                             ],
                           ),
                         ),
-
+                        20.heightBox,
                         Row(
                           children: [
                             'Sign in to continue'
@@ -202,77 +208,26 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         Padding(
-                          padding:
-                              EdgeInsets.only(left: 10, right: 10, bottom: 20),
+                          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
                           child: SizedBox(
-                            height: 40,
-                            child: ElevatedButton(
-                              onPressed: () async {
-                                if (_password.text.isEmpty &&
-                                    _emailPhonenumber.text.isEmpty) {
-                                  setState(() {
-                                    errors =
-                                        'Please input your email and password';
-                                  });
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: 'Error',
-                                    text: '$errors',
-                                  );
-                                } else if (_emailPhonenumber.text.isEmpty) {
-                                  setState(() {
-                                    errors = 'Please input your email';
-                                  });
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: 'Error',
-                                    text: '$errors',
-                                  );
-                                } else if (_password.text.isEmpty) {
-                                  setState(() {
-                                    errors = 'Please input your password';
-                                  });
-                                  QuickAlert.show(
-                                    context: context,
-                                    type: QuickAlertType.error,
-                                    title: 'Error',
-                                    text: '$errors',
-                                  );
-                                } else {
-                                  QuickAlert.show(
-                                    barrierDismissible: false,
-                                    context: context,
-                                    type: QuickAlertType.loading,
-                                    title: 'Signing in...',
-                                    text: 'Please Wait',
-                                  );
-                                  try {
-                                    await FirebaseAuth.instance
-                                        .signInWithEmailAndPassword(
-                                      email: _emailPhonenumber.text.trim(),
-                                      password: _password.text.trim(),
-                                    );
-                                    Navigator.pop(context);
-                                    // Navigate to HomeScreen after closing pop-ups
-                                    Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              AuthWrapper()), // Replace with your HomeScreen
-                                    );
-                                    QuickAlert.show(
-                                      context: context,
-                                      type: QuickAlertType.success,
-                                      title: 'Hello!',
-                                      text: 'Welcome to BH Finder app!',
-                                    );
-                                  } on FirebaseAuthException catch (e) {
-                                    Navigator.pop(context);
+                            height: 50,
+                            width: double.infinity,
+                            child: GlowButton(
+                                borderRadius: BorderRadius.circular(20),
+                                child: Row(
+                                  mainAxisAlignment:
+                                  MainAxisAlignment.center,
+                                  children: [
+                                    'Log in'.text.white.size(15).make(),
+                                  ],
+                                ),
+                                onPressed: () async {
+
+                                  if (_password.text.isEmpty &&
+                                      _emailPhonenumber.text.isEmpty) {
                                     setState(() {
-                                      errors = e
-                                          .message; // Show a user-friendly error message
+                                      errors =
+                                      'Please input your email and password';
                                     });
                                     QuickAlert.show(
                                       context: context,
@@ -280,31 +235,70 @@ class _SignInScreenState extends State<SignInScreen> {
                                       title: 'Error',
                                       text: '$errors',
                                     );
-                                    print('Error: $e');
+                                  } else if (_emailPhonenumber.text.isEmpty) {
+                                    setState(() {
+                                      errors = 'Please input your email';
+                                    });
+                                    QuickAlert.show(
+                                      context: context,
+                                      type: QuickAlertType.error,
+                                      title: 'Error',
+                                      text: '$errors',
+                                    );
+                                  } else if (_password.text.isEmpty) {
+                                    setState(() {
+                                      errors = 'Please input your password';
+                                    });
+                                    QuickAlert.show(
+                                      context: context,
+                                      type: QuickAlertType.error,
+                                      title: 'Error',
+                                      text: '$errors',
+                                    );
+                                  } else {
+                                    QuickAlert.show(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      type: QuickAlertType.loading,
+                                      title: 'Signing in...',
+                                      text: 'Please Wait',
+                                    );
+                                    try {
+                                      await FirebaseAuth.instance
+                                          .signInWithEmailAndPassword(
+                                        email: _emailPhonenumber.text.trim(),
+                                        password: _password.text.trim(),
+                                      );
+                                      Navigator.pop(context);
+                                      // Navigate to HomeScreen after closing pop-ups
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AuthWrapper()), // Replace with your HomeScreen
+                                      );
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.success,
+                                        title: 'Hello!',
+                                        text: 'Welcome to BH Finder app!',
+                                      );
+                                    } on FirebaseAuthException catch (e) {
+                                      Navigator.pop(context);
+                                      setState(() {
+                                        errors = e
+                                            .message; // Show a user-friendly error message
+                                      });
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.error,
+                                        title: 'Error',
+                                        text: '$errors',
+                                      );
+                                      print('Error: $e');
+                                    }
                                   }
-                                }
-                              },
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor:
-                                    Color.fromRGBO(26, 60, 105, 1.0),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(30),
-                                ),
-                              ),
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Text(
-                                    "Log in",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 15,
-                                      fontWeight: FontWeight.w300,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                                }),
                           ),
                         ),
                         Row(
