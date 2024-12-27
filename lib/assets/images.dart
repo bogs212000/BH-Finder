@@ -11,6 +11,7 @@ class AppImages {
   static const welcome = 'assets/images/undraw_well-done_kqud.png';
   static const sign_in = 'assets/images/undraw_fingerprint-login_19qv.png';
   static const logo = 'assets/logo.png';
+  static const house = 'assets/images/undraw_ordinary-day_ak4e.png';
 }
 
 class AboutApp{

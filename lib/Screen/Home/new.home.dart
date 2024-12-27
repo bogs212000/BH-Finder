@@ -11,6 +11,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../cons.dart';
+import '../BHouse/bh.new.dart';
 import '../BHouse/bh.screen.dart';
 
 class Home extends StatefulWidget {
@@ -145,8 +146,8 @@ class _HomeState extends State<Home> {
                               OwnerUuId = data['OwnerUId'];
                               rBHouseDocId = data['Email'];
                             });
-                            Get.to(() => BHouseScreen(), arguments: [
-                              data['OwnerUId'],
+                            Get.to(() => BhouseScreenNew(), arguments: [
+                              data['OwnerUId'].toString(),
                               data['Email'],
                               data["OwnerUId"]
                             ]);

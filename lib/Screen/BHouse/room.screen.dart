@@ -20,9 +20,8 @@ import '../Loading/loading.bhouse.screen.dart';
 import 'bh.screen.dart';
 
 class RoomScreen extends StatefulWidget {
-  final String? token;
 
-  const RoomScreen({super.key, this.token});
+  const RoomScreen({super.key});
 
   @override
   State<RoomScreen> createState() => _RoomScreenState();
@@ -41,7 +40,7 @@ class _RoomScreenState extends State<RoomScreen> {
     fetchRoomData(setState);
     super.initState();
     bHouseRoom =
-        FirebaseFirestore.instance.collection('Rooms').doc(rRoomsDocId).get();
+        FirebaseFirestore.instance.collection('Rooms').doc('${Get.arguments[1].toString()}').get();
   }
 
   Future<void> _onRefresh() async {
@@ -49,7 +48,7 @@ class _RoomScreenState extends State<RoomScreen> {
     fetchRoomData(setState);
     setState(() {
       bHouseRoom =
-          FirebaseFirestore.instance.collection('Rooms').doc(rRoomsDocId).get();
+          FirebaseFirestore.instance.collection('Rooms').doc('${Get.arguments[1].toString()}').get();
     });
     await Future.delayed(
         Duration(milliseconds: 1000)); // Simulate loading delay
@@ -66,7 +65,7 @@ class _RoomScreenState extends State<RoomScreen> {
 
   Future<List<String>> _loadImage() async {
     ListResult result =
-        await storage.ref().child("roomImages/${docID.toString()}").listAll();
+        await storage.ref().child("roomImages/${Get.arguments[1].toString()}").listAll();
     List<String> imageUrls = [];
 
     for (Reference ref in result.items) {
@@ -96,7 +95,7 @@ class _RoomScreenState extends State<RoomScreen> {
               return const Center(child: Text('Error fetching data'));
             }
             if (!snapshot.hasData || !snapshot.data!.exists) {
-              return const Center(child: Text('No Reservation found'));
+              return const Center(child: Text('No data found'));
             }
             Map<String, dynamic> data =
                 snapshot.data!.data() as Map<String, dynamic>;

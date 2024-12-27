@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 import '../../cons.dart';
@@ -18,7 +19,7 @@ class _LocationScreenState extends State<LocationScreen> {
   late LatLng cam;
   Set<Marker> _markers = {};
 
-  final LatLng _center = LatLng(bHouseLat!, bHouseLong!); // San Francisco
+  final LatLng _center = LatLng(Get.arguments[0]!, Get.arguments[1]!); // San Francisco
 
   @override
   void initState() {
@@ -70,10 +71,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       padding: EdgeInsets.only(top: 40, left: 20),
                       child: GestureDetector(
                         onTap: () {
-                          Navigator.of(context).pushAndRemoveUntil(
-                            _toBHouseScreen(),
-                                (Route<dynamic> route) => false,
-                          );
+                          Get.back();
                         },
                         child: Container(
                           height: 35,
@@ -83,7 +81,7 @@ class _LocationScreenState extends State<LocationScreen> {
                             border: Border.all(color: Colors.grey, width: 0.3),
                             borderRadius: BorderRadius.circular(20),
                           ),
-                          child: Center(
+                          child: const Center(
                             child: Icon(
                               Icons.arrow_back,
                               color: Colors.white,
@@ -103,7 +101,7 @@ class _LocationScreenState extends State<LocationScreen> {
                           border: Border.all(color: Colors.grey, width: 0.3),
                           borderRadius: BorderRadius.circular(20),
                         ),
-                        child: Center(
+                        child: const Center(
                           child: Icon(
                             Icons.support_agent,
                             size: 20,

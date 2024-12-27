@@ -76,7 +76,7 @@ class _BHouseScreenState extends State<BHouseScreen> {
   Future<List<String>> _loadImage() async {
     ListResult result = await storage
         .ref()
-        .child("BHouseImages/$bUuId")
+        .child("BHouseImages/${Get.arguments[0]}")
         .listAll();
     List<String> imageUrls = [];
 
