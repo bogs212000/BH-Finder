@@ -15,6 +15,7 @@ import 'package:uuid/v4.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../Auth/auth.wrapper.dart';
+import '../../assets/images.dart';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -98,10 +99,11 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
+                        Image.asset(AppImages.fill_up, height: 150),
                         Padding(
                           padding: const EdgeInsets.only(left: 5, right: 5),
                           child:
-                              'Please provide accurate and valid information during sign-up to ensure smooth account creation and service.'
+                              '             Please provide accurate and valid information during sign-up to ensure smooth account creation and service.'
                                   .text
                                   .make(),
                         ),

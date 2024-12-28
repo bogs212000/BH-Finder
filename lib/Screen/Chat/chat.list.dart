@@ -33,7 +33,7 @@ class _ChatListState extends State<ChatList> {
           height: double.infinity,
           child: Column(
             children: [
-              70.heightBox,
+              80.heightBox,
               SizedBox(
                 height: 100,
                 child: Row(

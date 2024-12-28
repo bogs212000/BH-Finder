@@ -101,6 +101,7 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
       appBar: AppBar(
         elevation: 0,
         backgroundColor: Colors.transparent,
+        foregroundColor: Colors.white,
       ),
       body: VxBox(
         child: Column(

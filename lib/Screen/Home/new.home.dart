@@ -1,3 +1,8 @@
+import 'package:bh_finder/Screen/BordersReservation/boarder.reservation.screen.dart';
+import 'package:bh_finder/Screen/Home/my.reservations.dart';
+import 'package:bh_finder/Screen/Home/view.current.room.dart';
+import 'package:bh_finder/Screen/Owner/reservation/reservation.view.screen.dart';
+import 'package:bh_finder/Screen/Search/search.screen.dart';
 import 'package:bh_finder/assets/fonts.dart';
 import 'package:bh_finder/assets/images.dart';
 import 'package:cached_network_image/cached_network_image.dart';
@@ -30,18 +35,7 @@ class _HomeState extends State<Home> {
         child: SingleChildScrollView(
           child: Column(
             children: [
-              70.heightBox,
-              Row(
-                children: [
-                  Image.asset(AppImages.logo, height: 50),
-                  ' BH FINDER'
-                      .text
-                      .size(20)
-                      .extraBold
-                      .blue900
-                      .make(),
-                ],
-              ),
+              80.heightBox,
               FutureBuilder<QuerySnapshot>(
                 future: FirebaseFirestore.instance
                     .collection("Rooms")
@@ -56,8 +50,8 @@ class _HomeState extends State<Home> {
                           baseColor: Colors.grey.shade200,
                           highlightColor: Colors.white,
                           child: Padding(
-                            padding:
-                                const EdgeInsets.only(left: 20, right: 40, top: 20),
+                            padding: const EdgeInsets.only(
+                                left: 20, right: 40, top: 20),
                             child: Container(
                               height: 50,
                               width: 200,
@@ -109,17 +103,55 @@ class _HomeState extends State<Home> {
 
                       return Padding(
                         padding:
-                            const EdgeInsets.only(left: 20, right: 20, top: 10),
+                            const EdgeInsets.only(left: 10, right: 10, top: 10),
                         child: Container(
                           width: double.infinity,
                           child: Column(
                             children: [
                               SizedBox(
-                                height: 130,
+                                height: 120,
                                 child: Row(
                                   children: [
                                     Expanded(
-                                        child: Image.asset(AppImages.street)),
+                                        child: Column(
+                                          children: [
+                                            Image.asset(AppImages.street),
+                                            10.heightBox,
+                                            data['paid?'] == false ? Padding(
+                                              padding: const EdgeInsets.only(left: 10, right: 10),
+                                              child: SizedBox(
+                                                height: 30,
+                                                width: double.infinity,
+                                                child: GlowButton(
+                                                    borderRadius:
+                                                    BorderRadius.circular(20),
+                                                    child: 'View room'
+                                                        .text
+                                                        .bold
+                                                        .white
+                                                        .make(),
+                                                    onPressed: () {
+                                                      Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
+                                                    }),
+                                              ),
+                                            ) : Padding(
+                                              padding: const EdgeInsets.only(left: 20, right: 20),
+                                              child: SizedBox(
+                                                height: 30,
+                                                width: double.infinity,
+                                                child: GlowButton(
+                                                    borderRadius:
+                                                    BorderRadius.circular(20),
+                                                    child: 'View'
+                                                        .text
+                                                        .bold
+                                                        .white
+                                                        .make(),
+                                                    onPressed: () {}),
+                                              ),
+                                            )
+                                          ],
+                                        )),
                                     Expanded(
                                       child: Column(
                                         children: [
@@ -142,7 +174,7 @@ class _HomeState extends State<Home> {
                                           Row(
                                             children: [
                                               Text(
-                                                  'Boarding House : ${data['bHouseName']}',
+                                                  'BH : ${data['bHouseName']}',
                                                   style: const TextStyle(
                                                       fontSize: 12,
                                                       fontFamily:
@@ -172,39 +204,39 @@ class _HomeState extends State<Home> {
                                                     fontFamily:
                                                         AppFonts.quicksand),
                                               ),
-                                              const Spacer(),
-                                              if (daysLeft < 3)
-                                                SizedBox(
-                                                  height: 25,
-                                                  child: ElevatedButton(
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        rerentOwnerId =
-                                                            data['ownerUid'];
-                                                      });
-                                                      // Get.to(()=>RerentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
-                                                    },
-                                                    style: ElevatedButton
-                                                        .styleFrom(
-                                                      backgroundColor:
-                                                          const Color.fromRGBO(
-                                                              26, 60, 105, 1.0),
-                                                      shape:
-                                                          RoundedRectangleBorder(
-                                                        borderRadius:
-                                                            BorderRadius
-                                                                .circular(10),
-                                                      ),
-                                                    ),
-                                                    child: const Text(
-                                                      'Re-rent room',
-                                                      style: TextStyle(
-                                                          color: Colors.white,
-                                                          fontWeight:
-                                                              FontWeight.bold),
-                                                    ),
-                                                  ),
-                                                ),
+                                              // const Spacer(),
+                                              // if (daysLeft < 3)
+                                              //   SizedBox(
+                                              //     height: 25,
+                                              //     child: ElevatedButton(
+                                              //       onPressed: () {
+                                              //         setState(() {
+                                              //           rerentOwnerId =
+                                              //               data['ownerUid'];
+                                              //         });
+                                              //         // Get.to(()=>RerentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
+                                              //       },
+                                              //       style: ElevatedButton
+                                              //           .styleFrom(
+                                              //         backgroundColor:
+                                              //             const Color.fromRGBO(
+                                              //                 26, 60, 105, 1.0),
+                                              //         shape:
+                                              //             RoundedRectangleBorder(
+                                              //           borderRadius:
+                                              //               BorderRadius
+                                              //                   .circular(10),
+                                              //         ),
+                                              //       ),
+                                              //       child: const Text(
+                                              //         'Re-rent room',
+                                              //         style: TextStyle(
+                                              //             color: Colors.white,
+                                              //             fontWeight:
+                                              //                 FontWeight.bold),
+                                              //       ),
+                                              //     ),
+                                              //   ),
                                             ],
                                           ),
                                         ],
@@ -306,7 +338,9 @@ class _HomeState extends State<Home> {
                                           'Search'.text.white.make(),
                                         ],
                                       ),
-                                      onPressed: () {}),
+                                      onPressed: () {
+                                        Get.to(()=>SearchScreen());
+                                      }),
                                 )
                               ],
                             ),
@@ -353,7 +387,8 @@ class _HomeState extends State<Home> {
                               baseColor: Colors.grey.shade200,
                               highlightColor: Colors.white,
                               child: Container(
-                                margin: const EdgeInsets.symmetric(horizontal: 5),
+                                margin:
+                                    const EdgeInsets.symmetric(horizontal: 5),
                                 decoration: BoxDecoration(
                                   color: Colors.grey,
                                   borderRadius: BorderRadius.circular(20),
@@ -507,7 +542,9 @@ class _HomeState extends State<Home> {
                                   child: GlowButton(
                                       borderRadius: BorderRadius.circular(20),
                                       child: 'View'.text.white.make(),
-                                      onPressed: () {}),
+                                      onPressed: () {
+                                        Get.to(()=>MyReservations());
+                                      }),
                                 )
                               ],
                             ),

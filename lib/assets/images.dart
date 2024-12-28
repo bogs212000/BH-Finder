@@ -16,6 +16,9 @@ class AppImages {
   static const reservation_list = 'assets/images/undraw_note-list_47ij.png';
   static const street = 'assets/images/undraw_quiet-street_v45k.png';
   static const pie = 'assets/images/undraw_pie-graph_8m6b.png';
+  static const fill_up = 'assets/images/undraw_mobile-posts_kc42.png';
+  static const notif = 'assets/images/undraw_warning_qn4r.png';
+  static const vault = 'assets/images/undraw_vault_tyfh.png';
 }
 
 class AboutApp{

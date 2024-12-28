@@ -4,6 +4,7 @@ import 'dart:async';
 
 import 'package:bh_finder/Auth/auth.wrapper.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
+import 'package:bh_finder/Screen/Owner/OwnerSignUp/first.screen.dart';
 import 'package:bh_finder/Screen/about/about.screen.dart';
 import 'package:bh_finder/assets/fonts.dart';
 import 'package:bh_finder/assets/images.dart';
@@ -348,8 +349,7 @@ class _SignInScreenState extends State<SignInScreen> {
                         Spacer(),
                         GestureDetector(
                           onTap: () {
-                            Navigator.pushNamed(
-                                context, '/OwnerSignupFirstScreen');
+                           Get.to(()=> OwnerSignupFirst());
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

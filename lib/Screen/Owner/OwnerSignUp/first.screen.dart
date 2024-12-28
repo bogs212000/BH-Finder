@@ -1,6 +1,8 @@
 // ignore_for_file: prefer_const_constructors
 
 import 'dart:io';
+import 'package:bh_finder/assets/images.dart';
+import 'package:flutter_glow/flutter_glow.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -77,7 +79,8 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
-        title: 'Sign up'.text.make(),
+        centerTitle: true,
+        title: 'Owner Sign up'.text.make(),
       ),
       body: Stack(
         children: [
@@ -89,7 +92,8 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
             child: SingleChildScrollView(
               child: Column(
                 children: [
-                  'Please ensure all required details are filled out accurately. Double-check the information for correctness before submitting.'
+                  Image.asset(AppImages.fill_up, height: 150),
+                  '           Please ensure all required details are filled out accurately. Double-check the information for correctness before submitting.'
                       .text
                       .make(),
                   SizedBox(height: 20),
@@ -300,7 +304,9 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                     padding: EdgeInsets.only(bottom: 20),
                     child: SizedBox(
                       height: 50,
-                      child: ElevatedButton(
+                      width: double.infinity,
+                      child: GlowButton(
+                        borderRadius: BorderRadius.circular(20),
                         onPressed: () async {
                           if (_ownerFirstName.text.isEmpty ||
                               _ownerMiddleName.text.isEmpty ||
@@ -334,12 +340,6 @@ class _OwnerSignupFirstState extends State<OwnerSignupFirst> {
                                 context, '/OwnerSignupSecondScreen');
                           }
                         },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: Color.fromRGBO(26, 60, 105, 1.0),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                        ),
                         child: const Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [

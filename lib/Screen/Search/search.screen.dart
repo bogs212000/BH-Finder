@@ -12,12 +12,15 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import '../../assets/fonts.dart';
 import '../../assets/images.dart';
 import '../../fetch.dart';
+import '../BHouse/bh.new.dart';
 import '../BHouse/bh.screen.dart';
 import '../Loading/loading.bhouse.screen.dart';
 import '../Map/nearme.map.dart';
@@ -50,10 +53,6 @@ class _SearchScreenState extends State<SearchScreen> {
 
   @override
   void initState() {
-    Navigator.of(context).popUntil((route) => route.isFirst);
-    fetchBoarderData(setState);
-    checkGps();
-    checkGPS();
     super.initState();
 
     if (userEmail != null) {
@@ -68,82 +67,6 @@ class _SearchScreenState extends State<SearchScreen> {
     });
   }
 
-  Future checkGPS() async {
-    if (!await location.serviceEnabled()) {
-      print('Location enabled');
-      getLocation();
-    }
-  }
-
-  checkGps() async {
-    servicestatus = await Geolocator.isLocationServiceEnabled();
-    if (servicestatus) {
-      permission = await Geolocator.checkPermission();
-
-      if (permission == LocationPermission.denied) {
-        permission = await Geolocator.requestPermission();
-        if (permission == LocationPermission.denied) {
-          print('Location permissions are denied');
-        } else if (permission == LocationPermission.deniedForever) {
-          print("'Location permissions are permanently denied");
-        } else {
-          haspermission = true;
-        }
-      } else {
-        haspermission = true;
-      }
-
-      if (haspermission) {
-        setState(() {
-          //refresh the UI
-        });
-
-        getLocation();
-      }
-    } else {
-      print("GPS Service is not enabled, turn on GPS location");
-    }
-
-    setState(() {
-      //refresh the UI
-    });
-  }
-
-  getLocation() async {
-    position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: LocationAccuracy.best);
-    print(position.longitude);
-    print(position.latitude);
-
-    double long = position.longitude;
-    double lat = position.latitude;
-    setState(() {
-      userLat = position.latitude;
-      userLong = position.longitude;
-    });
-    print('$userLat, $userLong');
-    setState(() {
-      //refresh UI
-    });
-
-    LocationSettings locationSettings = const LocationSettings(
-      accuracy: LocationAccuracy.best, //accuracy of the location data
-      distanceFilter: 50, //minimum distance (measured in meters) a
-      //device must move horizontally before an update event is generated;
-    );
-
-    StreamSubscription<Position> positionStream =
-    Geolocator.getPositionStream(locationSettings: locationSettings)
-        .listen((Position position) {
-      print(position.longitude); //Output: 80.24599079
-      print(position.latitude); //Output: 29.6593457
-
-      long = position.longitude as double;
-      lat = position.latitude as double;
-      lat as double;
-      long as double;
-    });
-  }
 
   Future<void> _onRefresh() async {
     fetchBoarderData(setState);
@@ -179,7 +102,7 @@ class _SearchScreenState extends State<SearchScreen> {
           ),
           child: Column(
             children: [
-              70.heightBox,
+              80.heightBox,
               SizedBox(
                 height: 100,
                 child: Row(
@@ -380,20 +303,14 @@ class _SearchScreenState extends State<SearchScreen> {
                                 return GestureDetector(
                                   onTap: () {
                                     setState(() {
-                                      OwnerUuId =
-                                      data['OwnerUId'];
-                                      rBHouseDocId =
-                                      data['Email'];
-                                      print(
-                                          "$OwnerUuId, $rBHouseDocId");
+                                      OwnerUuId = data['OwnerUId'];
+                                      rBHouseDocId = data['Email'];
                                     });
-                                    Navigator.of(context)
-                                        .pushAndRemoveUntil(
-                                      _toBhouseScreen(),
-                                          (Route<dynamic>
-                                      route) =>
-                                      false,
-                                    );
+                                    Get.to(() => const BhouseScreenNew(), arguments: [
+                                      data['OwnerUId'].toString(),
+                                      data['Email'],
+                                      data["OwnerUId"]
+                                    ]);
                                   },
                                   child: Container(
                                     width: 150,

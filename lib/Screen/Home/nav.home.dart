@@ -10,6 +10,8 @@ import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -195,6 +197,12 @@ class _NavHomeState extends State<NavHome> {
       //   ),
       // ),
       appBar: AppBar(
+        title:  Row(
+          children: [
+            Image.asset(AppImages.logo, height: 50),
+            ' BH FINDER'.text.size(20).extraBold.blue900.make(),
+          ],
+        ),
         backgroundColor: Colors.transparent,
         elevation: 0,
         actions: [
@@ -330,45 +338,57 @@ class _NavHomeState extends State<NavHome> {
             20.heightBox,
             ListTile(
               leading: Icon(
-                Icons.account_circle, color: Colors.blue.shade900,
+                Icons.account_circle,
+                color: Colors.blue.shade900,
                 size: 20,
               ),
               title: 'Profile'.text.size(15).make(),
             ),
             ListTile(
               leading: Icon(
-                Icons.book_outlined, color: Colors.blue.shade900,
+                Icons.book_outlined,
+                color: Colors.blue.shade900,
                 size: 20,
               ),
               title: 'User guide'.text.size(15).make(),
             ),
             ListTile(
               leading: Icon(
-                Icons.security, color: Colors.blue.shade900,
+                Icons.security,
+                color: Colors.blue.shade900,
                 size: 20,
               ),
               title: 'Privacy policy'.text.size(15).make(),
             ),
             ListTile(
               leading: Icon(
-                Icons.bookmark_border, color: Colors.blue.shade900,
+                Icons.bookmark_border,
+                color: Colors.blue.shade900,
                 size: 20,
               ),
               title: 'Terms and Conditions'.text.size(15).make(),
             ),
             ListTile(
               leading: Icon(
-                Icons.info_outline, color: Colors.blue.shade900,
+                Icons.info_outline,
+                color: Colors.blue.shade900,
                 size: 20,
               ),
-              title: 'About'.text.size(15).make(),
+              title: GestureDetector(
+                  onTap: () {
+                    Get.to(() => AboutApp());
+                    Navigator.pop(context);
+                  },
+                  child: 'About'.text.size(15).make()),
             ),
             ListTile(
               leading: Icon(
-                Icons.outbond_outlined, color: Colors.blue.shade900,
+                Icons.outbond_outlined,
+                color: Colors.blue.shade900,
                 size: 20,
               ),
-              title: 'Sign out'.text.size(15).make(),
+              title: GestureDetector(
+                  onTap: () {}, child: 'Sign out'.text.size(15).make()),
             ),
           ],
         ),
