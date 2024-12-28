@@ -31,6 +31,238 @@ class _HomeState extends State<Home> {
           child: Column(
             children: [
               70.heightBox,
+              Row(
+                children: [
+                  Image.asset(AppImages.logo, height: 50),
+                  ' BH FINDER'
+                      .text
+                      .size(20)
+                      .extraBold
+                      .blue900
+                      .make(),
+                ],
+              ),
+              FutureBuilder<QuerySnapshot>(
+                future: FirebaseFirestore.instance
+                    .collection("Rooms")
+                    .where('boarderID', isEqualTo: bUuId)
+                    .get(),
+                builder: (BuildContext context,
+                    AsyncSnapshot<QuerySnapshot> snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Row(
+                      children: [
+                        Shimmer.fromColors(
+                          baseColor: Colors.grey.shade200,
+                          highlightColor: Colors.white,
+                          child: Padding(
+                            padding:
+                                const EdgeInsets.only(left: 20, right: 40, top: 20),
+                            child: Container(
+                              height: 50,
+                              width: 200,
+                              decoration: BoxDecoration(
+                                color: Colors.grey,
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    );
+                  }
+                  if (snapshot.hasError) {
+                    return const Center(child: Text('Error fetching data'));
+                  }
+                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                    return Column(
+                      children: [
+                        "You haven't started renting a room yet."
+                            .text
+                            .size(15)
+                            .fontFamily(AppFonts.quicksand)
+                            .bold
+                            .make(),
+                        Image.asset(
+                          AppImages.street,
+                        ),
+                      ],
+                    );
+                  }
+
+                  // Use a Column to display the fetched documents instead of ListView
+                  return Column(
+                    children: snapshot.data!.docs.map((doc) {
+                      Map<String, dynamic> data =
+                          doc.data() as Map<String, dynamic>;
+                      cDocId = data['roomDocId'];
+                      DateTime boardersIn = DateTime.fromMillisecondsSinceEpoch(
+                          data['boardersIn'].millisecondsSinceEpoch);
+                      DateTime boardersOut =
+                          DateTime.fromMillisecondsSinceEpoch(
+                              data['boardersOut'].millisecondsSinceEpoch);
+                      Duration difference =
+                          boardersOut.difference(DateTime.now());
+                      int daysLeft = difference.inDays;
+                      print(
+                          'IN: ${boardersIn.toLocal()}, Days Left: $daysLeft');
+
+                      return Padding(
+                        padding:
+                            const EdgeInsets.only(left: 20, right: 20, top: 10),
+                        child: Container(
+                          width: double.infinity,
+                          child: Column(
+                            children: [
+                              SizedBox(
+                                height: 130,
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: Image.asset(AppImages.street)),
+                                    Expanded(
+                                      child: Column(
+                                        children: [
+                                          Row(
+                                            children: [
+                                              '$daysLeft '
+                                                  .text
+                                                  .size(30)
+                                                  .extraBold
+                                                  .blue900
+                                                  .make(),
+                                              ' Days left'
+                                                  .text
+                                                  .fontFamily(
+                                                      AppFonts.quicksand)
+                                                  .size(15)
+                                                  .make(),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                  'Boarding House : ${data['bHouseName']}',
+                                                  style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontFamily:
+                                                          AppFonts.quicksand)),
+                                              const Spacer(),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                  'Room : ${data['roomNameNumber']}',
+                                                  style: const TextStyle(
+                                                      fontSize: 12,
+                                                      fontFamily:
+                                                          AppFonts.quicksand)),
+                                            ],
+                                          ),
+                                          Row(
+                                            children: [
+                                              Text(
+                                                'Status : ${data['paid?'] ? "Paid" : "Unpaid"}',
+                                                style: TextStyle(
+                                                    fontSize: 12,
+                                                    color: data['paid?']
+                                                        ? Colors.green
+                                                        : Colors.red,
+                                                    fontFamily:
+                                                        AppFonts.quicksand),
+                                              ),
+                                              const Spacer(),
+                                              if (daysLeft < 3)
+                                                SizedBox(
+                                                  height: 25,
+                                                  child: ElevatedButton(
+                                                    onPressed: () {
+                                                      setState(() {
+                                                        rerentOwnerId =
+                                                            data['ownerUid'];
+                                                      });
+                                                      // Get.to(()=>RerentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
+                                                    },
+                                                    style: ElevatedButton
+                                                        .styleFrom(
+                                                      backgroundColor:
+                                                          const Color.fromRGBO(
+                                                              26, 60, 105, 1.0),
+                                                      shape:
+                                                          RoundedRectangleBorder(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(10),
+                                                      ),
+                                                    ),
+                                                    child: const Text(
+                                                      'Re-rent room',
+                                                      style: TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold),
+                                                    ),
+                                                  ),
+                                                ),
+                                            ],
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    // SizedBox(
+                                    //   height: 25,
+                                    //   child: ElevatedButton(
+                                    //
+                                    //     onPressed: () {
+                                    //       setState(() {
+                                    //         fetchGcashEmail = data['Email'];
+                                    //       });
+                                    //       // Get.to(()=>ReceiptScreen(), arguments: [data['roomDocId']]);
+                                    //       // Navigator.push(
+                                    //       //     context,
+                                    //       //     MaterialPageRoute(
+                                    //       //       builder: (context) => ReceiptScreen(
+                                    //       //         roomId: data['roomDocId'],
+                                    //       //       ),
+                                    //       //     ));
+                                    //     },
+                                    //     style: ElevatedButton.styleFrom(
+                                    //       backgroundColor: Color.fromRGBO(
+                                    //           26, 60, 105, 1.0),
+                                    //       shape: RoundedRectangleBorder(
+                                    //         borderRadius:
+                                    //         BorderRadius.circular(10),
+                                    //       ),
+                                    //     ),
+                                    //     child: data['paid?'] == false
+                                    //         ? Text(
+                                    //       'Pay Now',
+                                    //       style: TextStyle(
+                                    //           color: Colors.white,
+                                    //           fontWeight:
+                                    //           FontWeight.bold),
+                                    //     )
+                                    //         : Text(
+                                    //       'See receipt',
+                                    //       style: TextStyle(
+                                    //           color: Colors.white,
+                                    //           fontWeight:
+                                    //           FontWeight.bold),
+                                    //     ),
+                                    //   ),
+                                    // ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      );
+                    }).toList(), // Convert the documents to a list of widgets
+                  );
+                },
+              ),
               SizedBox(
                 height: 150,
                 child: Row(
@@ -88,7 +320,12 @@ class _HomeState extends State<Home> {
               10.heightBox,
               Row(
                 children: [
-                  'New Boarding House added'.text.size(15).fontFamily(AppFonts.quicksand).bold.make(),
+                  'New Boarding House added'
+                      .text
+                      .size(15)
+                      .fontFamily(AppFonts.quicksand)
+                      .bold
+                      .make(),
                 ],
               ),
               10.heightBox,
@@ -116,7 +353,7 @@ class _HomeState extends State<Home> {
                               baseColor: Colors.grey.shade200,
                               highlightColor: Colors.white,
                               child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
+                                margin: const EdgeInsets.symmetric(horizontal: 5),
                                 decoration: BoxDecoration(
                                   color: Colors.grey,
                                   borderRadius: BorderRadius.circular(20),
@@ -133,20 +370,21 @@ class _HomeState extends State<Home> {
                       scrollDirection: Axis.horizontal, // Horizontal scrolling
                       itemCount: datas.length > 5 ? 5 : datas.length,
                       itemBuilder: (context, index) {
-                        final data = datas[index].data() as Map<String, dynamic>;
+                        final data =
+                            datas[index].data() as Map<String, dynamic>;
                         List<dynamic> ratings = data['ratings'];
                         double average =
                             ratings.reduce((a, b) => a + b) / ratings.length;
                         String averageOneDecimal = average.toStringAsFixed(1);
                         double clampedRating = average.clamp(0.0, 5.0);
-          
+
                         return GestureDetector(
                           onTap: () {
                             setState(() {
                               OwnerUuId = data['OwnerUId'];
                               rBHouseDocId = data['Email'];
                             });
-                            Get.to(() => BhouseScreenNew(), arguments: [
+                            Get.to(() => const BhouseScreenNew(), arguments: [
                               data['OwnerUId'].toString(),
                               data['Email'],
                               data["OwnerUId"]
@@ -154,7 +392,7 @@ class _HomeState extends State<Home> {
                           },
                           child: Container(
                             width: 150, // Width for horizontal scrolling
-                            margin: EdgeInsets.all(5),
+                            margin: const EdgeInsets.all(5),
                             decoration: BoxDecoration(
                               borderRadius: BorderRadius.circular(5),
                               color: Colors.white,
@@ -185,39 +423,40 @@ class _HomeState extends State<Home> {
                                 Padding(
                                   padding: const EdgeInsets.all(5),
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
                                       Text(
                                         data['BoardingHouseName'],
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontWeight: FontWeight.bold),
                                       ),
                                       Text(
                                         data['address'],
                                         maxLines: 1,
                                         overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                             fontSize: 10, color: Colors.grey),
                                       ),
                                       Row(
                                         children: List.generate(5, (index) {
                                           if (index < clampedRating.toInt()) {
-                                            return Icon(Icons.star,
+                                            return const Icon(Icons.star,
                                                 color: Colors.amber, size: 15);
                                           } else if (index < clampedRating) {
-                                            return Icon(Icons.star_half,
+                                            return const Icon(Icons.star_half,
                                                 color: Colors.amber, size: 15);
                                           } else {
-                                            return Icon(Icons.star_border,
+                                            return const Icon(Icons.star_border,
                                                 color: Colors.amber, size: 15);
                                           }
                                         }),
                                       ),
                                       Text(
                                         ' - $averageOneDecimal',
-                                        style: TextStyle(fontSize: 10),
+                                        style: const TextStyle(fontSize: 10),
                                       ),
                                     ],
                                   ),
@@ -231,150 +470,52 @@ class _HomeState extends State<Home> {
                   },
                 ),
               ),
-              20.heightBox,
-              Row(
-                children: [
-                  'Most reviewed'.text.bold.size(15).fontFamily(AppFonts.quicksand).make(),
-                ],
-              ),
               10.heightBox,
               SizedBox(
-                width: double.infinity,
-                height: 240, // Adjust height as needed
-                child: StreamBuilder<QuerySnapshot>(
-                  stream: FirebaseFirestore.instance
-                      .collection("BoardingHouses")
-                      .where('verified', isEqualTo: true)
-                      .orderBy('createdAt', descending: true)
-                      .snapshots(),
-                  builder: (context, snapshot) {
-                    if (snapshot.hasError) {
-                      return Center(
-                        child: Text('Error: ${snapshot.error}'),
-                      );
-                    }
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Row(
-                        children: List.generate(
-                          2, // Example number of shimmer placeholders
-                              (index) => Expanded(
-                            child: Shimmer.fromColors(
-                              baseColor: Colors.grey.shade200,
-                              highlightColor: Colors.white,
-                              child: Container(
-                                margin: EdgeInsets.symmetric(horizontal: 5),
-                                decoration: BoxDecoration(
-                                  color: Colors.grey,
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                height: 200,
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }
-                    final datas = snapshot.data?.docs ?? [];
-                    return ListView.builder(
-                      scrollDirection: Axis.horizontal, // Horizontal scrolling
-                      itemCount: datas.length > 5 ? 5 : datas.length,
-                      itemBuilder: (context, index) {
-                        final data = datas[index].data() as Map<String, dynamic>;
-                        List<dynamic> ratings = data['ratings'];
-                        double average =
-                            ratings.reduce((a, b) => a + b) / ratings.length;
-                        String averageOneDecimal = average.toStringAsFixed(1);
-                        double clampedRating = average.clamp(0.0, 5.0);
-          
-                        return GestureDetector(
-                          onTap: () {
-                            setState(() {
-                              OwnerUuId = data['OwnerUId'];
-                              rBHouseDocId = data['Email'];
-                            });
-                            Get.to(() => BHouseScreen(), arguments: [
-                              data['OwnerUId'],
-                              data['Email'],
-                              data["OwnerUId"]
-                            ]);
-                          },
-                          child: Container(
-                            width: 150, // Width for horizontal scrolling
-                            margin: EdgeInsets.all(5),
-                            decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(5),
-                              color: Colors.white,
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.grey.withOpacity(0.2),
-                                  spreadRadius: 1,
-                                  blurRadius: 3,
-                                ),
-                              ],
-                            ),
-                            child: Column(
+                height: 150,
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: VxBox(
+                                child: Image.asset(AppImages.reservation_list))
+                            .white
+                            .make()),
+                    Expanded(
+                      child: VxBox(
+                        child: Column(
+                          children: [
+                            Row(
                               children: [
-                                Container(
-                                  height: 150,
-                                  decoration: BoxDecoration(
-                                    borderRadius: const BorderRadius.only(
-                                      topLeft: Radius.circular(5),
-                                      topRight: Radius.circular(5),
-                                    ),
-                                    image: DecorationImage(
-                                      image: CachedNetworkImageProvider(
-                                          data['Image']),
-                                      fit: BoxFit.cover,
-                                    ),
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(5),
-                                  child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        data['BoardingHouseName'],
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontWeight: FontWeight.bold),
-                                      ),
-                                      Text(
-                                        data['address'],
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
-                                        style: TextStyle(
-                                            fontSize: 10, color: Colors.grey),
-                                      ),
-                                      Row(
-                                        children: List.generate(5, (index) {
-                                          if (index < clampedRating.toInt()) {
-                                            return Icon(Icons.star,
-                                                color: Colors.amber, size: 15);
-                                          } else if (index < clampedRating) {
-                                            return Icon(Icons.star_half,
-                                                color: Colors.amber, size: 15);
-                                          } else {
-                                            return Icon(Icons.star_border,
-                                                color: Colors.amber, size: 15);
-                                          }
-                                        }),
-                                      ),
-                                      Text(
-                                        ' - $averageOneDecimal',
-                                        style: TextStyle(fontSize: 10),
-                                      ),
-                                    ],
-                                  ),
-                                ),
+                                'View'.text.size(30).blue900.bold.make(),
                               ],
                             ),
-                          ),
-                        );
-                      },
-                    );
-                  },
+                            Row(
+                              children: [
+                                'your reservation'
+                                    .text
+                                    .fontFamily(AppFonts.quicksand)
+                                    .size(20)
+                                    .bold
+                                    .make(),
+                              ],
+                            ),
+                            10.heightBox,
+                            Row(
+                              children: [
+                                SizedBox(
+                                  width: 80,
+                                  child: GlowButton(
+                                      borderRadius: BorderRadius.circular(20),
+                                      child: 'View'.text.white.make(),
+                                      onPressed: () {}),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      ).white.make(),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -382,7 +523,7 @@ class _HomeState extends State<Home> {
         ),
       )
           .height(MediaQuery.of(context).size.height)
-          .padding(EdgeInsets.only(left: 20, right: 20))
+          .padding(const EdgeInsets.only(left: 20, right: 20))
           .width(MediaQuery.of(context).size.width)
           .white
           .make(),

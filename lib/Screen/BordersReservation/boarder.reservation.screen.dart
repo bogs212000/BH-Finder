@@ -167,13 +167,7 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                               padding: EdgeInsets.only(top: 40, left: 20),
                               child: GestureDetector(
                                 onTap: () {
-                                  setState(() {
-                                    reserved = false;
-                                  });
-                                  Navigator.of(context).pushAndRemoveUntil(
-                                    _toRoomScreen(),
-                                    (Route<dynamic> route) => false,
-                                  );
+                                 Get.back();
                                 },
                                 child: Container(
                                   height: 35,

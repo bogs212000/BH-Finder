@@ -1,3 +1,4 @@
+import 'package:bh_finder/Screen/BHouse/room.new.dart';
 import 'package:bh_finder/Screen/BHouse/room.screen.dart';
 import 'package:bh_finder/assets/images.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -106,11 +107,12 @@ class _RoomListNewState extends State<RoomListNew> {
                       Map<String, dynamic> datas = snapshot.data!.docs[index]
                           .data()! as Map<String, dynamic>;
                       return Padding(
-                        padding: const EdgeInsets.only(bottom: 10),
+                        padding: EdgeInsets.only(bottom: 10),
                         child: GestureDetector(
                           onTap: () {
                             Get.to(
-                              () => RoomScreen(),
+                              () => RoomNew(),
+                              arguments: [datas['roomDocId'],datas['roomDocId'],]
                             );
                           },
                           child: Container(

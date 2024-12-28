@@ -12,6 +12,10 @@ class AppImages {
   static const sign_in = 'assets/images/undraw_fingerprint-login_19qv.png';
   static const logo = 'assets/logo.png';
   static const house = 'assets/images/undraw_ordinary-day_ak4e.png';
+  static const calendar = 'assets/images/undraw_calendar_76t8.png';
+  static const reservation_list = 'assets/images/undraw_note-list_47ij.png';
+  static const street = 'assets/images/undraw_quiet-street_v45k.png';
+  static const pie = 'assets/images/undraw_pie-graph_8m6b.png';
 }
 
 class AboutApp{

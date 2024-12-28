@@ -349,6 +349,27 @@ class _NavHomeState extends State<NavHome> {
               ),
               title: 'Privacy policy'.text.size(15).make(),
             ),
+            ListTile(
+              leading: Icon(
+                Icons.bookmark_border, color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Terms and Conditions'.text.size(15).make(),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.info_outline, color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'About'.text.size(15).make(),
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.outbond_outlined, color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Sign out'.text.size(15).make(),
+            ),
           ],
         ),
       ),
