@@ -2,14 +2,19 @@ import 'dart:io';
 
 import 'package:bh_finder/Screen/Loading/loading.screen.dart';
 import 'package:bh_finder/Screen/Owner/OwnerSignUp/owner.signup.data.dart';
+import 'package:bh_finder/Screen/Owner/add.rooms.dart';
 import 'package:bh_finder/Screen/Owner/owner.home.screen.dart';
 import 'package:bh_finder/Screen/Owner/owner.nav.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
+import 'package:bh_finder/assets/fonts.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_glow/flutter_glow.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -17,8 +22,11 @@ import 'package:uuid/uuid.dart';
 import 'package:uuid/v1.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../../assets/images.dart';
 import '../../cons.dart';
 import 'Rooms/view.room.dart';
+
+String? roomroomId;
 
 class ListRoomsScreen extends StatefulWidget {
   const ListRoomsScreen({super.key});
@@ -50,21 +58,11 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
         ? LoadingScreen()
         : Scaffold(
             appBar: AppBar(
-              leading: GestureDetector(
-                onTap: () {
-                  Navigator.of(context).pushAndRemoveUntil(
-                    MaterialPageRoute(
-                      builder: (context) => OwnerNav(),
-                    ),
-                    (Route<dynamic> route) =>
-                        false, // Removes all previous routes
-                  );
-                },
-                child: Icon(Icons.arrow_back),
-              ),
+              centerTitle: true,
+              foregroundColor: Colors.blue[900],
               backgroundColor: Colors.white,
               elevation: 0,
-              title: 'Rooms'.text.make(),
+              title: 'Rooms'.text.bold.make(),
             ),
             body: Stack(
               children: [
@@ -73,241 +71,308 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                   color: Colors.white,
                   width: double.infinity,
                   height: double.infinity,
-                  child: StreamBuilder(
-                    stream: FirebaseFirestore.instance
-                        .collection("Rooms")
-                        .where('ownerUid', isEqualTo: OwnerUuId)
-                        .snapshots(),
-                    builder: (BuildContext context,
-                        AsyncSnapshot<QuerySnapshot> snapshot) {
-                      // Check if the snapshot has an error
-                      if (snapshot.hasError) {
-                        return const Center(
-                          child: Text(
-                            "Something went wrong!",
-                            style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.redAccent,
-                            ),
-                          ),
-                        );
-                      }
-
-                      // Show loading spinner while waiting for data
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(
-                          child: CircularProgressIndicator(color: Colors.red),
-                        );
-                      }
-
-                      // Show message if no data is found
-                      if (snapshot.data?.size == 0) {
-                        return Center(
-                          child: Text('Nothing to fetch here.'),
-                        );
-                      }
-
-                      // Data is available, display it
-                      return ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        itemCount: snapshot.data!.docs.length,
-                        // Use the length of the fetched data
-                        itemBuilder: (context, index) {
-                          Map<String, dynamic> data = snapshot.data!.docs[index]
-                              .data()! as Map<String, dynamic>;
-                          String docId = snapshot.data!.docs[index].id;
-                          return Padding(
-                            padding: const EdgeInsets.only(bottom: 10),
-                            child: GestureDetector(
-                              onTap: () {
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  MaterialPageRoute(
-                                    builder: (context) => ViewRoom(
-                                        viewRoomId: data['roomDocId'],
-                                        boarderToken: data['boarderToken'],
-                                        bHouseName: data['bHouseName']),
+                  child: Column(
+                    children: [
+                      VxBox(child: Image.asset(AppImages.house))
+                          .white
+                          .height(150)
+                          .make(),
+                      10.heightBox,
+                      Expanded(
+                        child: StreamBuilder(
+                          stream: FirebaseFirestore.instance
+                              .collection("Rooms")
+                              .where('ownerUid', isEqualTo: OwnerUuId)
+                              .snapshots(),
+                          builder: (BuildContext context,
+                              AsyncSnapshot<QuerySnapshot> snapshot) {
+                            // Check if the snapshot has an error
+                            if (snapshot.hasError) {
+                              return const Center(
+                                child: Text(
+                                  "Something went wrong!",
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.redAccent,
                                   ),
-                                  (Route<dynamic> route) =>
-                                      false, // Removes all previous routes
-                                );
-                              },
-                              child: Container(
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  borderRadius: BorderRadius.circular(10),
                                 ),
-                                child: Row(
-                                  children: [
-                                    Container(
-                                      width: 80,
+                              );
+                            }
+
+                            // Show loading spinner while waiting for data
+                            if (snapshot.connectionState ==
+                                ConnectionState.waiting) {
+                              return Center(
+                                child: CircularProgressIndicator(
+                                    color: Colors.red),
+                              );
+                            }
+
+                            // Show message if no data is found
+                            if (snapshot.data?.size == 0) {
+                              return Center(
+                                child: Text('Nothing to fetch here.'),
+                              );
+                            }
+
+                            // Data is available, display it
+                            return ListView.builder(
+                              physics: BouncingScrollPhysics(),
+                              itemCount: snapshot.data!.docs.length,
+                              // Use the length of the fetched data
+                              itemBuilder: (context, index) {
+                                Map<String, dynamic> data =
+                                    snapshot.data!.docs[index].data()!
+                                        as Map<String, dynamic>;
+                                String docId = snapshot.data!.docs[index].id;
+                                return Padding(
+                                  padding: const EdgeInsets.only(bottom: 10),
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        roomroomId = data['roomDocId'];
+                                      });
+                                      Get.to(() => ViewRoom(), arguments: [
+                                        data['roomDocId'],
+                                        data['boarderToken'],
+                                        data['bHouseName']
+                                      ]);
+                                      // Navigator.of(context).pushAndRemoveUntil(
+                                      //   MaterialPageRoute(
+                                      //     builder: (context) => ViewRoom(
+                                      //         viewRoomId: data['roomDocId'],
+                                      //         boarderToken:
+                                      //             data['boarderToken'],
+                                      //         bHouseName: data['bHouseName']),
+                                      //   ),
+                                      //   (Route<dynamic> route) =>
+                                      //       false, // Removes all previous routes
+                                      // );
+                                    },
+                                    child: Container(
                                       height: 90,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.circular(10),
-                                        image: DecorationImage(
-                                          image: CachedNetworkImageProvider(
-                                            data['roomImage'] ??
-                                                'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
-                                          ),
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                    ),
-                                    SizedBox(width: 10),
-                                    Expanded(
-                                      child: Container(
                                         color: Colors.white,
-                                        child: Column(
-                                          mainAxisAlignment:
-                                              MainAxisAlignment.center,
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              '${data['roomNameNumber']}',
-                                              style: TextStyle(
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 15,
-                                              ),
-                                            ),
-                                            Text(
-                                              data['roomStatus'],
-                                              style: TextStyle(
-                                                color: Colors.orangeAccent,
-                                                fontWeight: FontWeight.w300,
-                                              ),
-                                            ),
-                                          ],
-                                        ),
+                                        borderRadius: BorderRadius.circular(10),
                                       ),
-                                    ),
-                                    Container(
-                                      width: 110,
-                                      padding:
-                                          EdgeInsets.symmetric(horizontal: 10),
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
+                                      child: Row(
                                         children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              Text(
-                                                '₱ ${data['price'] ?? '---'} per month',
-                                                style: const TextStyle(
-                                                  fontWeight: FontWeight.bold,
-                                                  fontSize: 10,
+                                          Container(
+                                            width: 80,
+                                            height: 90,
+                                            decoration: BoxDecoration(
+                                              borderRadius:
+                                                  BorderRadius.circular(10),
+                                              image: DecorationImage(
+                                                image:
+                                                    CachedNetworkImageProvider(
+                                                  data['roomImage'] ??
+                                                      'https://images.adsttc.com/media/images/53a3/b4b4/c07a/80d6/3400/02d2/slideshow/HastingSt_Exterior_048.jpg?1403237534',
                                                 ),
+                                                fit: BoxFit.cover,
                                               ),
-                                            ],
+                                            ),
                                           ),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.end,
-                                            children: [
-                                              data['roomStatus'] != "unavailable" ? GestureDetector(
-                                                onTap: () {
-                                                  QuickAlert.show(
-                                                    onCancelBtnTap: () {
-                                                      Navigator.pop(context);
-                                                    },
-                                                    onConfirmBtnTap: () async {
-                                                      try {
-                                                        await FirebaseFirestore
-                                                            .instance
-                                                            .collection('Rooms')
-                                                            .doc(docId)
-                                                            .delete();
-                                                        Navigator.pop(context);
-                                                        QuickAlert.show(
-                                                          onCancelBtnTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          onConfirmBtnTap: () {
-                                                            Navigator.pop(
-                                                                context);
-                                                          },
-                                                          context: context,
-                                                          type: QuickAlertType
-                                                              .success,
-                                                          text:
-                                                              'Room deleted successfully!',
-                                                          titleAlignment:
-                                                              TextAlign.center,
-                                                          textAlignment:
-                                                              TextAlign.center,
-                                                          confirmBtnText: 'Ok',
-                                                          cancelBtnText: 'No',
-                                                          confirmBtnColor:
-                                                              Colors.blue,
-                                                          backgroundColor:
-                                                              Colors.white,
-                                                          headerBackgroundColor:
-                                                              Colors.grey,
-                                                          confirmBtnTextStyle:
-                                                              const TextStyle(
-                                                            color: Colors.white,
-                                                            fontWeight:
-                                                                FontWeight.bold,
-                                                          ),
-                                                          titleColor:
-                                                              Colors.black,
-                                                          textColor:
-                                                              Colors.black,
-                                                        );
-                                                      } catch (e) {
-                                                        print(e);
-                                                      }
-                                                    },
-                                                    context: context,
-                                                    type:
-                                                        QuickAlertType.confirm,
-                                                    text:
-                                                        "Are you sure you want to delete this room?",
-                                                    titleAlignment:
-                                                        TextAlign.center,
-                                                    textAlignment:
-                                                        TextAlign.center,
-                                                    confirmBtnText: 'Yes',
-                                                    cancelBtnText: 'No',
-                                                    confirmBtnColor:
-                                                        Colors.blue,
-                                                    backgroundColor:
-                                                        Colors.white,
-                                                    headerBackgroundColor:
-                                                        Colors.grey,
-                                                    confirmBtnTextStyle:
-                                                        const TextStyle(
-                                                      color: Colors.white,
+                                          SizedBox(width: 10),
+                                          Expanded(
+                                            child: Container(
+                                              color: Colors.white,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: [
+                                                  Text(
+                                                    '${data['roomNameNumber']}',
+                                                    style: TextStyle(
                                                       fontWeight:
                                                           FontWeight.bold,
+                                                      fontSize: 15,
                                                     ),
-                                                    titleColor: Colors.black,
-                                                    textColor: Colors.black,
-                                                  );
-                                                },
-                                                child: const Icon(
-                                                  Icons.delete_forever_outlined,
-                                                  color: Colors.grey,
-                                                  size: 25,
+                                                  ),
+                                                  Text(
+                                                    data['roomStatus'],
+                                                    style: TextStyle(
+                                                      color:
+                                                          Colors.orangeAccent,
+                                                      fontWeight:
+                                                          FontWeight.w300,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                          Container(
+                                            width: 110,
+                                            padding: EdgeInsets.symmetric(
+                                                horizontal: 10),
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              children: [
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    Text(
+                                                      '₱ ${data['price'] ?? '---'} per month',
+                                                      style: const TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.bold,
+                                                        fontSize: 10,
+                                                      ),
+                                                    ),
+                                                  ],
                                                 ),
-                                              ) : SizedBox(),
-                                            ],
+                                                Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.end,
+                                                  children: [
+                                                    data['roomStatus'] !=
+                                                            "unavailable"
+                                                        ? GestureDetector(
+                                                            onTap: () {
+                                                              QuickAlert.show(
+                                                                onCancelBtnTap:
+                                                                    () {
+                                                                  Navigator.pop(
+                                                                      context);
+                                                                },
+                                                                onConfirmBtnTap:
+                                                                    () async {
+                                                                  try {
+                                                                    await FirebaseFirestore
+                                                                        .instance
+                                                                        .collection(
+                                                                            'Rooms')
+                                                                        .doc(
+                                                                            docId)
+                                                                        .delete();
+                                                                    Navigator.pop(
+                                                                        context);
+                                                                    QuickAlert
+                                                                        .show(
+                                                                      onCancelBtnTap:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      onConfirmBtnTap:
+                                                                          () {
+                                                                        Navigator.pop(
+                                                                            context);
+                                                                      },
+                                                                      context:
+                                                                          context,
+                                                                      type: QuickAlertType
+                                                                          .success,
+                                                                      text:
+                                                                          'Room deleted successfully!',
+                                                                      titleAlignment:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      textAlignment:
+                                                                          TextAlign
+                                                                              .center,
+                                                                      confirmBtnText:
+                                                                          'Ok',
+                                                                      cancelBtnText:
+                                                                          'No',
+                                                                      confirmBtnColor:
+                                                                          Colors
+                                                                              .blue,
+                                                                      backgroundColor:
+                                                                          Colors
+                                                                              .white,
+                                                                      headerBackgroundColor:
+                                                                          Colors
+                                                                              .grey,
+                                                                      confirmBtnTextStyle:
+                                                                          const TextStyle(
+                                                                        color: Colors
+                                                                            .white,
+                                                                        fontWeight:
+                                                                            FontWeight.bold,
+                                                                      ),
+                                                                      titleColor:
+                                                                          Colors
+                                                                              .black,
+                                                                      textColor:
+                                                                          Colors
+                                                                              .black,
+                                                                    );
+                                                                  } catch (e) {
+                                                                    print(e);
+                                                                  }
+                                                                },
+                                                                context:
+                                                                    context,
+                                                                type:
+                                                                    QuickAlertType
+                                                                        .confirm,
+                                                                text:
+                                                                    "Are you sure you want to delete this room?",
+                                                                titleAlignment:
+                                                                    TextAlign
+                                                                        .center,
+                                                                textAlignment:
+                                                                    TextAlign
+                                                                        .center,
+                                                                confirmBtnText:
+                                                                    'Yes',
+                                                                cancelBtnText:
+                                                                    'No',
+                                                                confirmBtnColor:
+                                                                    Colors.blue,
+                                                                backgroundColor:
+                                                                    Colors
+                                                                        .white,
+                                                                headerBackgroundColor:
+                                                                    Colors.grey,
+                                                                confirmBtnTextStyle:
+                                                                    const TextStyle(
+                                                                  color: Colors
+                                                                      .white,
+                                                                  fontWeight:
+                                                                      FontWeight
+                                                                          .bold,
+                                                                ),
+                                                                titleColor:
+                                                                    Colors
+                                                                        .black,
+                                                                textColor:
+                                                                    Colors
+                                                                        .black,
+                                                              );
+                                                            },
+                                                            child: const Icon(
+                                                              Icons
+                                                                  .delete_forever_outlined,
+                                                              color:
+                                                                  Colors.grey,
+                                                              size: 25,
+                                                            ),
+                                                          )
+                                                        : SizedBox(),
+                                                  ],
+                                                ),
+                                              ],
+                                            ),
                                           ),
                                         ],
                                       ),
                                     ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        },
-                      );
-                    },
+                                  ),
+                                );
+                              },
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
                 ),
                 Container(
@@ -320,31 +385,20 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                         padding:
                             EdgeInsets.only(left: 30, right: 30, bottom: 20),
                         child: SizedBox(
-                          height: 40,
-                          child: ElevatedButton(
-                            onPressed: () async {
+                          height: 50,
+                          width: 200,
+                          child: GlowButton(
+                            borderRadius: BorderRadius.circular(20),
+                            onPressed: () {
                               print(OwnerUuId);
-                              Navigator.pushNamed(context, '/AddRooms');
+                              Get.to(() => AddRooms());
                             },
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: Color(0xFF31355C),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(10),
-                              ),
-                            ),
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                Text(
-                                  "Add Rooms",
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.w500,
-                                  ),
-                                ),
-                              ],
-                            ),
+                            child: 'Add Rooms'
+                                .text
+                                .fontFamily(AppFonts.quicksand)
+                                .size(20)
+                                .white
+                                .make(),
                           ),
                         ),
                       ),

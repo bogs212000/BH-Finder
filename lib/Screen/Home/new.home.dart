@@ -8,6 +8,7 @@ import 'package:bh_finder/assets/images.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -79,7 +80,9 @@ class _HomeState extends State<Home> {
                             .make(),
                         Image.asset(
                           AppImages.street,
-                        ),
+                        ).animate()
+                            .fade(duration: 100.ms)
+                            .scale(delay: 100.ms),
                       ],
                     );
                   }
@@ -115,7 +118,9 @@ class _HomeState extends State<Home> {
                                     Expanded(
                                         child: Column(
                                           children: [
-                                            Image.asset(AppImages.street),
+                                            Image.asset(AppImages.street).animate()
+                                                .fade(duration: 100.ms)
+                                                .scale(delay: 100.ms),
                                             10.heightBox,
                                             data['paid?'] == false ? Padding(
                                               padding: const EdgeInsets.only(left: 10, right: 10),
@@ -133,7 +138,9 @@ class _HomeState extends State<Home> {
                                                     onPressed: () {
                                                       Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
                                                     }),
-                                              ),
+                                              ).animate()
+                                                  .fade(duration: 200.ms)
+                                                  .scale(delay: 200.ms),
                                             ) : Padding(
                                               padding: const EdgeInsets.only(left: 20, right: 20),
                                               child: SizedBox(

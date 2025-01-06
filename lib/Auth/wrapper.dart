@@ -14,6 +14,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
 import '../Screen/Home/nav.home.dart';
+import '../Screen/Owner/new/new.nav.owner.dart';
 import '../Screen/Owner/owner.home.screen.dart';
 import '../Screen/SignUp/guest.screen.dart';
 import '../cons.dart';
@@ -59,7 +60,7 @@ class Wrapper extends StatelessWidget {
             ) {
               if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Owner")) {
-                return OwnerNav();
+                return NewOwnerNav();
               } else if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Boarder") &&
                   (user != null && !user.emailVerified)) {

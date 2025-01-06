@@ -33,6 +33,7 @@ class _RoomNewState extends State<RoomNew> {
   final RefreshController _refreshController =
       RefreshController(initialRefresh: false);
   String? room;
+  User? cUser = FirebaseAuth.instance.currentUser;
 
   @override
   void initState() {
@@ -295,7 +296,16 @@ class _RoomNewState extends State<RoomNew> {
                               child: GlowButton(
                                   borderRadius: BorderRadius.circular(20),
                                   child: 'Reserve Now'.text.white.make(),
-                                  onPressed: ()async {
+                                  onPressed: ()async { if (cUser == null) {
+                                    QuickAlert.show(
+                                        text: 'Sign in first to continue',
+                                        context: context,
+                                        type: QuickAlertType.info,
+                                        onConfirmBtnTap: () {
+                                          Navigator.pop(context);
+                                        });
+                                  }
+                                  else {
                                     try {
                                       CollectionReference collectionRef =
                                       FirebaseFirestore.instance
@@ -326,7 +336,8 @@ class _RoomNewState extends State<RoomNew> {
                                                     .currentUser
                                                     ?.email
                                                     ?.toLowerCase())
-                                                .where('roomId', isEqualTo: room)
+                                                .where(
+                                                'roomId', isEqualTo: room)
                                                 .where('status',
                                                 isEqualTo: 'pending')
                                                 .get()
@@ -429,7 +440,9 @@ class _RoomNewState extends State<RoomNew> {
                                             confirmBtnColor: Colors.blue,
                                           );
                                         } else {
-                                          Get.to(()=>BoarderReservationScreen(), arguments: [Get.arguments[0]]);
+                                          Get.to(() =>
+                                              BoarderReservationScreen(),
+                                              arguments: [Get.arguments[0]]);
                                           // Navigator.push(
                                           //     context,
                                           //     MaterialPageRoute(
@@ -460,6 +473,7 @@ class _RoomNewState extends State<RoomNew> {
                                       print(
                                           'Error fetching document: $e'); // Log the error for debugging
                                     }
+                                  }
                                   }),
                             )
                           ],

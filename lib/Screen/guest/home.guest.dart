@@ -1,9 +1,12 @@
+import 'package:bh_finder/Screen/Search/search.screen.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
+import 'package:bh_finder/Screen/about/about.screen.dart';
 import 'package:bh_finder/assets/fonts.dart';
 import 'package:bh_finder/assets/images.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
@@ -12,6 +15,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../cons.dart';
+import '../BHouse/bh.new.dart';
 import '../BHouse/bh.screen.dart';
 
 class HomeGuest extends StatefulWidget {
@@ -43,7 +47,7 @@ class _HomeGuestState extends State<HomeGuest> {
                   Spacer(),
                   GestureDetector(
                       onTap: () {
-                        Get.to(() => AboutApp());
+                        Get.to(() => AboutScreen());
                       },
                       child: Icon(Icons.info_outline)),
                 ],
@@ -54,7 +58,9 @@ class _HomeGuestState extends State<HomeGuest> {
                 child: Row(
                   children: [
                     Expanded(
-                        child: VxBox(child: Image.asset(AppImages.welcome))
+                        child: VxBox(child: Image.asset(AppImages.welcome).animate()
+                            .fade(duration: 200.ms)
+                            .scale(delay: 200.ms))
                             .white
                             .make()),
                     Expanded(
@@ -166,8 +172,8 @@ class _HomeGuestState extends State<HomeGuest> {
                               OwnerUuId = data['OwnerUId'];
                               rBHouseDocId = data['Email'];
                             });
-                            Get.to(() => BHouseScreen(), arguments: [
-                              data['OwnerUId'],
+                            Get.to(() => const BhouseScreenNew(), arguments: [
+                              data['OwnerUId'].toString(),
                               data['Email'],
                               data["OwnerUId"]
                             ]);
@@ -273,7 +279,7 @@ class _HomeGuestState extends State<HomeGuest> {
                           ],
                         ),
                         onPressed: () {
-                          Get.to(() => SignInScreen());
+                          Get.to(() => SearchScreen());
                         }),
                   ),
                 ],

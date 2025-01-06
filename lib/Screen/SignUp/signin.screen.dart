@@ -75,7 +75,9 @@ class _SignInScreenState extends State<SignInScreen> {
                               Expanded(
                                 child: Image.asset(
                                   AppImages.sign_in,
-                                ),
+                                ).animate()
+                                    .fade(duration: 200.ms)
+                                    .scale(delay: 200.ms),
                               ),
                               Expanded(
                                   child: VxBox(

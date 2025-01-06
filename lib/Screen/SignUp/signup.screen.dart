@@ -5,6 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_animate/flutter_animate.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:quickalert/models/quickalert_type.dart';
@@ -99,7 +100,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
-                        Image.asset(AppImages.fill_up, height: 150),
+                        Image.asset(AppImages.fill_up, height: 150).animate()
+                            .fade(duration: 200.ms)
+                            .scale(delay: 200.ms),
                         Padding(
                           padding: const EdgeInsets.only(left: 5, right: 5),
                           child:

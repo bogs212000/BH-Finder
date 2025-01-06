@@ -1,3 +1,4 @@
+import 'package:bh_finder/assets/images.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
@@ -88,8 +89,14 @@ class _PaymentLogsState extends State<PaymentLogs> {
               );
             }
             if (snapshot.data?.size == 0) {
-              return const Center(
-                child: Text('No notifications yet!'),
+              return Center(
+                child: Column(
+                  children: [
+                    50.heightBox,
+                    Image.asset(AppImages.lost, height: 200),
+                    Text('No payment logs yet!'),
+                  ],
+                ),
               );
             }
             Row(children: const [
@@ -143,12 +150,12 @@ class _PaymentLogsState extends State<PaymentLogs> {
                                   .color(Colors.grey)
                                   .make(),
                               Spacer(),
-                              data['contactNumber'].toString()
-                                  .text
-                                  .size(12)
-                                  .light
-                                  .color(Colors.grey)
-                                  .make(),
+                              // data['contactNumber'].toString()
+                              //     .text
+                              //     .size(12)
+                              //     .light
+                              //     .color(Colors.grey)
+                              //     .make(),
                             ],
                           ),
                           Divider(),

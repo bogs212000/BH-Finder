@@ -11,6 +11,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:get/get.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -49,7 +50,7 @@ class _ViewRoomState extends State<ViewRoom> {
     super.initState();
     bHouseRoom = FirebaseFirestore.instance
         .collection('Rooms')
-        .doc(widget.viewRoomId)
+        .doc(Get.arguments[0])
         .get();
   }
 
@@ -78,7 +79,7 @@ class _ViewRoomState extends State<ViewRoom> {
     setState(() {
       bHouseRoom = FirebaseFirestore.instance
           .collection('Rooms')
-          .doc(widget.viewRoomId)
+          .doc('${Get.arguments[0]}')
           .get();
     });
     await Future.delayed(
@@ -690,15 +691,34 @@ class _ViewRoomState extends State<ViewRoom> {
 
                                                                 Navigator.pop(
                                                                     context); // Close the loading dialog
-                                                                await FirebaseFirestore.instance.collection('Payment logs').doc().set({
-                                                                  'ownerUid': data['ownerUid'],
-                                                                  'boardersName': data['boardersName'],
-                                                                  'boardersIn': data['boardersIn'],
-                                                                  'boardersOut': data['boardersOut'],
-                                                                  'price': data['price'],
-                                                                  'contactNumber': data['contactNumber'],
-                                                                  'bHouseName': data['bHouseName'],
-                                                                  'createdAt': DateTime.now(),
+                                                                await FirebaseFirestore
+                                                                    .instance
+                                                                    .collection(
+                                                                        'Payment logs')
+                                                                    .doc()
+                                                                    .set({
+                                                                  'ownerUid': data[
+                                                                      'ownerUid'],
+                                                                  'boardersName':
+                                                                      data[
+                                                                          'boardersName'],
+                                                                  'boardersIn':
+                                                                      data[
+                                                                          'boardersIn'],
+                                                                  'boardersOut':
+                                                                      data[
+                                                                          'boardersOut'],
+                                                                  'price': data[
+                                                                      'price'],
+                                                                  'contactNumber':
+                                                                      data[
+                                                                          'contactNumber'],
+                                                                  'bHouseName':
+                                                                      data[
+                                                                          'bHouseName'],
+                                                                  'createdAt':
+                                                                      DateTime
+                                                                          .now(),
                                                                 });
                                                                 QuickAlert.show(
                                                                   context:
@@ -762,11 +782,7 @@ class _ViewRoomState extends State<ViewRoom> {
                           padding: EdgeInsets.only(top: 40, left: 20),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => ListRoomsScreen()),
-                              );
+                              Get.back();
                             },
                             child: Container(
                               height: 35,
@@ -819,8 +835,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                         title: 'Cleaning successful',
                                         context: (context),
                                         type: QuickAlertType.success);
-                                    setState(() {
-                                    });
+                                    setState(() {});
                                     _onRefresh();
                                   } catch (e) {
                                     print(e);
@@ -870,20 +885,20 @@ class _ViewRoomState extends State<ViewRoom> {
                                 padding: EdgeInsets.only(top: 40, right: 20),
                                 child: GestureDetector(
                                   onTap: () {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => ChatBoarders(
-                                          token: data['token'],
-                                          boarderNumber:
-                                              data['boardersConNumber'],
-                                          boarderEmail: data['boarderEmail'],
-                                          ownerToken: ownerToken,
-                                          name: data['boardersName'],
-                                          bhouseName: data['bHouseName'],
-                                        ),
-                                      ),
-                                    );
+                                    // Navigator.push(
+                                    //   context,
+                                    //   MaterialPageRoute(
+                                    //     builder: (context) => ChatBoarders(
+                                    //       token: data['token'],
+                                    //       boarderNumber:
+                                    //           data['boardersConNumber'],
+                                    //       boarderEmail: data['boarderEmail'],
+                                    //       ownerToken: ownerToken,
+                                    //       name: data['boardersName'],
+                                    //       bhouseName: data['bHouseName'],
+                                    //     ),
+                                    //   ),
+                                    // );
                                   },
                                   child: Container(
                                     height: 35,

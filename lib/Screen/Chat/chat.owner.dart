@@ -346,6 +346,7 @@ class _ChatOwnerState extends State<ChatOwner> {
         'ownerNumber': '${widget.ownerNumber.toString()}',
         'ownerToken': widget.token.toString(),
         'myToken': myToken,
+        'boarderNumber': bPhoneNumber,
       });
       await FirebaseFirestore.instance
           .collection('BoardingHouses')

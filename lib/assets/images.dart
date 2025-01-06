@@ -19,6 +19,8 @@ class AppImages {
   static const fill_up = 'assets/images/undraw_mobile-posts_kc42.png';
   static const notif = 'assets/images/undraw_warning_qn4r.png';
   static const vault = 'assets/images/undraw_vault_tyfh.png';
+  static const lost = 'assets/images/undraw_lost_teip.png';
+  static const chat_borders = 'assets/images/undraw_chatting_5u5z.png';
 }
 
 class AboutApp{

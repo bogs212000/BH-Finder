@@ -81,6 +81,7 @@ dependencies:
   flutter_local_notifications: ^13.0.0
   get: ^4.6.6
   flutter_glow: ^0.3.2
+  animations: ^2.0.11
 
 
 #  geolocator: ^9.0.2

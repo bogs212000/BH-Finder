@@ -5,6 +5,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import 'package:get/get.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:googleapis_auth/auth.dart';
 import 'package:googleapis_auth/auth_io.dart';
@@ -15,12 +16,12 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 import '../../cons.dart';
+import 'owner.chat.list.dart';
 
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class ChatBoarders extends StatefulWidget {
-  final String? boarderNumber, token, ownerToken, boarderEmail, name, bhouseName;
-  ChatBoarders({Key? key, this.boarderNumber, this.token, this.ownerToken, this.boarderEmail, this.name, this.bhouseName}) : super(key: key);
+  ChatBoarders({Key? key,}) : super(key: key);
 
   @override
   State<ChatBoarders> createState() => _ChatBoardersState();
@@ -52,7 +53,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         },
         body: jsonEncode({
           'message': {
-            'token': widget.token,
+            'token': Get.arguments[1],
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,
@@ -84,6 +85,13 @@ class _ChatBoardersState extends State<ChatBoarders> {
   }
 
   @override
+  void initState() {
+    // TODO: implement initState
+    super.initState();
+    print('${Get.arguments[0]}');
+  }
+
+  @override
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     double screenWidth = MediaQuery.of(context).size.width;
@@ -94,8 +102,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
           Navigator.pop(context);
         },
         onConfirmBtnTap: () async {
-          String number = '${widget.boarderNumber}'; //set the number here
-          bool? res = await FlutterPhoneDirectCaller.callNumber(number);
+         await FlutterPhoneDirectCaller.callNumber(bPhone!);
           Navigator.pop(context);
         },
         context: context,
@@ -121,7 +128,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
       appBar: AppBar(
         leading: GestureDetector(
           onTap: () {
-            Navigator.pop(context);
+            Get.back();
           },
           child: const Icon(
             Icons.arrow_back_ios_new,
@@ -175,7 +182,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
             child: StreamBuilder(
               stream: _firestore
                   .collection('Chats')
-                  .doc('${widget.boarderEmail}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+                  .doc('${Get.arguments[3]}+${FirebaseAuth.instance.currentUser?.email.toString()}')
                   .collection('Chats')
                   .orderBy('createdAt', descending: false)
                   .snapshots(),
@@ -323,22 +330,23 @@ class _ChatBoardersState extends State<ChatBoarders> {
       try{
         await FirebaseFirestore.instance
             .collection('Chats')
-            .doc('${widget.boarderEmail}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+            .doc('${Get.arguments[3]}+${FirebaseAuth.instance.currentUser?.email.toString()}')
             .set({
           'ownerEmail': FirebaseAuth.instance.currentUser?.email.toString(),
-          'email': widget.boarderEmail,
-          'bHouse': widget.bhouseName,
-          'name': widget.name,
+          'email': Get.arguments[3],
+          'bHouse': Get.arguments[5],
+          'name': Get.arguments[4],
           'role': 'boarder',
           'createdAt': DateTime.now(),
-          'myToken': widget.token,
-          'ownerToken': widget.ownerToken,
+          'myToken': Get.arguments[1],
+          'ownerToken': Get.arguments[2],
           'seenBorder?': true,
           'seenOwner?': false,
+          'boarderNumber': bPhone,
         });
         await FirebaseFirestore.instance
             .collection('Chats')
-            .doc('${widget.boarderEmail}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+            .doc('${Get.arguments[3]}+${FirebaseAuth.instance.currentUser?.email.toString()}')
             .collection('Chats')
             .add({
           'date': date,
@@ -349,7 +357,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         });
         print('Success!');
         String body = _messageController.text;
-        String title = widget.bhouseName.toString();
+        String title = Get.arguments[5].toString();
         _messageController.clear();
         sendPushMessage(body, title);
       } catch(e){print(e);}

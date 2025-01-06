@@ -1,14 +1,18 @@
 import 'package:bh_finder/Screen/Chat/chat.list.dart';
+import 'package:bh_finder/Screen/Chat/owner.chat.list.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
-import 'package:bh_finder/Screen/PrivacyPolicy/privacy.policy.dart';
+import 'package:bh_finder/Screen/Owner/BHouseProfile/bhouse.profile.dart';
+import 'package:bh_finder/Screen/Owner/owner.home.screen.dart';
+import 'package:bh_finder/Screen/Owner/payment.logs.dart';
 import 'package:bh_finder/Screen/Profile/user.profile.dart';
 import 'package:bh_finder/Screen/Search/search.screen.dart';
 import 'package:bh_finder/Screen/TermsAndConditons/terms.conditions.dart';
+import 'package:bh_finder/Screen/UserGuide/UsersGuide.dart';
 import 'package:bh_finder/Screen/about/about.screen.dart';
-import 'package:bh_finder/assets/images.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flashy_tab_bar2/flashy_tab_bar2.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
@@ -18,35 +22,34 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
-import '../../cons.dart';
-import '../../fetch.dart';
-import '../../main.dart';
-import '../UserGuide/UsersGuide.dart';
-import '../notification/notification.screen.dart';
-import 'new.home.dart';
+import '../../../assets/images.dart';
+import '../../../cons.dart';
+import '../../../fetch.dart';
+import '../../PrivacyPolicy/privacy.policy.dart';
+import '../owner.notification.dart';
+import 'new.owner.home.dart';
 
-class NavHome extends StatefulWidget {
+class NewOwnerNav extends StatefulWidget {
   @override
-  _NavHomeState createState() => _NavHomeState();
+  _NewOwnerNavState createState() => _NewOwnerNavState();
 }
 
-class _NavHomeState extends State<NavHome> {
-  int _selectedIndex = 0;
+class _NewOwnerNavState extends State<NewOwnerNav> {
   String? userEmail = FirebaseAuth.instance.currentUser?.email;
   late AndroidNotificationChannel channel;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
   User? currentUser = FirebaseAuth.instance.currentUser;
   late Future<DocumentSnapshot> notification;
   List<Widget> tabItems = [
-    Home(),
-    ChatList(),
-    SearchScreen(),
-    UserProfile(),
+    NewOwnerHome(),
+    OwnerChatList(),
+    PaymentLogs(),
+    BHouseProfile(),
   ];
 
   @override
   void initState() {
-    fetchBoarderData(setState);
+    fetchOwnerData(setState);
     Navigator.of(context).popUntil((route) => route.isFirst);
     if (userEmail != null) {
       notification =
@@ -168,38 +171,93 @@ class _NavHomeState extends State<NavHome> {
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     return Scaffold(
-      backgroundColor: Colors.transparent,
-      // drawer: Drawer(
-      //   backgroundColor: Colors.white,
-      //   child: ListView(
-      //     padding: EdgeInsets.zero,
-      //     children: [
-      //       SizedBox(height: 40),
-      //       const Row(children: [
-      //         SizedBox(width: 10),
-      //         Text(
-      //           "BH Finder",
-      //           style: TextStyle(
-      //               fontSize: 20.0,
-      //               color: Colors.blueAccent,
-      //               letterSpacing: 1.0,
-      //               fontWeight: FontWeight.bold),
-      //         ),
-      //       ]),
-      //
-      //       //profile
-      //       ListTile(
-      //         contentPadding: EdgeInsets.only(left: 20),
-      //         leading:
-      //             Icon(Icons.person_outline, size: 30, color: Colors.black),
-      //         title: const Text('Profile',
-      //             style: TextStyle(
-      //                 fontWeight: FontWeight.bold, color: Colors.black)),
-      //         onTap: () {},
-      //       ),
-      //     ],
-      //   ),
-      // ),
+      drawer: Drawer(
+        child: Column(
+          children: [
+            20.heightBox,
+            Row(
+              children: [
+                10.widthBox,
+                Image.asset(
+                  AppImages.logo,
+                  height: 70,
+                ),
+                'BH Finder'.text.bold.size(20).make(),
+              ],
+            ),
+            20.heightBox,
+            ListTile(
+              leading: Icon(
+                Icons.account_circle,
+                color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Profile'.text.size(15).make(),
+              onTap: (){
+                setState(() {
+                  selectedIndex = 3;
+                });
+                Get.back();
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.book_outlined,
+                color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'User guide'.text.size(15).make(),
+              onTap: (){
+                Get.to(() => UsersGuideScreen());
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.security,
+                color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Privacy policy'.text.size(15).make(),
+              onTap: (){
+                Get.to(() => PrivacyPolicyScreen());
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.bookmark_border,
+                color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Terms and Conditions'.text.size(15).make(),
+              onTap: () {
+                Get.to(() => TermsAndConditionsScreen());
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.info_outline,
+                color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'About'.text.size(15).make(),
+              onTap: () {
+                Get.to(() => AboutScreen());
+              },
+            ),
+            ListTile(
+              leading: Icon(
+                Icons.outbond_outlined,
+                color: Colors.blue.shade900,
+                size: 20,
+              ),
+              title: 'Sign out'.text.size(15).make(),
+              onTap: () async {
+                await FirebaseAuth.instance.signOut();
+              },
+            ),
+          ],
+        ),
+      ),
       appBar: AppBar(
         title: Row(
           children: [
@@ -207,14 +265,13 @@ class _NavHomeState extends State<NavHome> {
             ' BH FINDER'.text.size(20).extraBold.blue900.make(),
           ],
         ),
-        backgroundColor: Colors.transparent,
-        elevation: 0,
+        backgroundColor: Colors.white,
         actions: [
           currentUser != null && userEmail != null
               ? StreamBuilder<DocumentSnapshot>(
                   stream: FirebaseFirestore.instance
-                      .collection('Users')
-                      .doc(userEmail)
+                      .collection('BoardingHouses')
+                      .doc(FirebaseAuth.instance.currentUser!.email.toString())
                       .snapshots(),
                   builder: (BuildContext context,
                       AsyncSnapshot<DocumentSnapshot> snapshot) {
@@ -247,20 +304,16 @@ class _NavHomeState extends State<NavHome> {
                       padding: EdgeInsets.only(right: 10),
                       child: GestureDetector(
                         onTap: () async {
+                          setState(() {
+                            Get.to(() => OwnerNotificationScreen());
+                          });
                           await FirebaseFirestore.instance
-                              .collection('Users')
+                              .collection('BoardingHouses')
                               .doc(FirebaseAuth.instance.currentUser?.email
                                   .toString())
                               .update({
                             'notification': 0,
                           });
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => NotificationScreen(
-                                      boardersID: bUuId,
-                                    )),
-                          );
                         },
                         child: Stack(
                           children: [
@@ -281,10 +334,10 @@ class _NavHomeState extends State<NavHome> {
                                   ),
                                 ],
                               ),
-                              child: const Center(
+                              child: Center(
                                 child: Icon(
                                   Icons.notifications_active_outlined,
-                                  color: Colors.black,
+                                  color: Colors.blue[900],
                                 ),
                               ),
                             ),
@@ -322,107 +375,126 @@ class _NavHomeState extends State<NavHome> {
                   },
                 )
               : SizedBox(),
+          currentUser != null
+              ? StreamBuilder<DocumentSnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('BoardingHouses')
+                      .doc(FirebaseAuth.instance.currentUser!.email.toString())
+                      .snapshots(),
+                  builder: (BuildContext context,
+                      AsyncSnapshot<DocumentSnapshot> snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Shimmer.fromColors(
+                        baseColor: Colors.grey.shade200,
+                        highlightColor: Colors.white,
+                        child: Padding(
+                          padding: EdgeInsets.only(left: 20, right: 20),
+                          child: Container(
+                            height: 35,
+                            width: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.grey,
+                              borderRadius: BorderRadius.circular(10),
+                            ),
+                          ),
+                        ),
+                      );
+                    }
+                    if (snapshot.hasError) {
+                      return const Center(child: Text('Error fetching data'));
+                    }
+                    if (!snapshot.hasData || !snapshot.data!.exists) {
+                      return const Center(child: Text('No Reservation found'));
+                    }
+                    Map<String, dynamic> data =
+                        snapshot.data!.data() as Map<String, dynamic>;
+                    return Padding(
+                      padding: EdgeInsets.only(right: 10),
+                      child: GestureDetector(
+                        onTap: () async {
+                          setState(() {
+                            selectedIndex = 1;
+                          });
+                          await FirebaseFirestore.instance
+                              .collection('BoardingHouses')
+                              .doc(FirebaseAuth.instance.currentUser?.email
+                                  .toString())
+                              .update({
+                            'chat': 0,
+                          });
+                        },
+                        child: Stack(
+                          children: [
+                            Container(
+                              height: 35,
+                              width: 35,
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.5),
+                                border:
+                                    Border.all(color: Colors.grey, width: 0.3),
+                                borderRadius: BorderRadius.circular(20),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.2),
+                                    spreadRadius: 1,
+                                    blurRadius: 1,
+                                    offset: Offset(0, 1),
+                                  ),
+                                ],
+                              ),
+                              child: Center(
+                                child: Icon(
+                                  Icons.message_outlined,
+                                  color: Colors.blue[900],
+                                ),
+                              ),
+                            ),
+                            data['chat'] != 0
+                                ? Container(
+                                    height: 35,
+                                    width: 35,
+                                    child: Column(
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.end,
+                                          children: [
+                                            CircleAvatar(
+                                              backgroundColor: Colors.red,
+                                              radius: 8,
+                                              child: Center(
+                                                  child: '${data['chat']}'
+                                                      .text
+                                                      .size(1)
+                                                      .color(Colors.white)
+                                                      .make()),
+                                            )
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  )
+                                : SizedBox(),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                )
+              : SizedBox(),
         ],
       ),
-      extendBodyBehindAppBar: true,
-      drawer: Drawer(
-        child: Column(
-          children: [
-            20.heightBox,
-            Row(
-              children: [
-                10.widthBox,
-                Image.asset(
-                  AppImages.logo,
-                  height: 70,
-                ),
-                'BH Finder'.text.bold.size(20).make(),
-              ],
-            ),
-            20.heightBox,
-            ListTile(
-              leading: Icon(
-                Icons.account_circle,
-                color: Colors.blue.shade900,
-                size: 20,
-              ),
-              title: 'Profile'.text.size(15).make(),
-              onTap: (){
-                setState(() {
-                  _selectedIndex = 3;
-                });
-                Get.back();
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.book_outlined,
-                color: Colors.blue.shade900,
-                size: 20,
-              ),
-              title: 'User guide'.text.size(15).make(),
-              onTap: (){
-                Get.to(() => UsersGuideScreen());
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.security,
-                color: Colors.blue.shade900,
-                size: 20,
-              ),
-              title: 'Privacy policy'.text.size(15).make(),
-              onTap: (){
-                Get.to(() => PrivacyPolicyScreen());
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.bookmark_border,
-                color: Colors.blue.shade900,
-                size: 20,
-              ),
-              title: 'Terms and Conditions'.text.size(15).make(),
-              onTap: (){
-                Get.to(() => TermsAndConditionsScreen());
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.info_outline,
-                color: Colors.blue.shade900,
-                size: 20,
-              ),
-              title: 'About'.text.size(15).make(),
-              onTap: (){
-                Get.to(() => AboutScreen());
-              },
-            ),
-            ListTile(
-              leading: Icon(
-                Icons.outbond_outlined,
-                color: Colors.blue.shade900,
-                size: 20,
-              ),
-              title: 'Sign out'.text.size(15).make(),
-              onTap: () async {
-                await FirebaseAuth.instance.signOut();
-              },
-            ),
-          ],
-        ),
-      ),
       body: Center(
-        child: tabItems[_selectedIndex],
+        child: tabItems[selectedIndex],
       ),
       bottomNavigationBar: FlashyTabBar(
         animationCurve: Curves.linear,
-        selectedIndex: _selectedIndex,
+        selectedIndex: selectedIndex,
         iconSize: 30,
         showElevation: false,
         // use this to remove appBar's elevation
         onItemSelected: (index) => setState(() {
-          _selectedIndex = index;
+          selectedIndex = index;
         }),
         items: [
           FlashyTabBarItem(
@@ -434,8 +506,8 @@ class _NavHomeState extends State<NavHome> {
             title: Text('Chats'),
           ),
           FlashyTabBarItem(
-            icon: Icon(Icons.search),
-            title: Text('Search'),
+            icon: Icon(Icons.featured_play_list),
+            title: Text('Logs'),
           ),
           FlashyTabBarItem(
             icon: Icon(Icons.account_circle),

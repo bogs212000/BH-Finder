@@ -66,7 +66,9 @@ class _ViewUserState extends State<ViewUser> {
     return loading
         ? LoadingScreen()
         : Scaffold(
-      appBar: AppBar(),
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+      ),
       backgroundColor: Colors.white,
       body: SmartRefresher(
         enablePullDown: true,
