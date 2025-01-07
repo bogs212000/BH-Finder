@@ -19,6 +19,7 @@ import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:uuid/uuid.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
+import '../../api.dart';
 import '../../cons.dart';
 import '../../fetch.dart';
 import '../BHouse/room.screen.dart';
@@ -69,7 +70,7 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle
-            .loadString('assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
+            .loadString('assets/firebase/${Api.notifications}'),
       );
 
       final client =

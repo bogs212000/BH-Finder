@@ -116,6 +116,7 @@ flutter:
      - assets/images/
      - assets/fonts/
      - assets/firebase/bh-finder-50ccf-firebase-adminsdk-qu8mx-b15f6f7f15.json
+     - assets/firebase/
      - assets/firebase/bh-finder-50ccf-24e13bbe3c81.json
   #   - images/a_dot_ham.jpeg
 

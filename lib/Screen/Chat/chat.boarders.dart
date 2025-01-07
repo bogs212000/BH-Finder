@@ -15,6 +15,7 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
+import '../../api.dart';
 import '../../cons.dart';
 import 'owner.chat.list.dart';
 
@@ -37,7 +38,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle.loadString(
-            'assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
+            'assets/firebase/${Api.notifications}'),
       );
 
       final client =
@@ -53,7 +54,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         },
         body: jsonEncode({
           'message': {
-            'token': Get.arguments[1],
+            'token': '${Get.arguments[1]}',
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,

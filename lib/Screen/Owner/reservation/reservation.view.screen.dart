@@ -24,6 +24,7 @@ import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
+import '../../../api.dart';
 import '../../../cons.dart';
 import '../owner.home.screen.dart';
 import 'package:http/http.dart' as http;
@@ -57,7 +58,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle
-            .loadString('assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
+            .loadString('assets/firebase/${Api.notifications}'),
       );
 
       final client =

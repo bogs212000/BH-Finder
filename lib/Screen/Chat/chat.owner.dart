@@ -15,6 +15,7 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 import 'package:velocity_x/velocity_x.dart';
+import '../../api.dart';
 import '../../cons.dart';
 
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
@@ -41,7 +42,7 @@ class _ChatOwnerState extends State<ChatOwner> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle.loadString(
-            'assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
+            'assets/firebase/${Api.notifications}'),
       );
 
       final client =
