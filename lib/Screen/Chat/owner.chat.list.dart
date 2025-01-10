@@ -39,6 +39,7 @@ class _OwnerChatListState extends State<OwnerChatList> {
       height: double.infinity,
       child: Column(
         children: [
+          70.heightBox,
           Image.asset(AppImages.chat_borders, height: 100),
           10.heightBox,
           Expanded(

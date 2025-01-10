@@ -749,22 +749,6 @@ class _BHouseScreenState extends State<BHouseScreen> {
                             padding: EdgeInsets.only(top: 40, right: 20),
                             child: GestureDetector(
                               onTap: () {
-                                setState(() {
-                                  ownerEmail = data['Email'].toString();
-                                  bHouse =
-                                      data['BoardingHouseName'].toString();
-                                });
-                                print('$ownerEmail, $bHouse');
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => ChatOwner(
-                                      emailOwner : data['Email'].toString(),
-                                      token: data['token'],
-                                      ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
-                                    ),
-                                  ),
-                                );
 
                               },
                               child: Container(

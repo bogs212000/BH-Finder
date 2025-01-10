@@ -22,10 +22,12 @@ import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:scrollable_clean_calendar/controllers/clean_calendar_controller.dart';
 import 'package:scrollable_clean_calendar/scrollable_clean_calendar.dart';
 import 'package:scrollable_clean_calendar/utils/enums.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import '../../../api.dart';
 import '../../../cons.dart';
+import '../../Home/my.reservations.dart';
 import '../owner.home.screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -200,7 +202,57 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                     ],
                   ),
                   Divider(),
-                  const SizedBox(height: 5),
+                  SizedBox(
+                    height: 25,
+                    child: StreamBuilder<QuerySnapshot>(
+                      stream: FirebaseFirestore.instance
+                          .collection('BoardingHouses')
+                          .where('OwnerUId', isEqualTo: owner) // Replace 'fieldName' and 'specificText' accordingly
+                          .snapshots(),
+                      builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+                        if (snapshot.connectionState == ConnectionState.waiting) {
+                          return Shimmer.fromColors(
+                            baseColor: Colors.grey.shade200,
+                            highlightColor: Colors.white,
+                            child: Padding(
+                              padding: EdgeInsets.only(left: 20, right: 20),
+                              child: Container(
+                                height: 35,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey,
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                              ),
+                            ),
+                          );
+                        }
+                        if (snapshot.hasError) {
+                          return const Center(child: Text('Error fetching data'));
+                        }
+                        if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
+                          return const Center(child: Text('No Reservation found'));
+                        }
+
+                        // Extracting and displaying the filtered data
+                        return ListView.builder(
+                          itemCount: snapshot.data!.docs.length,
+                          itemBuilder: (context, index) {
+                            Map<String, dynamic> data =
+                            snapshot.data!.docs[index].data() as Map<String, dynamic>;
+                            return Row(
+                              children: [
+                                'BH :'.text.size(15).light.make(),
+                                Spacer(),
+                                Text(data['BoardingHouseName'] ?? 'No name', style: TextStyle(fontWeight: FontWeight.w500, fontSize: 15),),
+                              ],
+                            ); // Replace 'name' with your field key
+
+                          },
+                        );
+                      },
+                    ),
+                  ),
                   Row(
                     children: [
                       'Name :'.text.size(15).light.make(),

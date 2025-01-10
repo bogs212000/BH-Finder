@@ -9,6 +9,8 @@ import 'package:velocity_x/velocity_x.dart';
 import 'package:intl/intl.dart';
 import '../../cons.dart';
 
+String? owner;
+
 class MyReservations extends StatefulWidget {
   const MyReservations({super.key});
 
@@ -118,6 +120,7 @@ class _MyReservationsState extends State<MyReservations> {
                       onTap: () {
                         setState(() {
                           rBHouseDocId = data['docID'];
+                          owner = data['OwnerId'];
                         });
                         print(rBHouseDocId);
                        Get.to(()=>ViewReservationScreen());

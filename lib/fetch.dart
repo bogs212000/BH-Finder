@@ -134,6 +134,7 @@ Future<void> fetchOwnerData(Function setState) async {
         .get();
 
     setState(() {
+      bhName = snapshot.data()?['BoardingHouseName'];
       ownerToken = snapshot.data()?['token'];
       userRole = snapshot.data()?['role'];
       OwnerUuId = snapshot.data()?['OwnerUId'];

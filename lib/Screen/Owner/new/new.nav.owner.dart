@@ -171,6 +171,7 @@ class _NewOwnerNavState extends State<NewOwnerNav> {
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     return Scaffold(
+      extendBodyBehindAppBar: true,
       drawer: Drawer(
         child: Column(
           children: [
@@ -261,11 +262,12 @@ class _NewOwnerNavState extends State<NewOwnerNav> {
       appBar: AppBar(
         title: Row(
           children: [
-            Image.asset(AppImages.logo, height: 50),
-            ' BH FINDER'.text.size(20).extraBold.blue900.make(),
+            Image.asset(AppImages.logo, height: 50, color: selectedIndex > 0 ? Colors.blue[900] : null),
+            ' BH FINDER'.text.size(20).extraBold.color(selectedIndex > 0 ? Colors.blue[900] : Colors.white).make(),
           ],
         ),
-        backgroundColor: Colors.white,
+        backgroundColor: Colors.transparent,
+        foregroundColor: selectedIndex > 0 ? Colors.blue[900] : Colors.white,
         actions: [
           currentUser != null && userEmail != null
               ? StreamBuilder<DocumentSnapshot>(

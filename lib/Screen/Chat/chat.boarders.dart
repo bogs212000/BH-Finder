@@ -54,7 +54,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         },
         body: jsonEncode({
           'message': {
-            'token': '${Get.arguments[1]}',
+            'token': Get.arguments[1],
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,

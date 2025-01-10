@@ -407,14 +407,14 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       DateTime
                                                                           .now(),
                                                                   'message':
-                                                                      'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - ${widget.bHouseName}',
+                                                                      'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - $bhName',
                                                                   'status':
                                                                       false,
                                                                 });
                                                                 String title =
                                                                     '$BhouseName';
                                                                 String body =
-                                                                    'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - ${widget.bHouseName}';
+                                                                    'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - $bhName';
                                                                 sendPushMessage(
                                                                     body,
                                                                     title);
@@ -572,7 +572,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       DateTime
                                                                           .now(),
                                                                   'message':
-                                                                      'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- ${widget.bHouseName}',
+                                                                      'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- $bhName',
                                                                   'status':
                                                                       false,
                                                                 });
@@ -580,7 +580,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                 String title =
                                                                     '$BhouseName';
                                                                 String body =
-                                                                    'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- ${widget.bHouseName}';
+                                                                    'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- $bhName';
                                                                 sendPushMessage(
                                                                     body,
                                                                     title);

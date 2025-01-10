@@ -9,9 +9,12 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
+import 'package:quickalert/models/quickalert_type.dart';
+import 'package:quickalert/widgets/quickalert_dialog.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -90,6 +93,35 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
       debugPrint("Error loading images: $e");
       return [];
     }
+  }
+
+
+  _callNumber(String num) async{
+    QuickAlert.show(
+      onCancelBtnTap: () {
+        Navigator.pop(context);
+      },
+      onConfirmBtnTap: () async {
+        await FlutterPhoneDirectCaller.callNumber(num);
+        Navigator.pop(context);
+      },
+      context: context,
+      type: QuickAlertType.confirm,
+      text: 'Do you want to continue?',
+      titleAlignment: TextAlign.center,
+      textAlignment: TextAlign.center,
+      confirmBtnText: 'Yes',
+      cancelBtnText: 'No',
+      confirmBtnColor: Colors.blue,
+      backgroundColor: Colors.white,
+      headerBackgroundColor: Colors.grey,
+      confirmBtnTextStyle: const TextStyle(
+        color: Colors.white,
+        fontWeight: FontWeight.bold,
+      ),
+      titleColor: Colors.black,
+      textColor: Colors.black,
+    );
   }
 
 
@@ -429,6 +461,92 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
                                       ),
                                     ),
                                   ),
+                                  Container(
+                                    width: 35,
+                                    child: GestureDetector(
+                                      onTap: () {
+                                        _callNumber(data['PhoneNumber']);
+                                      },
+                                      child: Container(
+                                        height: 35,
+                                        width: 35,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Colors.grey, width: 0.3),
+                                          borderRadius:
+                                          BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                              Colors.grey.withOpacity(0.2),
+                                              spreadRadius: 1,
+                                              blurRadius: 1,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.call,
+                                            color: Colors.grey.withOpacity(0.5),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  5.widthBox,
+                                  Container(
+                                    width: 35,
+                                    child: GestureDetector(
+                                      onTap: () {
+
+                                        setState(() {
+                                          ownerEmail = data['Email'].toString();
+                                          bHouse =
+                                              data['BoardingHouseName'].toString();
+                                        });
+                                        print('$ownerEmail, $bHouse');
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => ChatOwner(
+                                              emailOwner : data['Email'].toString(),
+                                              token: data['token'],
+                                              ownerNumber: data['PhoneNumber'].toString(), // pass the owner number here
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      child: Container(
+                                        height: 35,
+                                        width: 35,
+                                        decoration: BoxDecoration(
+                                          color: Colors.white,
+                                          border: Border.all(
+                                              color: Colors.grey, width: 0.3),
+                                          borderRadius:
+                                          BorderRadius.circular(20),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                              Colors.grey.withOpacity(0.2),
+                                              spreadRadius: 1,
+                                              blurRadius: 1,
+                                              offset: const Offset(0, 1),
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Icon(
+                                            Icons.chat,
+                                            color: Colors.grey.withOpacity(0.5),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                  5.widthBox,
                                   Container(
                                     width: 35,
                                     child: GestureDetector(
