@@ -216,30 +216,88 @@ class _UserProfileState extends State<UserProfile> {
                               //   ),
                               // ),
                               SizedBox(
-                                child: Row(children: [
-                                  Expanded(child: Column(
-                                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                    children: [
-                                      Row(
-                                        children: [
-                                          'Information'.text.size(20).blue900.bold.make(),
-                                        ],
-                                      ),
-                                      Image.asset(AppImages.notif),
-                                      20.heightBox,
-                                      Row(
-                                        children: [
-                                          'Secured'.text.size(20).blue900.bold.make(),
-                                        ],
-                                      ),
-                                      10.heightBox,
-                                      Image.asset(AppImages.vault),
-                                    ],
-                                  )),
-                                  Expanded(child: Column(children: [
-                                    AppText.info_secured_data.text.fontFamily(AppFonts.quicksand).make()
-                                  ],))
-                                ],),
+                                child: Row(
+                                  children: [
+                                    Expanded(
+                                        child: Column(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceEvenly,
+                                      children: [
+                                        Row(
+                                          children: [
+                                            'Information'
+                                                .text
+                                                .size(20)
+                                                .blue900
+                                                .bold
+                                                .make(),
+                                          ],
+                                        ),
+                                        Image.asset(AppImages.notif),
+                                        20.heightBox,
+                                        Row(
+                                          children: [
+                                            'Secured'
+                                                .text
+                                                .size(20)
+                                                .blue900
+                                                .bold
+                                                .make(),
+                                          ],
+                                        ),
+                                        10.heightBox,
+                                        Image.asset(AppImages.vault),
+                                      ],
+                                    )),
+                                    Expanded(
+                                        child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            SizedBox(
+                                              height: 35, width: 130,
+                                              child: GlowButton(
+                                                  borderRadius:
+                                                      BorderRadius.circular(20),
+                                                  child: 'Edit Profile'
+                                                      .text
+                                                  .light.size(18)
+                                                      .white
+                                                      .make(),
+                                                  onPressed: () {
+                                                    Get.to(() => UserEditProfile(
+                                                                first: data['FirstName'],
+                                                                middle: data['MiddleName'],
+                                                                last: data['LastName'],
+                                                                address: data['address'],
+                                                                email: data['Email'],
+                                                                phoneNum: data['PhoneNumber'],
+                                                                profilePic: data['Image']));
+                                                            Navigator.push(
+                                                              context,
+                                                              MaterialPageRoute(
+                                                                builder: (context) => UserEditProfile(
+                                                                    first: data['FirstName'],
+                                                                    middle: data['MiddleName'],
+                                                                    last: data['LastName'],
+                                                                    address: data['address'],
+                                                                    email: data['Email'],
+                                                                    phoneNum: data['PhoneNumber'],
+                                                                    profilePic: data['Image']),
+                                                              ),
+                                                            );
+                                                  }),
+                                            ),
+                                          ],
+                                        ),
+                                        20.heightBox,
+                                        AppText.info_secured_data.text
+                                            .fontFamily(AppFonts.quicksand)
+                                            .make()
+                                      ],
+                                    ))
+                                  ],
+                                ),
                               )
                             ],
                           ),

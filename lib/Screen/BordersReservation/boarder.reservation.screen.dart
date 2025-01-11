@@ -25,6 +25,8 @@ import '../../fetch.dart';
 import '../BHouse/room.screen.dart';
 import 'package:http/http.dart' as http;
 
+import '../Owner/list.rooms.screen.dart';
+
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
 class BoarderReservationScreen extends StatefulWidget {
@@ -86,7 +88,7 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
         },
         body: jsonEncode({
           'message': {
-            'token': widget.token,
+            'token': btoken,
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,

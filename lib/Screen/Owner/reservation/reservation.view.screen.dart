@@ -485,7 +485,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                               .pushAndRemoveUntil(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    OwnerNav()),
+                                                    NewOwnerNav()),
                                             (Route<dynamic> route) =>
                                                 false, // Remove all previous routes
                                           );
@@ -624,7 +624,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                                               .pushAndRemoveUntil(
                                             MaterialPageRoute(
                                                 builder: (context) =>
-                                                    OwnerNav()),
+                                                    NewOwnerNav()),
                                             (Route<dynamic> route) =>
                                                 false, // Remove all previous routes
                                           );

@@ -22,6 +22,7 @@ import '../../cons.dart';
 import '../../fetch.dart';
 import '../Chat/chat.owner.dart';
 import '../Loading/loading.bhouse.screen.dart';
+import '../Owner/list.rooms.screen.dart';
 import '../Review/review.section.dart';
 import '../SignUp/guest.screen.dart';
 
@@ -629,6 +630,9 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
                                         borderRadius: BorderRadius.circular(20),
                                         child: 'View rooms'.text.white.make(),
                                         onPressed: () {
+                                          setState(() {
+                                            btoken = data['token'];
+                                          });
                                           Get.to(() => RoomListNew(), arguments: [
                                             data['OwnerUId'],
                                             data['OwnerUId']

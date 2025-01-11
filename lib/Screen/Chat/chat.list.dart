@@ -15,6 +15,7 @@ import '../../assets/fonts.dart';
 import '../../assets/images.dart';
 import '../../cons.dart';
 import '../Home/home.screen.dart';
+import '../Owner/list.rooms.screen.dart';
 
 class ChatList extends StatefulWidget {
   const ChatList({super.key});
@@ -158,6 +159,7 @@ class _ChatListState extends State<ChatList> {
                               setState(() {
                                 ownerEmail = data['ownerEmail'].toString();
                                 bHouse = data['bHouse'];
+                                btoken = data['ownerToken'];
                               });
                               Navigator.push(
                                 context,

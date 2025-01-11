@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:velocity_x/velocity_x.dart';
 import '../../api.dart';
 import '../../cons.dart';
+import '../Owner/list.rooms.screen.dart';
 
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
 
@@ -58,7 +59,7 @@ class _ChatOwnerState extends State<ChatOwner> {
         },
         body: jsonEncode({
           'message': {
-            'token': widget.token,
+            'token': btoken,
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,

@@ -154,7 +154,9 @@ class _HomeState extends State<Home> {
                                                         .bold
                                                         .white
                                                         .make(),
-                                                    onPressed: () {}),
+                                                    onPressed: () {
+                                                      Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
+                                                    }),
                                               ),
                                             )
                                           ],

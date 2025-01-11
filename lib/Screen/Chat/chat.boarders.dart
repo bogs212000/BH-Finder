@@ -17,6 +17,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:http/http.dart' as http;
 import '../../api.dart';
 import '../../cons.dart';
+import '../Owner/list.rooms.screen.dart';
 import 'owner.chat.list.dart';
 
 final _scopes = ['https://www.googleapis.com/auth/firebase.messaging'];
@@ -54,7 +55,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         },
         body: jsonEncode({
           'message': {
-            'token': Get.arguments[1],
+            'token': btoken,
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,
@@ -340,7 +341,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
           'role': 'boarder',
           'createdAt': DateTime.now(),
           'myToken': Get.arguments[1],
-          'ownerToken': Get.arguments[2],
+          'ownerToken': btoken,
           'seenBorder?': true,
           'seenOwner?': false,
           'boarderNumber': bPhone,

@@ -21,6 +21,7 @@ import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
 import 'package:intl/intl.dart';
+import '../../../api.dart';
 import '../../../cons.dart';
 import '../../BHouse/bh.screen.dart';
 import '../list.rooms.screen.dart';
@@ -91,7 +92,7 @@ class _ViewRoomState extends State<ViewRoom> {
     try {
       final serviceAccountCredentials = ServiceAccountCredentials.fromJson(
         await rootBundle
-            .loadString('assets/firebase/bh-finder-50ccf-24e13bbe3c81.json'),
+            .loadString('assets/firebase/${Api.notifications}'),
       );
 
       final client =
@@ -107,7 +108,7 @@ class _ViewRoomState extends State<ViewRoom> {
         },
         body: jsonEncode({
           'message': {
-            'token': widget.boarderToken,
+            'token': btoken,
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,
@@ -412,7 +413,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       false,
                                                                 });
                                                                 String title =
-                                                                    '$BhouseName';
+                                                                    '${data['bHouseName']}';
                                                                 String body =
                                                                     'Hi ${data['boardersName']}, we noticed that your rent for room ${data['roomNameNumber']} is still unpaid, and you have less than 7 days remaining in your stay. Please contact the owner as soon as possible to settle your payment. - $bhName';
                                                                 sendPushMessage(
@@ -578,7 +579,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                 });
 
                                                                 String title =
-                                                                    '$BhouseName';
+                                                                    '${data['bHouseName']}';
                                                                 String body =
                                                                     'Hi ${data['boardersName']}, our records show that your rent for room ${data['roomNameNumber']} is still unpaid. Please reach out to the owner to settle your payment at your earliest convenience.- $bhName';
                                                                 sendPushMessage(
@@ -672,7 +673,7 @@ class _ViewRoomState extends State<ViewRoom> {
                                                                       false,
                                                                 });
                                                                 String title =
-                                                                    '$BhouseName';
+                                                                    '${data['bHouseName']}';
                                                                 String body =
                                                                     'Hi ${data['boardersName']}, thank you for settling your rent!';
                                                                 sendPushMessage(

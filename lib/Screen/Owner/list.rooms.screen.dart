@@ -27,6 +27,7 @@ import '../../cons.dart';
 import 'Rooms/view.room.dart';
 
 String? roomroomId;
+String? btoken;
 
 class ListRoomsScreen extends StatefulWidget {
   const ListRoomsScreen({super.key});
@@ -132,6 +133,7 @@ class _ListRoomsScreenState extends State<ListRoomsScreen> {
                                     onTap: () {
                                       setState(() {
                                         roomroomId = data['roomDocId'];
+                                        btoken = data['boarderToken'];
                                       });
                                       Get.to(() => ViewRoom(), arguments: [
                                         data['roomDocId'],

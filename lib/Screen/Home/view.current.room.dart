@@ -7,6 +7,7 @@ import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_image_slideshow/flutter_image_slideshow.dart';
+import 'package:flutter_phone_direct_caller/flutter_phone_direct_caller.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
@@ -86,6 +87,35 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
 
   @override
   Widget build(BuildContext context) {
+
+    _callNumber(String number) async {
+      QuickAlert.show(
+        onCancelBtnTap: () {
+          Navigator.pop(context);
+        },
+        onConfirmBtnTap: () async {
+          bool? res = await FlutterPhoneDirectCaller.callNumber(number);
+          Navigator.pop(context);
+        },
+        context: context,
+        type: QuickAlertType.confirm,
+        text: 'Do you want to continue?',
+        titleAlignment: TextAlign.center,
+        textAlignment: TextAlign.center,
+        confirmBtnText: 'Yes',
+        cancelBtnText: 'No',
+        confirmBtnColor: Colors.blue,
+        backgroundColor: Colors.white,
+        headerBackgroundColor: Colors.grey,
+        confirmBtnTextStyle: const TextStyle(
+          color: Colors.white,
+          fontWeight: FontWeight.bold,
+        ),
+        titleColor: Colors.black,
+        textColor: Colors.black,
+      );
+    }
+
     return Scaffold(
       extendBodyBehindAppBar: true,
       appBar: AppBar(
@@ -136,18 +166,19 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                               fit: BoxFit.cover,
                               width: 300,
                               height: 450,
-                              placeholder: (context, url) => Shimmer.fromColors(
-                                baseColor: Colors.grey.shade200,
-                                highlightColor: Colors.white,
-                                child: Container(
-                                  height: 450,
-                                  width: 300,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey,
-                                    borderRadius: BorderRadius.circular(20),
+                              placeholder: (context, url) =>
+                                  Shimmer.fromColors(
+                                    baseColor: Colors.grey.shade200,
+                                    highlightColor: Colors.white,
+                                    child: Container(
+                                      height: 450,
+                                      width: 300,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.circular(20),
+                                      ),
+                                    ),
                                   ),
-                                ),
-                              ),
                               errorWidget: (context, url, error) =>
                                   Icon(Icons.error),
                             );
@@ -169,140 +200,172 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                         return const Center(child: Text('Error fetching data'));
                       }
                       if (!snapshot.hasData || !snapshot.data!.exists) {
-                        return const Center(child: Text('No Reservation found'));
+                        return const Center(
+                            child: Text('No Reservation found'));
                       }
                       Map<String, dynamic> data =
                       snapshot.data!.data() as Map<String, dynamic>;
-                      return Column(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.only(
-                                top: 30, left: 20, right: 20, bottom: 0),
-                            height: 550,
-                            width: double.infinity,
-                            decoration: const BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.only(
-                                topLeft: Radius.circular(30),
-                                topRight: Radius.circular(30),
+                      return SingleChildScrollView(
+                        child: Column(
+                          children: [
+                            Container(
+                              padding: const EdgeInsets.only(
+                                  top: 30, left: 20, right: 20, bottom: 0),
+                              height: 600,
+                              width: double.infinity,
+                              decoration: const BoxDecoration(
+                                color: Colors.white,
+                                borderRadius: BorderRadius.only(
+                                  topLeft: Radius.circular(30),
+                                  topRight: Radius.circular(30),
+                                ),
                               ),
-                            ),
-                            child: Column(
-                              children: [
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: Container(
+                              child: Column(
+                                children: [
+                                  Row(
+                                    children: [
+                                      Expanded(
+                                        child: Container(
+                                          child: Column(
+                                            children: [
+                                              Row(
+                                                children: [
+                                                  '${data['roomNameNumber']}'
+                                                      .text
+                                                      .bold
+                                                      .size(18)
+                                                      .make(),
+                                                ],
+                                              ),
+                                              Row(
+                                                children: [
+                                                  '${data['address']}'
+                                                      .text
+                                                      .light
+                                                      .color(Colors.grey)
+                                                      .size(13)
+                                                      .make(),
+                                                ],
+                                              )
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Container(
+                                        width: 100,
                                         child: Column(
                                           children: [
                                             Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                               children: [
-                                                '${data['roomNameNumber']}'
+                                                'Price per Month'
                                                     .text
-                                                    .bold
-                                                    .size(18)
+                                                    .size(10)
                                                     .make(),
                                               ],
                                             ),
                                             Row(
+                                              mainAxisAlignment:
+                                              MainAxisAlignment.end,
                                               children: [
-                                                '${data['address']}'
+                                                '₱ ${data['price']}'
                                                     .text
-                                                    .light
-                                                    .color(Colors.grey)
-                                                    .size(13)
+                                                    .size(20)
+                                                    .bold
                                                     .make(),
                                               ],
-                                            )
+                                            ),
                                           ],
                                         ),
-                                      ),
+                                      )
+                                    ],
+                                  ),
+                                  SizedBox(height: 10),
+                                  Row(
+                                    children: [
+                                      'Description'.text.semiBold.size(16).make(),
+                                    ],
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Row(
+                                      children: [
+                                        Flexible(
+                                          child: '${data['descriptions']}'
+                                              .text
+                                              .light
+                                              .overflow(TextOverflow.fade)
+                                              .maxLines(5)
+                                              .color(Colors.grey)
+                                              .size(13)
+                                              .make(),
+                                        ),
+                                      ],
                                     ),
-                                    Container(
-                                      width: 100,
-                                      child: Column(
+                                  ),
+                                  10.heightBox,
+                                  SizedBox(
+                                    child: Row(children: [
+                                      Expanded(child: Column(
                                         children: [
                                           Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.end,
                                             children: [
-                                              'Price per Month'
-                                                  .text
-                                                  .size(10)
-                                                  .make(),
-                                            ],
-                                          ),
-                                          Row(
-                                            mainAxisAlignment:
-                                            MainAxisAlignment.end,
-                                            children: [
-                                              '₱ ${data['price']}'
-                                                  .text
+                                              'Note'.text
                                                   .size(20)
+                                                  .blue900
                                                   .bold
                                                   .make(),
                                             ],
                                           ),
+                                          Image.asset(AppImages.notif),
                                         ],
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                SizedBox(height: 10),
-                                Row(
-                                  children: [
-                                    'Description'.text.semiBold.size(16).make(),
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.all(8.0),
-                                  child: Row(
-                                    children: [
-                                      Flexible(
-                                        child: '${data['descriptions']}'
-                                            .text
-                                            .light
-                                            .overflow(TextOverflow.fade)
-                                            .maxLines(5)
-                                            .color(Colors.grey)
-                                            .size(13)
-                                            .make(),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                                10.heightBox,
-                                SizedBox(
-                                  child: Row(children: [
-                                    Expanded(child: Column(
-                                      children: [
-                                        Row(
-                                          children: [
-                                            'Note'.text.size(20).blue900.bold.make(),
-                                          ],
+                                      )),
+                                      Expanded(child: Column(children: [
+                                        SizedBox(
+                                          width: 150,
+                                          child: GlowButton(
+                                            borderRadius: BorderRadius.circular(20),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Icon(Icons.call, color: Colors.white, size: 15,),
+                                                  'Contact Owner'.text.light.white
+                                                      .size(15).make(),
+                                                ],
+                                              ), onPressed: () {
+                                            _callNumber(data['contactNumber']);
+                                          }),
                                         ),
-                                        Image.asset(AppImages.notif),
-                                      ],
-                                    )),
-                                    Expanded(child: Column(children: [
-                                      AppText.current_room_note.text.fontFamily(AppFonts.quicksand).make()
-                                    ],))
-                                  ],),
-                                )
-                              ],
+                                        20.heightBox,
+                                        AppText.current_room_note.text.fontFamily(
+                                            AppFonts.quicksand).make()
+                                      ],))
+                                    ],),
+                                  ),
+                                  30.heightBox,
+                                ],
+                              ),
                             ),
-                          )
-                        ],
+                            30.heightBox,
+                          ],
+                        ),
                       );
                     },
                   ),
-                ).height(550).width(double.infinity).make(),
+                ).height(650).width(double.infinity).make(),
               ],
             ),
           ))
-          .height(MediaQuery.of(context).size.height)
+          .height(MediaQuery
+          .of(context)
+          .size
+          .height)
           .white
-          .width(MediaQuery.of(context).size.width)
+          .width(MediaQuery
+          .of(context)
+          .size
+          .width)
           .make(),
     );
   }
