@@ -154,7 +154,7 @@ class _ViewReservationScreenState extends State<ViewReservationScreen> {
                       'Info'.text.fontFamily(AppFonts.quicksand).make(),
                     ],
                   ),
-                  'Before proceeding with renting, please ensure to thoroughly check the details and verify the user.'
+                  'Ensure you select and book a specific room that meets your preferences and requirements to avoid any inconvenience during your stay.'
                       .text
                       .fontFamily(AppFonts.quicksand)
                       .bold

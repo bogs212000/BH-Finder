@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
+import 'Screen/Home/new.home.dart';
 import 'cons.dart';
 
 Future<int> fetchRoomsWithOwnersID() async {
@@ -143,6 +144,24 @@ Future<void> fetchOwnerData(Function setState) async {
       // fetchRoleError = false;
     });
   } catch (e) {
+    setState(() {
+      // fetchRoleError = true;
+    });
+  }
+}
+
+Future<void> fetchCurrentBhToken(Function setState, String email) async {
+  try {
+    final snapshot = await FirebaseFirestore.instance
+        .collection('Users')
+        .doc(email)
+        .get();
+    setState(() {
+      token = snapshot.data()?['token'];
+    });
+    print('hahaha $token');
+  } catch (e) {
+    print(e);
     setState(() {
       // fetchRoleError = true;
     });

@@ -1,3 +1,4 @@
+import 'package:bh_finder/Auth/auth.wrapper.dart';
 import 'package:bh_finder/Screen/Chat/chat.list.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/PrivacyPolicy/privacy.policy.dart';
@@ -322,6 +323,114 @@ class _NavHomeState extends State<NavHome> {
                   },
                 )
               : SizedBox(),
+          currentUser != null && userEmail != null
+              ? StreamBuilder<DocumentSnapshot>(
+            stream: FirebaseFirestore.instance
+                .collection('Chats')
+                .doc('${userEmail}+${bemail}')
+                .snapshots(),
+            builder: (BuildContext context,
+                AsyncSnapshot<DocumentSnapshot> snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey.shade200,
+                  highlightColor: Colors.white,
+                  child: Padding(
+                    padding: EdgeInsets.only(left: 20, right: 20),
+                    child: Container(
+                      height: 35,
+                      width: double.infinity,
+                      decoration: BoxDecoration(
+                        color: Colors.grey,
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                  ),
+                );
+              }
+              if (snapshot.hasError) {
+                return const Center(child: Text('Error fetching data'));
+              }
+              if (!snapshot.hasData || !snapshot.data!.exists) {
+                return const Center(child: Text('No Reservation found'));
+              }
+              Map<String, dynamic> data =
+              snapshot.data!.data() as Map<String, dynamic>;
+              return Padding(
+                padding: EdgeInsets.only(right: 10),
+                child: GestureDetector(
+                  onTap: () async {
+                    await FirebaseFirestore.instance
+                        .collection('Chats')
+                        .doc('${FirebaseAuth.instance.currentUser?.email}+${bemail}'
+                        .toString())
+                        .update({
+                      'bcount': 0,
+                    });
+                    setState(() {
+                      _selectedIndex = 1;
+                    });
+                  },
+                  child: Stack(
+                    children: [
+                      Container(
+                        height: 35,
+                        width: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.5),
+                          border:
+                          Border.all(color: Colors.grey, width: 0.3),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 1,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.chat_bubble_outline,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ),
+                      data['bcount'] != 0
+                          ? Container(
+                        height: 35,
+                        width: 35,
+                        child: Column(
+                          children: [
+                            Row(
+                              mainAxisAlignment:
+                              MainAxisAlignment.end,
+                              children: [
+                                CircleAvatar(
+                                  backgroundColor: Colors.red,
+                                  radius: 8,
+                                  child: Center(
+                                      child:
+                                      '${data['bcount']}'
+                                          .text
+                                          .size(1)
+                                          .color(Colors.white)
+                                          .make()),
+                                )
+                              ],
+                            ),
+                          ],
+                        ),
+                      )
+                          : SizedBox(),
+                    ],
+                  ),
+                ),
+              );
+            },
+          )
+              : SizedBox(),
         ],
       ),
       extendBodyBehindAppBar: true,
@@ -407,6 +516,7 @@ class _NavHomeState extends State<NavHome> {
               title: 'Sign out'.text.size(15).make(),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
+                Get.offAll(AuthWrapper());
               },
             ),
           ],

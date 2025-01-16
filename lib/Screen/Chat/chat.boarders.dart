@@ -345,6 +345,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
           'seenBorder?': true,
           'seenOwner?': false,
           'boarderNumber': bPhone,
+          'bcount': FieldValue.increment(1),
         });
         await FirebaseFirestore.instance
             .collection('Chats')

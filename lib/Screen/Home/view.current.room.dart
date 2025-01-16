@@ -21,7 +21,9 @@ import '../../assets/text.dart';
 import '../../cons.dart';
 import '../../fetch.dart';
 import '../BordersReservation/boarder.reservation.screen.dart';
+import '../Chat/chat.owner.dart';
 import '../Loading/loading.bhouse.screen.dart';
+import 'new.home.dart';
 
 class ViewCurrentRoom extends StatefulWidget {
   const ViewCurrentRoom({super.key});
@@ -211,7 +213,7 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                             Container(
                               padding: const EdgeInsets.only(
                                   top: 30, left: 20, right: 20, bottom: 0),
-                              height: 600,
+                              height: 650,
                               width: double.infinity,
                               decoration: const BoxDecoration(
                                 color: Colors.white,
@@ -330,11 +332,36 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                                                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                                                 children: [
                                                   Icon(Icons.call, color: Colors.white, size: 15,),
-                                                  'Contact Owner'.text.light.white
+                                                  'Call Owner'.text.light.white
                                                       .size(15).make(),
                                                 ],
                                               ), onPressed: () {
                                             _callNumber(data['contactNumber']);
+                                          }),
+                                        ),
+                                        10.heightBox,
+                                        SizedBox(
+                                          width: 150,
+                                          child: GlowButton(
+                                              borderRadius: BorderRadius.circular(20),
+                                              child: Row(
+                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                                children: [
+                                                  Icon(Icons.chat, color: Colors.white, size: 15,),
+                                                  'Chat Owner'.text.light.white
+                                                      .size(15).make(),
+                                                ],
+                                              ), onPressed: () {
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) => ChatOwner(
+                                                  emailOwner: bemail!,
+                                                  ownerNumber: data['contactNumber'],
+                                                  token: token,
+                                                ),
+                                              ),
+                                            );
                                           }),
                                         ),
                                         20.heightBox,
@@ -353,7 +380,7 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                       );
                     },
                   ),
-                ).height(650).width(double.infinity).make(),
+                ).height(670).width(double.infinity).make(),
               ],
             ),
           ))

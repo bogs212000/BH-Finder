@@ -22,6 +22,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
+import '../../../Auth/auth.wrapper.dart';
 import '../../../assets/images.dart';
 import '../../../cons.dart';
 import '../../../fetch.dart';
@@ -254,6 +255,7 @@ class _NewOwnerNavState extends State<NewOwnerNav> {
               title: 'Sign out'.text.size(15).make(),
               onTap: () async {
                 await FirebaseAuth.instance.signOut();
+                Get.offAll(AuthWrapper());
               },
             ),
           ],

@@ -334,9 +334,9 @@ class _ChatOwnerState extends State<ChatOwner> {
     if (_messageController.text.trim().isNotEmpty) {
       await FirebaseFirestore.instance
           .collection('Chats')
-          .doc('$email+$ownerEmail')
+          .doc('$email+${widget.emailOwner}')
           .set({
-        'ownerEmail': ownerEmail,
+        'ownerEmail': '${widget.emailOwner}',
         'email': email,
         'bHouse': bHouse,
         'name': '$fName $mName $lName',

@@ -17,9 +17,12 @@ import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
 import '../../cons.dart';
+import '../../fetch.dart';
 import '../BHouse/bh.new.dart';
 import '../BHouse/bh.screen.dart';
 
+String? token;
+String? bemail;
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -28,6 +31,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  @override
+  void initState() {
+    super.initState();
+    // TODO: implement initState
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -93,6 +102,9 @@ class _HomeState extends State<Home> {
                       Map<String, dynamic> data =
                           doc.data() as Map<String, dynamic>;
                       cDocId = data['roomDocId'];
+                     bemail = data['Email'];
+
+                      // token = data[''];
                       DateTime boardersIn = DateTime.fromMillisecondsSinceEpoch(
                           data['boardersIn'].millisecondsSinceEpoch);
                       DateTime boardersOut =
@@ -136,6 +148,7 @@ class _HomeState extends State<Home> {
                                                         .white
                                                         .make(),
                                                     onPressed: () {
+                                                      fetchCurrentBhToken(setState, bemail!);
                                                       Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
                                                     }),
                                               ).animate()
