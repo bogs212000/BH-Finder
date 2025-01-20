@@ -73,7 +73,7 @@ class _NewOwnerHomeState extends State<NewOwnerHome> {
                   double star = average;
                   double clampedRating = star.clamp(0.0, 5.0);
                   int numberOfReviews =
-                  ratings.length > 1 ? ratings.length - 1 : 0;
+                      ratings.length > 1 ? ratings.length - 1 : 0;
                   addressLat = data['Lat'];
                   addressLong = data['Long'];
                   bHouse = data['BoardingHouseName'];
@@ -93,29 +93,29 @@ class _NewOwnerHomeState extends State<NewOwnerHome> {
                                 padding: const EdgeInsets.all(8.0),
                                 child: Row(
                                   children: [
-                                    '${data['address']}'.text.size(10).white.light.make(),
+                                    Flexible(
+                                        child: '${data['address']}'
+                                            .text
+                                            .overflow(TextOverflow.ellipsis)
+                                            .size(10)
+                                            .white
+                                            .light
+                                            .make()),
                                     Spacer(),
                                     Row(
-                                      mainAxisAlignment:
-                                      MainAxisAlignment.end,
-                                      children:
-                                      List.generate(5, (index) {
-                                        if (index <
-                                            clampedRating.toInt()) {
+                                      mainAxisAlignment: MainAxisAlignment.end,
+                                      children: List.generate(5, (index) {
+                                        if (index < clampedRating.toInt()) {
                                           // Filled star
-                                          return const Icon(
-                                              Icons.star,
+                                          return const Icon(Icons.star,
                                               color: Colors.amber);
-                                        } else if (index <
-                                            clampedRating) {
+                                        } else if (index < clampedRating) {
                                           // Half star
-                                          return const Icon(
-                                              Icons.star_half,
+                                          return const Icon(Icons.star_half,
                                               color: Colors.amber);
                                         } else {
                                           // Empty star
-                                          return const Icon(
-                                              Icons.star_border,
+                                          return const Icon(Icons.star_border,
                                               color: Colors.amber);
                                         }
                                       }),
@@ -129,9 +129,10 @@ class _NewOwnerHomeState extends State<NewOwnerHome> {
                         )
                             .width(MediaQuery.of(context).size.width)
                             .bgImage(DecorationImage(
-                                image: NetworkImage(data['Image']), fit: BoxFit.cover))
+                                image: NetworkImage(data['Image']),
+                                fit: BoxFit.cover))
                             .height(250)
-                        .color(Vx.purple200)
+                            .color(Vx.purple200)
                             .make(),
                         10.heightBox,
                         Padding(

@@ -10,6 +10,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:get/get.dart';
+import 'package:get/get_core/src/get_main.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
@@ -18,6 +20,7 @@ import '../../fetch.dart';
 import 'package:location/location.dart' as loc;
 
 import '../Auth/auth.wrapper.dart';
+import '../assets/images.dart';
 import 'admin.view.bhouse.dart';
 
 class AdminHomeScreen extends StatefulWidget {
@@ -28,18 +31,23 @@ class AdminHomeScreen extends StatefulWidget {
 }
 
 class _AdminHomeScreenState extends State<AdminHomeScreen> {
-
   @override
   void initState() {
     Navigator.of(context).popUntil((route) => route.isFirst);
     super.initState();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
-        title: 'Admin'.text.make(),
+        title: Row(
+          children: [
+            Image.asset(AppImages.logo, height: 50),
+            ' BH FINDER'.text.size(20).extraBold.blue900.make(),
+          ],
+        ),
         actions: [
           Padding(
             padding: EdgeInsets.only(right: 10),
@@ -101,21 +109,14 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                 children: [
                   Row(
                     children: [
-                      Container(
-                        width: 150,
-                        padding: EdgeInsets.all(5),
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(12),
-                          color: Color(0xFF31355C),
-                        ),
-                        child: 'Boarding Houses'
-                            .text
-                            .lg
-                            .size(11)
-                            .center
-                            .color(Colors.white)
-                            .make(),
-                      )
+                      Expanded(child: Image.asset(AppImages.welcome)),
+                      Expanded(
+                          child: 'Welcome to Admin'
+                              .text
+                              .size(20)
+                              .extraBold
+                              .blue900
+                              .make()),
                     ],
                   ),
                   SizedBox(height: 5),
@@ -125,10 +126,12 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
             SizedBox(height: 10),
             Expanded(
               child: Container(
+                padding: EdgeInsets.only(left: 20, right: 20),
                 width: double.infinity,
                 child: StreamBuilder<QuerySnapshot>(
                   stream: FirebaseFirestore.instance
                       .collection("BoardingHouses")
+                      // .where('deleted?', isEqualTo: false)
                       .snapshots(),
                   builder: (context, snapshot) {
                     if (snapshot.hasError) {
@@ -165,11 +168,13 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                 setState(() {
                                   OwnerUuId = data['OwnerUId'];
                                   rBHouseDocId = data['Email'];
+                                  status = data['verified'];
                                 });
-                                Navigator.of(context).pushAndRemoveUntil(
-                                  _toAdminBhouseScreen(),
-                                  (Route<dynamic> route) => false,
-                                );
+                                Get.to(()=>AdminBHouseScreen());
+                                // Navigator.of(context).pushAndRemoveUntil(
+                                //   _toAdminBhouseScreen(),
+                                //   (Route<dynamic> route) => false,
+                                // );
                               },
                               child: Container(
                                 width: 150,
@@ -277,8 +282,9 @@ class _AdminHomeScreenState extends State<AdminHomeScreen> {
                                                                     .make()
                                                                 : 'Unverified'
                                                                     .text
+                                                                    .size(5)
                                                                     .color(Colors
-                                                                        .red)
+                                                                        .orangeAccent)
                                                                     .make(),
                                                             Spacer(),
                                                             Row(

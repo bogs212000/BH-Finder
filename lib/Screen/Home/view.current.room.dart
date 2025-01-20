@@ -207,180 +207,178 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                       }
                       Map<String, dynamic> data =
                       snapshot.data!.data() as Map<String, dynamic>;
-                      return SingleChildScrollView(
-                        child: Column(
-                          children: [
-                            Container(
-                              padding: const EdgeInsets.only(
-                                  top: 30, left: 20, right: 20, bottom: 0),
-                              height: 650,
-                              width: double.infinity,
-                              decoration: const BoxDecoration(
-                                color: Colors.white,
-                                borderRadius: BorderRadius.only(
-                                  topLeft: Radius.circular(30),
-                                  topRight: Radius.circular(30),
-                                ),
+                      return Column(
+                        children: [
+                          Container(
+                            padding: const EdgeInsets.only(
+                                top: 30, left: 20, right: 20, bottom: 0),
+                            height: 650,
+                            width: double.infinity,
+                            decoration: const BoxDecoration(
+                              color: Colors.white,
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(30),
+                                topRight: Radius.circular(30),
                               ),
-                              child: Column(
-                                children: [
-                                  Row(
-                                    children: [
-                                      Expanded(
-                                        child: Container(
-                                          child: Column(
-                                            children: [
-                                              Row(
-                                                children: [
-                                                  '${data['roomNameNumber']}'
-                                                      .text
-                                                      .bold
-                                                      .size(18)
-                                                      .make(),
-                                                ],
-                                              ),
-                                              Row(
-                                                children: [
-                                                  '${data['address']}'
-                                                      .text
-                                                      .light
-                                                      .color(Colors.grey)
-                                                      .size(13)
-                                                      .make(),
-                                                ],
-                                              )
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      Container(
-                                        width: 100,
+                            ),
+                            child: Column(
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Container(
                                         child: Column(
                                           children: [
                                             Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.end,
                                               children: [
-                                                'Price per Month'
+                                                '${data['roomNameNumber']}'
                                                     .text
-                                                    .size(10)
+                                                    .bold
+                                                    .size(18)
                                                     .make(),
                                               ],
                                             ),
                                             Row(
-                                              mainAxisAlignment:
-                                              MainAxisAlignment.end,
                                               children: [
-                                                '₱ ${data['price']}'
+                                                '${data['address']}'
                                                     .text
-                                                    .size(20)
-                                                    .bold
+                                                    .light
+                                                    .color(Colors.grey)
+                                                    .size(13)
                                                     .make(),
                                               ],
-                                            ),
+                                            )
                                           ],
                                         ),
-                                      )
-                                    ],
-                                  ),
-                                  SizedBox(height: 10),
-                                  Row(
-                                    children: [
-                                      'Description'.text.semiBold.size(16).make(),
-                                    ],
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Row(
-                                      children: [
-                                        Flexible(
-                                          child: '${data['descriptions']}'
-                                              .text
-                                              .light
-                                              .overflow(TextOverflow.fade)
-                                              .maxLines(5)
-                                              .color(Colors.grey)
-                                              .size(13)
-                                              .make(),
-                                        ),
-                                      ],
+                                      ),
                                     ),
-                                  ),
-                                  10.heightBox,
-                                  SizedBox(
-                                    child: Row(children: [
-                                      Expanded(child: Column(
+                                    Container(
+                                      width: 100,
+                                      child: Column(
                                         children: [
                                           Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.end,
                                             children: [
-                                              'Note'.text
+                                              'Price per Month'
+                                                  .text
+                                                  .size(10)
+                                                  .make(),
+                                            ],
+                                          ),
+                                          Row(
+                                            mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                            children: [
+                                              '₱ ${data['price']}'
+                                                  .text
                                                   .size(20)
-                                                  .blue900
                                                   .bold
                                                   .make(),
                                             ],
                                           ),
-                                          Image.asset(AppImages.notif),
                                         ],
-                                      )),
-                                      Expanded(child: Column(children: [
-                                        SizedBox(
-                                          width: 150,
-                                          child: GlowButton(
-                                            borderRadius: BorderRadius.circular(20),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: [
-                                                  Icon(Icons.call, color: Colors.white, size: 15,),
-                                                  'Call Owner'.text.light.white
-                                                      .size(15).make(),
-                                                ],
-                                              ), onPressed: () {
-                                            _callNumber(data['contactNumber']);
-                                          }),
-                                        ),
-                                        10.heightBox,
-                                        SizedBox(
-                                          width: 150,
-                                          child: GlowButton(
-                                              borderRadius: BorderRadius.circular(20),
-                                              child: Row(
-                                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                                                children: [
-                                                  Icon(Icons.chat, color: Colors.white, size: 15,),
-                                                  'Chat Owner'.text.light.white
-                                                      .size(15).make(),
-                                                ],
-                                              ), onPressed: () {
-                                            Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                builder: (context) => ChatOwner(
-                                                  emailOwner: bemail!,
-                                                  ownerNumber: data['contactNumber'],
-                                                  token: token,
-                                                ),
-                                              ),
-                                            );
-                                          }),
-                                        ),
-                                        20.heightBox,
-                                        AppText.current_room_note.text.fontFamily(
-                                            AppFonts.quicksand).make()
-                                      ],))
-                                    ],),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                                SizedBox(height: 10),
+                                Row(
+                                  children: [
+                                    'Description'.text.semiBold.size(16).make(),
+                                  ],
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.all(8.0),
+                                  child: Row(
+                                    children: [
+                                      Flexible(
+                                        child: '${data['descriptions']}'
+                                            .text
+                                            .light
+                                            .overflow(TextOverflow.fade)
+                                            .maxLines(5)
+                                            .color(Colors.grey)
+                                            .size(13)
+                                            .make(),
+                                      ),
+                                    ],
                                   ),
-                                  30.heightBox,
-                                ],
-                              ),
+                                ),
+                                10.heightBox,
+                                SizedBox(
+                                  child: Row(children: [
+                                    Expanded(child: Column(
+                                      children: [
+                                        Row(
+                                          children: [
+                                            'Note'.text
+                                                .size(20)
+                                                .blue900
+                                                .bold
+                                                .make(),
+                                          ],
+                                        ),
+                                        Image.asset(AppImages.notif),
+                                      ],
+                                    )),
+                                    Expanded(child: Column(children: [
+                                      SizedBox(
+                                        width: 150,
+                                        child: GlowButton(
+                                          borderRadius: BorderRadius.circular(20),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Icon(Icons.call, color: Colors.white, size: 15,),
+                                                'Call Owner'.text.light.white
+                                                    .size(15).make(),
+                                              ],
+                                            ), onPressed: () {
+                                          _callNumber(data['contactNumber']);
+                                        }),
+                                      ),
+                                      10.heightBox,
+                                      SizedBox(
+                                        width: 150,
+                                        child: GlowButton(
+                                            borderRadius: BorderRadius.circular(20),
+                                            child: Row(
+                                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                              children: [
+                                                Icon(Icons.chat, color: Colors.white, size: 15,),
+                                                'Chat Owner'.text.light.white
+                                                    .size(15).make(),
+                                              ],
+                                            ), onPressed: () {
+                                          Navigator.push(
+                                            context,
+                                            MaterialPageRoute(
+                                              builder: (context) => ChatOwner(
+                                                emailOwner: bemail!,
+                                                ownerNumber: data['contactNumber'],
+                                                token: token,
+                                              ),
+                                            ),
+                                          );
+                                        }),
+                                      ),
+                                      20.heightBox,
+                                      AppText.current_room_note.text.fontFamily(
+                                          AppFonts.quicksand).make()
+                                    ],))
+                                  ],),
+                                ),
+                                30.heightBox,
+                              ],
                             ),
-                            30.heightBox,
-                          ],
-                        ),
+                          ),
+                          30.heightBox,
+                        ],
                       );
                     },
                   ),
-                ).height(670).width(double.infinity).make(),
+                ).height(680).width(double.infinity).make(),
               ],
             ),
           ))

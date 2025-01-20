@@ -200,12 +200,18 @@ class _SearchScreenState extends State<SearchScreen> {
                           .collection("BoardingHouses")
                           .where('verified',
                           isEqualTo: true)
+                          .where('deleted?',
+                          isEqualTo: false)
                           .snapshots()
                           : FirebaseFirestore.instance
                           .collection("BoardingHouses")
                           .where('BoardingHouseName',
                           isGreaterThanOrEqualTo:
                           search)
+                          .where('verified',
+                          isEqualTo: true)
+                          .where('deleted?',
+                          isEqualTo: false)
                           .snapshots(),
                       builder: (context, snapshot) {
                         if (snapshot.hasError) {

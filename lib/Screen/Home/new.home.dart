@@ -103,6 +103,9 @@ class _HomeState extends State<Home> {
                           doc.data() as Map<String, dynamic>;
                       cDocId = data['roomDocId'];
                      bemail = data['Email'];
+                      bHouse = data['bHouseName'];
+                      ownerEmail = data['Email'];
+                      print('current bhouse $bHouse');
 
                       // token = data[''];
                       DateTime boardersIn = DateTime.fromMillisecondsSinceEpoch(
@@ -392,6 +395,7 @@ class _HomeState extends State<Home> {
                   stream: FirebaseFirestore.instance
                       .collection("BoardingHouses")
                       .where('verified', isEqualTo: true)
+                      .where('deleted?', isEqualTo: false)
                       .orderBy('createdAt', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {

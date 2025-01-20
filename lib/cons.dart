@@ -54,6 +54,7 @@ String? cDocId;
 String? rBHouse;
 String? rRoomsDocId;
 String? rBHouseDocId;
+bool? status;
 DateTime? rCheckIn;
 DateTime? rCheckOut;
 

@@ -58,9 +58,11 @@ class _HomeGuestState extends State<HomeGuest> {
                 child: Row(
                   children: [
                     Expanded(
-                        child: VxBox(child: Image.asset(AppImages.welcome).animate()
-                            .fade(duration: 200.ms)
-                            .scale(delay: 200.ms))
+                        child: VxBox(
+                                child: Image.asset(AppImages.welcome)
+                                    .animate()
+                                    .fade(duration: 200.ms)
+                                    .scale(delay: 200.ms))
                             .white
                             .make()),
                     Expanded(
@@ -124,6 +126,7 @@ class _HomeGuestState extends State<HomeGuest> {
                   stream: FirebaseFirestore.instance
                       .collection("BoardingHouses")
                       .where('verified', isEqualTo: true)
+                      .where('deleted?', isEqualTo: false)
                       .orderBy('createdAt', descending: true)
                       .snapshots(),
                   builder: (context, snapshot) {

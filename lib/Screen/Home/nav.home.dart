@@ -240,7 +240,30 @@ class _NavHomeState extends State<NavHome> {
                       return const Center(child: Text('Error fetching data'));
                     }
                     if (!snapshot.hasData || !snapshot.data!.exists) {
-                      return const Center(child: Text('No Reservation found'));
+                      return Container(
+                        height: 35,
+                        width: 35,
+                        decoration: BoxDecoration(
+                          color: Colors.white.withOpacity(0.5),
+                          border:
+                          Border.all(color: Colors.grey, width: 0.3),
+                          borderRadius: BorderRadius.circular(20),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.2),
+                              spreadRadius: 1,
+                              blurRadius: 1,
+                              offset: Offset(0, 1),
+                            ),
+                          ],
+                        ),
+                        child: const Center(
+                          child: Icon(
+                            Icons.notifications_active_outlined,
+                            color: Colors.black,
+                          ),
+                        ),
+                      );
                     }
                     Map<String, dynamic> data =
                         snapshot.data!.data() as Map<String, dynamic>;
@@ -352,7 +375,33 @@ class _NavHomeState extends State<NavHome> {
                 return const Center(child: Text('Error fetching data'));
               }
               if (!snapshot.hasData || !snapshot.data!.exists) {
-                return const Center(child: Text('No Reservation found'));
+                return Padding(
+                  padding: const EdgeInsets.only(right: 5),
+                  child: Container(
+                    height: 35,
+                    width: 35,
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.5),
+                      border:
+                      Border.all(color: Colors.grey, width: 0.3),
+                      borderRadius: BorderRadius.circular(20),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.2),
+                          spreadRadius: 1,
+                          blurRadius: 1,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
+                    ),
+                    child: const Center(
+                      child: Icon(
+                        Icons.chat_bubble_outline,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ),
+                );
               }
               Map<String, dynamic> data =
               snapshot.data!.data() as Map<String, dynamic>;

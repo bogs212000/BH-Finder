@@ -195,7 +195,7 @@ class _MyReservationsState extends State<MyReservations> {
                                                 .make(),
                                         ],
                                       ),
-                                      Divider(),
+                                      Divider(),  
                                     ],
                                   ),
                                 ),

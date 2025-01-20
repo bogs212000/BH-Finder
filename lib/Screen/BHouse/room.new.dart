@@ -1,4 +1,5 @@
 import 'package:bh_finder/Screen/Owner/list.rooms.screen.dart';
+import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:easy_date_timeline/easy_date_timeline.dart';
@@ -303,6 +304,7 @@ class _RoomNewState extends State<RoomNew> {
                                         context: context,
                                         type: QuickAlertType.info,
                                         onConfirmBtnTap: () {
+                                          Get.to(()=>SignInScreen());
                                           Navigator.pop(context);
                                         });
                                   }

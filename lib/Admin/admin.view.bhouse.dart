@@ -8,6 +8,7 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
@@ -19,6 +20,7 @@ import '../../cons.dart';
 import '../../fetch.dart';
 import '../Auth/auth.wrapper.dart';
 import '../Screen/Map/location.map.dart';
+import '../assets/fonts.dart';
 import 'admin.home.dart';
 
 class AdminBHouseScreen extends StatefulWidget {
@@ -108,51 +110,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                           children: [
                             Row(
                               mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                SizedBox(
-                                  height: 30,
-                                  child: Switch(
-                                    value: isSwitched,
-                                    onChanged: (value) async {
-                                      setState(() {
-                                        isSwitched =
-                                            value; // Update the local state of the switch
-                                      });
-
-                                      // Update data in Firestore
-                                      try {
-                                        await FirebaseFirestore.instance
-                                            .collection(
-                                                'BoardingHouses') // Replace with your collection name
-                                            .doc(data[
-                                                'Email']) // Replace with your document ID
-                                            .update({
-                                          'verified': value
-                                        }); // Replace 'switchState' with your field name
-
-                                        // Optional: Show a confirmation message
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Switch state updated successfully!')),
-                                        );
-                                      } catch (e) {
-                                        // Handle errors
-                                        print("Failed to update data: $e");
-                                        ScaffoldMessenger.of(context)
-                                            .showSnackBar(
-                                          SnackBar(
-                                              content: Text(
-                                                  'Failed to update switch state!')),
-                                        );
-                                      }
-                                    },
-                                    activeTrackColor: Colors.lightGreenAccent,
-                                    activeColor: Colors.green,
-                                  ),
-                                ),
-                              ],
+                              children: [],
                             ),
                             Row(
                               children: [
@@ -364,6 +322,50 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                             Row(
                               children: [
                                 'Owner info'.text.light.make(),
+                                Spacer(),
+                                data['deleted?'] == true ? SizedBox() : SizedBox(
+                                  height: 30,
+                                  child: Switch(
+                                    value: status!,
+                                    onChanged: (value) async {
+                                      setState(() {
+                                        status =
+                                            value; // Update the local state of the switch
+                                      });
+
+                                      // Update data in Firestore
+                                      try {
+                                        await FirebaseFirestore.instance
+                                            .collection(
+                                                'BoardingHouses') // Replace with your collection name
+                                            .doc(data[
+                                                'Email']) // Replace with your document ID
+                                            .update({
+                                          'verified': value
+                                        }); // Replace 'switchState' with your field name
+
+                                        // Optional: Show a confirmation message
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Switch state updated successfully!')),
+                                        );
+                                      } catch (e) {
+                                        // Handle errors
+                                        print("Failed to update data: $e");
+                                        ScaffoldMessenger.of(context)
+                                            .showSnackBar(
+                                          SnackBar(
+                                              content: Text(
+                                                  'Failed to update switch state!')),
+                                        );
+                                      }
+                                    },
+                                    activeTrackColor: Colors.lightGreenAccent,
+                                    activeColor: Colors.green,
+                                  ),
+                                ),
                               ],
                             ),
                             Divider(),
@@ -414,12 +416,17 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                           '${datas['FirstName']} ${datas['MiddleName']} ${datas['LastName']}'
                                               .text
                                               .bold
+                                              .fontFamily(AppFonts.quicksand)
                                               .make(),
                                         ],
                                       ),
                                       Row(
                                         children: [
-                                          '${datas['Email']}'.text.bold.make(),
+                                          '${datas['Email']}'
+                                              .text
+                                              .bold
+                                              .fontFamily(AppFonts.quicksand)
+                                              .make(),
                                         ],
                                       ),
                                       Row(
@@ -427,6 +434,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                           '${datas['PhoneNumber']}'
                                               .text
                                               .bold
+                                              .fontFamily(AppFonts.quicksand)
                                               .make(),
                                         ],
                                       ),
@@ -435,6 +443,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                           '${datas['OwnerUId']}'
                                               .text
                                               .bold
+                                              .fontFamily(AppFonts.quicksand)
                                               .make(),
                                         ],
                                       ),
@@ -495,6 +504,144 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                           ),
                                         ],
                                       ),
+                                      5.heightBox,
+                                      Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.end,
+                                        children: [
+                                          data['deleted?'] == true
+                                              ? 'This BH has been deleted'
+                                                  .text
+                                                  .bold
+                                                  .fontFamily(
+                                                      AppFonts.quicksand)
+                                                  .red600
+                                                  .make()
+                                              : SizedBox(
+                                                  height: 40,
+                                                  width: 140,
+                                                  child: GlowButton(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20),
+                                                    color: Colors.red,
+                                                    child: Row(
+                                                      children: [
+                                                        Icon(
+                                                          Icons.delete_outline,
+                                                          color: Colors.white,
+                                                        ),
+                                                        5.widthBox,
+                                                        'Delete BH'
+                                                            .text
+                                                            .bold
+                                                            .fontFamily(AppFonts
+                                                                .quicksand)
+                                                            .white
+                                                            .make(),
+                                                      ],
+                                                    ),
+                                                    onPressed: () async {
+                                                      QuickAlert.show(
+                                                        onCancelBtnTap: () {
+                                                          Navigator.pop(
+                                                              context);
+                                                        },
+                                                        onConfirmBtnTap:
+                                                            () async {
+                                                          Navigator.pop(
+                                                              context);
+                                                          QuickAlert.show(
+                                                              context: context,
+                                                              type:
+                                                                  QuickAlertType
+                                                                      .loading,
+                                                              title:
+                                                                  'Loading...',
+                                                              text:
+                                                                  'Please wait');
+                                                          try {
+                                                            await FirebaseFirestore.instance
+                                                                .collection('BoardingHouses')
+                                                                .doc('${data['Email']}')
+                                                                .update({
+                                                              'deleted?': true,
+                                                            });
+                                                            Navigator.pop(
+                                                                context);
+                                                            QuickAlert.show(
+                                                                barrierDismissible:
+                                                                    true,
+                                                                context:
+                                                                    (context),
+                                                                type:
+                                                                    QuickAlertType
+                                                                        .success,
+                                                                title:
+                                                                    'Verified',
+                                                                text:
+                                                                    'Boarding House has been Deleted',
+                                                                onConfirmBtnTap:
+                                                                    () {
+                                                                  Navigator.of(
+                                                                          context)
+                                                                      .pushAndRemoveUntil(
+                                                                    MaterialPageRoute(
+                                                                      builder:
+                                                                          (context) =>
+                                                                              AuthWrapper(),
+                                                                    ),
+                                                                    (Route<dynamic>
+                                                                            route) =>
+                                                                        false, // Removes all previous routes
+                                                                  );
+                                                                });
+                                                          } on FirebaseAuthException catch (e) {
+                                                            print(e);
+                                                            Navigator.pop(
+                                                                context);
+                                                            QuickAlert.show(
+                                                                context:
+                                                                    (context),
+                                                                type:
+                                                                    QuickAlertType
+                                                                        .error,
+                                                                title: 'Error',
+                                                                text: '$e');
+                                                          }
+                                                        },
+                                                        context: context,
+                                                        type: QuickAlertType
+                                                            .confirm,
+                                                        text:
+                                                            'Delete this Boarding House.',
+                                                        titleAlignment:
+                                                            TextAlign.center,
+                                                        textAlignment:
+                                                            TextAlign.center,
+                                                        confirmBtnText: 'Yes',
+                                                        cancelBtnText: 'No',
+                                                        confirmBtnColor:
+                                                            Colors.blue,
+                                                        backgroundColor:
+                                                            Colors.white,
+                                                        headerBackgroundColor:
+                                                            Colors.grey,
+                                                        confirmBtnTextStyle:
+                                                            const TextStyle(
+                                                          color: Colors.white,
+                                                          fontWeight:
+                                                              FontWeight.bold,
+                                                        ),
+                                                        titleColor:
+                                                            Colors.black,
+                                                        textColor: Colors.black,
+                                                      );
+                                                    },
+                                                  ),
+                                                )
+                                        ],
+                                      )
                                     ],
                                   ),
                                 );
@@ -603,7 +750,7 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                                               });
                                               print('room ID: $roomId');
                                               Get.to(() => RoomScreen(),
-                                                  arguments: [data['token']]);
+                                                  arguments: [data['token'], data['roomDocId']]);
                                               // Navigator.pushNamedAndRemoveUntil(
                                               //   context,
                                               //   '/RoomScreen',
@@ -732,10 +879,11 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                           padding: EdgeInsets.only(top: 40, left: 20),
                           child: GestureDetector(
                             onTap: () {
-                              Navigator.of(context).pushAndRemoveUntil(
-                                _toHomeScreen(),
-                                (Route<dynamic> route) => false,
-                              );
+                              Get.back();
+                              // Navigator.of(context).pushAndRemoveUntil(
+                              //   _toHomeScreen(),
+                              //   (Route<dynamic> route) => false,
+                              // );
                             },
                             child: Container(
                               height: 35,
@@ -804,100 +952,88 @@ class _AdminBHouseScreenState extends State<AdminBHouseScreen> {
                             width: double.infinity,
                             child: Padding(
                               padding: const EdgeInsets.all(20.0),
-                              child: Row(
-                                children: [
-                                  Expanded(
-                                    child: GestureDetector(
-                                      onTap: () {
-                                        QuickAlert.show(
-                                          onCancelBtnTap: () {
-                                            Navigator.pop(context);
-                                          },
-                                          onConfirmBtnTap: () async {
+                              child: SizedBox(
+                                height: 50,
+                                child: GlowButton(
+                                    borderRadius: BorderRadius.circular(20),
+                                    child: 'Verify'
+                                        .text
+                                        .size(20)
+                                        .color(Colors.white)
+                                        .bold
+                                        .make(),
+                                    onPressed: () {
+                                      QuickAlert.show(
+                                        onCancelBtnTap: () {
+                                          Navigator.pop(context);
+                                        },
+                                        onConfirmBtnTap: () async {
+                                          Navigator.pop(context);
+                                          QuickAlert.show(
+                                              context: context,
+                                              type: QuickAlertType.loading,
+                                              title: 'Loading...',
+                                              text: 'Please wait');
+                                          try {
+                                            await FirebaseFirestore.instance
+                                                .collection('BoardingHouses')
+                                                .doc('${data['Email']}')
+                                                .update({
+                                              'verified': true,
+                                            });
+                                            await FirebaseFirestore.instance
+                                                .collection('Users')
+                                                .doc('${data['Email']}')
+                                                .update({
+                                              'verified': true,
+                                            });
                                             Navigator.pop(context);
                                             QuickAlert.show(
-                                                context: context,
-                                                type: QuickAlertType.loading,
-                                                title: 'Loading...',
-                                                text: 'Please wait');
-                                            try {
-                                              await FirebaseFirestore.instance
-                                                  .collection('BoardingHouses')
-                                                  .doc('${data['Email']}')
-                                                  .update({
-                                                'verified': true,
-                                              });
-                                              await FirebaseFirestore.instance
-                                                  .collection('Users')
-                                                  .doc('${data['Email']}')
-                                                  .update({
-                                                'verified': true,
-                                              });
-                                              Navigator.pop(context);
-                                              QuickAlert.show(
-                                                  barrierDismissible: true,
-                                                  context: (context),
-                                                  type: QuickAlertType.success,
-                                                  title: 'Verified',
-                                                  text:
-                                                      'Boarding House has been verified',
-                                                  onConfirmBtnTap: () {
-                                                    Navigator.of(context)
-                                                        .pushAndRemoveUntil(
-                                                      MaterialPageRoute(
-                                                        builder: (context) =>
-                                                            AuthWrapper(),
-                                                      ),
-                                                      (Route<dynamic> route) =>
-                                                          false, // Removes all previous routes
-                                                    );
-                                                  });
-                                            } on FirebaseAuthException catch (e) {
-                                              print(e);
-                                              Navigator.pop(context);
-                                              QuickAlert.show(
-                                                  context: (context),
-                                                  type: QuickAlertType.error,
-                                                  title: 'Error',
-                                                  text: '$e');
-                                            }
-                                          },
-                                          context: context,
-                                          type: QuickAlertType.confirm,
-                                          text: 'Verify this Boarding House.',
-                                          titleAlignment: TextAlign.center,
-                                          textAlignment: TextAlign.center,
-                                          confirmBtnText: 'Yes',
-                                          cancelBtnText: 'No',
-                                          confirmBtnColor: Colors.blue,
-                                          backgroundColor: Colors.white,
-                                          headerBackgroundColor: Colors.grey,
-                                          confirmBtnTextStyle: const TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.bold,
-                                          ),
-                                          titleColor: Colors.black,
-                                          textColor: Colors.black,
-                                        );
-                                      },
-                                      child: Container(
-                                        height: 50,
-                                        decoration: BoxDecoration(
-                                            color: Color.fromRGBO(
-                                                26, 60, 105, 1.0),
-                                            borderRadius:
-                                                BorderRadius.circular(10)),
-                                        child: Center(
-                                            child: 'Verify'
-                                                .text
-                                                .size(20)
-                                                .color(Colors.white)
-                                                .bold
-                                                .make()),
-                                      ),
-                                    ),
-                                  ),
-                                ],
+                                                barrierDismissible: true,
+                                                context: (context),
+                                                type: QuickAlertType.success,
+                                                title: 'Verified',
+                                                text:
+                                                    'Boarding House has been verified',
+                                                onConfirmBtnTap: () {
+                                                  Navigator.of(context)
+                                                      .pushAndRemoveUntil(
+                                                    MaterialPageRoute(
+                                                      builder: (context) =>
+                                                          AuthWrapper(),
+                                                    ),
+                                                    (Route<dynamic> route) =>
+                                                        false, // Removes all previous routes
+                                                  );
+                                                });
+                                          } on FirebaseAuthException catch (e) {
+                                            print(e);
+                                            Navigator.pop(context);
+                                            QuickAlert.show(
+                                                context: (context),
+                                                type: QuickAlertType.error,
+                                                title: 'Error',
+                                                text: '$e');
+                                          }
+                                        },
+                                        context: context,
+                                        type: QuickAlertType.confirm,
+                                        text: 'Verify this Boarding House.',
+                                        titleAlignment: TextAlign.center,
+                                        textAlignment: TextAlign.center,
+                                        confirmBtnText: 'Yes',
+                                        cancelBtnText: 'No',
+                                        confirmBtnColor: Colors.blue,
+                                        backgroundColor: Colors.white,
+                                        headerBackgroundColor: Colors.grey,
+                                        confirmBtnTextStyle: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        titleColor: Colors.black,
+                                        textColor: Colors.black,
+                                      );
+                                    }),
                               ),
                             ),
                           )

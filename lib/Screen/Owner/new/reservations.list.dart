@@ -8,6 +8,7 @@ import 'package:intl/intl.dart';
 import '../../../assets/images.dart';
 import '../../../cons.dart';
 import '../reservation/reservation.view.screen.dart';
+import '../reservation/view.dart';
 
 class ReservationListOwner extends StatefulWidget {
   const ReservationListOwner({super.key});
@@ -124,7 +125,7 @@ class _ReservationListOwnerState extends State<ReservationListOwner> {
                                   rBHouseDocId = data['docID'];
                                 });
                                 print(rBHouseDocId);
-                                Get.to(()=>ViewReservationScreen());
+                                Get.to(()=>OwnerViewReservationScreen());
                               },
                               child: Padding(
                                 padding:
@@ -170,6 +171,12 @@ class _ReservationListOwnerState extends State<ReservationListOwner> {
                                                       .color(Colors.grey)
                                                       .make(),
                                                   Spacer(),
+                                                  if (data['status'] == 'rejected')
+                                                    'rejected'
+                                                        .text
+                                                        .color(Colors.red)
+                                                        .size(10)
+                                                        .make(),
                                                   if (data['status'] == 'pending')
                                                     'Pending'
                                                         .text
