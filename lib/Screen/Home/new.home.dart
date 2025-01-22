@@ -105,7 +105,7 @@ class _HomeState extends State<Home> {
                      bemail = data['Email'];
                       bHouse = data['bHouseName'];
                       ownerEmail = data['Email'];
-                      print('current bhouse $bHouse');
+                      print('current bhouse $bHouse, $bemail');
 
                       // token = data[''];
                       DateTime boardersIn = DateTime.fromMillisecondsSinceEpoch(
@@ -151,6 +151,9 @@ class _HomeState extends State<Home> {
                                                         .white
                                                         .make(),
                                                     onPressed: () {
+                                                      setState(() {
+                                                        ownerEmail = bemail!;
+                                                      });
                                                       fetchCurrentBhToken(setState, bemail!);
                                                       Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
                                                     }),

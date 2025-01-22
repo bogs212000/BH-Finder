@@ -64,11 +64,6 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
     _refreshController.refreshCompleted(); // Notify that refresh is complete
   }
 
-  @override
-  void dispose() {
-    super.dispose();
-  }
-
   FirebaseStorage storage = FirebaseStorage.instance;
   String? docID;
 
@@ -351,6 +346,7 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                                                     .size(15).make(),
                                               ],
                                             ), onPressed: () {
+
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
