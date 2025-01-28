@@ -92,6 +92,7 @@ class _ChatOwnerState extends State<ChatOwner> {
 
   @override
   Widget build(BuildContext context) {
+
     Brightness brightness = MediaQuery.of(context).platformBrightness;
     double screenWidth = MediaQuery.of(context).size.width;
 

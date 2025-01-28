@@ -184,7 +184,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
             child: StreamBuilder(
               stream: _firestore
                   .collection('Chats')
-                  .doc('${Get.arguments[3]}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+                  .doc('$boardersEmail+${FirebaseAuth.instance.currentUser!.email.toString()}')
                   .collection('Chats')
                   .orderBy('createdAt', descending: false)
                   .snapshots(),
@@ -332,12 +332,12 @@ class _ChatBoardersState extends State<ChatBoarders> {
       try{
         await FirebaseFirestore.instance
             .collection('Chats')
-            .doc('${Get.arguments[3]}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+            .doc('$boardersEmail+${FirebaseAuth.instance.currentUser?.email.toString()}')
             .set({
           'ownerEmail': FirebaseAuth.instance.currentUser?.email.toString(),
-          'email': Get.arguments[3],
-          'bHouse': Get.arguments[5],
-          'name': Get.arguments[4],
+          'email': boardersEmail,
+          'bHouse': bHouse,
+          'name': chatName,
           'role': 'boarder',
           'createdAt': DateTime.now(),
           'myToken': Get.arguments[1],
@@ -349,7 +349,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         });
         await FirebaseFirestore.instance
             .collection('Chats')
-            .doc('${Get.arguments[3]}+${FirebaseAuth.instance.currentUser?.email.toString()}')
+            .doc('$boardersEmail+${FirebaseAuth.instance.currentUser?.email.toString()}')
             .collection('Chats')
             .add({
           'date': date,

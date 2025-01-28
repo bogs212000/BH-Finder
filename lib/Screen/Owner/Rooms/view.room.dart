@@ -24,6 +24,7 @@ import 'package:intl/intl.dart';
 import '../../../api.dart';
 import '../../../cons.dart';
 import '../../BHouse/bh.screen.dart';
+import '../../Chat/owner.chat.list.dart';
 import '../list.rooms.screen.dart';
 import 'package:http/http.dart' as http;
 
@@ -40,6 +41,7 @@ class ViewRoom extends StatefulWidget {
 }
 
 class _ViewRoomState extends State<ViewRoom> {
+  String? myEmail = FirebaseAuth.instance.currentUser?.email.toString();
   late Future<DocumentSnapshot> bHouseRoom;
   User? currentUser = FirebaseAuth.instance.currentUser;
   String? left;
@@ -885,21 +887,27 @@ class _ViewRoomState extends State<ViewRoom> {
                             : Padding(
                                 padding: EdgeInsets.only(top: 40, right: 20),
                                 child: GestureDetector(
-                                  onTap: () {
-                                    // Navigator.push(
-                                    //   context,
-                                    //   MaterialPageRoute(
-                                    //     builder: (context) => ChatBoarders(
-                                    //       token: data['token'],
-                                    //       boarderNumber:
-                                    //           data['boardersConNumber'],
-                                    //       boarderEmail: data['boarderEmail'],
-                                    //       ownerToken: ownerToken,
-                                    //       name: data['boardersName'],
-                                    //       bhouseName: data['bHouseName'],
-                                    //     ),
-                                    //   ),
-                                    // );
+                                  onTap: () async {
+                                    setState(() {
+                                      boardersEmail = data['boarderEmail'];
+                                      bHouse = data['bHouse'];
+                                      chatName = data['name'];
+                                      bPhone = data['boarderNumber'].toString();
+                                    });
+                                    print('bEmail: $boardersEmail');
+                                    await FirebaseFirestore.instance
+                                        .collection('BoardingHouses')
+                                        .doc(myEmail)
+                                        .update({'chat': 0});
+                                    Get.to(() => ChatBoarders(), arguments: [
+                                      data['boarderNumber'].toString(),
+                                      data['myToken'],
+                                      data['ownerToken'],
+                                      data['email'],
+                                      data['name'],
+                                      data['bHouse'],
+                                      data['boarderNumber'],
+                                    ]);
                                   },
                                   child: Container(
                                     height: 35,

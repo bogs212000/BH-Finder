@@ -23,6 +23,7 @@ import '../BHouse/bh.screen.dart';
 
 String? token;
 String? bemail;
+
 class Home extends StatefulWidget {
   const Home({super.key});
 
@@ -31,12 +32,12 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
-
   @override
   void initState() {
     super.initState();
     // TODO: implement initState
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,9 +90,7 @@ class _HomeState extends State<Home> {
                             .make(),
                         Image.asset(
                           AppImages.street,
-                        ).animate()
-                            .fade(duration: 100.ms)
-                            .scale(delay: 100.ms),
+                        ).animate().fade(duration: 100.ms).scale(delay: 100.ms),
                       ],
                     );
                   }
@@ -102,10 +101,9 @@ class _HomeState extends State<Home> {
                       Map<String, dynamic> data =
                           doc.data() as Map<String, dynamic>;
                       cDocId = data['roomDocId'];
-                     bemail = data['Email'];
-                      bHouse = data['bHouseName'];
                       ownerEmail = data['Email'];
-                      print('current bhouse $bHouse, $bemail');
+                      bHouse = data['bHouseName'];
+                      print('current bhouse $bHouse, $ownerEmail');
 
                       // token = data[''];
                       DateTime boardersIn = DateTime.fromMillisecondsSinceEpoch(
@@ -132,54 +130,75 @@ class _HomeState extends State<Home> {
                                   children: [
                                     Expanded(
                                         child: Column(
-                                          children: [
-                                            Image.asset(AppImages.street).animate()
-                                                .fade(duration: 100.ms)
-                                                .scale(delay: 100.ms),
-                                            10.heightBox,
-                                            data['paid?'] == false ? Padding(
-                                              padding: const EdgeInsets.only(left: 10, right: 10),
-                                              child: SizedBox(
-                                                height: 30,
-                                                width: double.infinity,
-                                                child: GlowButton(
-                                                    borderRadius:
-                                                    BorderRadius.circular(20),
-                                                    child: 'View room'
-                                                        .text
-                                                        .bold
-                                                        .white
-                                                        .make(),
-                                                    onPressed: () {
-                                                      setState(() {
-                                                        ownerEmail = bemail!;
-                                                      });
-                                                      fetchCurrentBhToken(setState, bemail!);
-                                                      Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
-                                                    }),
-                                              ).animate()
-                                                  .fade(duration: 200.ms)
-                                                  .scale(delay: 200.ms),
-                                            ) : Padding(
-                                              padding: const EdgeInsets.only(left: 20, right: 20),
-                                              child: SizedBox(
-                                                height: 30,
-                                                width: double.infinity,
-                                                child: GlowButton(
-                                                    borderRadius:
-                                                    BorderRadius.circular(20),
-                                                    child: 'View'
-                                                        .text
-                                                        .bold
-                                                        .white
-                                                        .make(),
-                                                    onPressed: () {
-                                                      Get.to(()=>ViewCurrentRoom(), arguments: [data['roomDocId'], data['roomDocId']]);
-                                                    }),
-                                              ),
-                                            )
-                                          ],
-                                        )),
+                                      children: [
+                                        Image.asset(AppImages.street)
+                                            .animate()
+                                            .fade(duration: 100.ms)
+                                            .scale(delay: 100.ms),
+                                        10.heightBox,
+                                        data['paid?'] == false
+                                            ? Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 10, right: 10),
+                                                child: SizedBox(
+                                                  height: 30,
+                                                  width: double.infinity,
+                                                  child: GlowButton(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      child: 'View room'
+                                                          .text
+                                                          .bold
+                                                          .white
+                                                          .make(),
+                                                      onPressed: () {
+                                                        setState(() {
+                                                          roomId = data['roomDocId'];
+                                                        });
+                                                        fetchCurrentBhToken(
+                                                            setState, ownerEmail!);
+                                                        Get.to(
+                                                            () =>
+                                                                ViewCurrentRoom(),
+                                                            arguments: [
+                                                              data['roomDocId'],
+                                                              data['roomDocId']
+                                                            ]);
+                                                      }),
+                                                )
+                                                    .animate()
+                                                    .fade(duration: 200.ms)
+                                                    .scale(delay: 200.ms),
+                                              )
+                                            : Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 20, right: 20),
+                                                child: SizedBox(
+                                                  height: 30,
+                                                  width: double.infinity,
+                                                  child: GlowButton(
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              20),
+                                                      child: 'View'
+                                                          .text
+                                                          .bold
+                                                          .white
+                                                          .make(),
+                                                      onPressed: () {
+                                                        Get.to(
+                                                            () =>
+                                                                ViewCurrentRoom(),
+                                                            arguments: [
+                                                              data['roomDocId'],
+                                                              data['roomDocId']
+                                                            ]);
+                                                      }),
+                                                ),
+                                              )
+                                      ],
+                                    )),
                                     Expanded(
                                       child: Column(
                                         children: [
@@ -196,17 +215,22 @@ class _HomeState extends State<Home> {
                                                   .fontFamily(
                                                       AppFonts.quicksand)
                                                   .size(15)
+                                                  .bold
                                                   .make(),
                                             ],
                                           ),
                                           Row(
                                             children: [
-                                              Text(
-                                                  'BH : ${data['bHouseName']}',
-                                                  style: const TextStyle(
-                                                      fontSize: 12,
-                                                      fontFamily:
-                                                          AppFonts.quicksand)),
+                                              Flexible(
+                                                child: Text(
+                                                    'BH : ${data['bHouseName']}',
+                                                    style: const TextStyle(
+                                                        fontSize: 12,
+                                                        fontFamily:
+                                                            AppFonts.quicksand,
+                                                        overflow: TextOverflow
+                                                            .ellipsis)),
+                                              ),
                                               const Spacer(),
                                             ],
                                           ),
@@ -367,7 +391,7 @@ class _HomeState extends State<Home> {
                                         ],
                                       ),
                                       onPressed: () {
-                                        Get.to(()=>SearchScreen());
+                                        Get.to(() => SearchScreen());
                                       }),
                                 )
                               ],
@@ -572,7 +596,7 @@ class _HomeState extends State<Home> {
                                       borderRadius: BorderRadius.circular(20),
                                       child: 'View'.text.white.make(),
                                       onPressed: () {
-                                        Get.to(()=>MyReservations());
+                                        Get.to(() => MyReservations());
                                       }),
                                 )
                               ],

@@ -46,7 +46,7 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
     super.initState();
     bHouseRoom = FirebaseFirestore.instance
         .collection('Rooms')
-        .doc('${Get.arguments[1].toString()}')
+        .doc('$roomId')
         .get();
   }
 
@@ -346,12 +346,16 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                                                     .size(15).make(),
                                               ],
                                             ), onPressed: () {
-
+                                          setState(() {
+                                            bHouse =
+                                                data['bHouseName'].toString();
+                                          });
+                                          print('haha $ownerEmail, $bHouse');
                                           Navigator.push(
                                             context,
                                             MaterialPageRoute(
                                               builder: (context) => ChatOwner(
-                                                emailOwner: bemail!,
+                                                emailOwner: ownerEmail,
                                                 ownerNumber: data['contactNumber'],
                                                 token: token,
                                               ),

@@ -74,7 +74,7 @@ class _HomeGuestState extends State<HomeGuest> {
                                 "Welcome".text.size(30).blue900.bold.make(),
                               ],
                             ),
-                            'Sign in fist to explore more!'
+                            'Sign in first to explore more!'
                                 .text
                                 .fontFamily(AppFonts.quicksand)
                                 .size(20)
