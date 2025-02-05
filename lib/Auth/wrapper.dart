@@ -1,5 +1,7 @@
 // ignore_for_file: prefer_const_constructors, prefer_const_literals_to_create_immutables
 
+import 'dart:async';
+
 import 'package:bh_finder/Admin/admin.home.dart';
 import 'package:bh_finder/Screen/Deleted/deleted.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
@@ -9,19 +11,29 @@ import 'package:bh_finder/Screen/Owner/owner.nav.dart';
 import 'package:bh_finder/Screen/SignUp/signin.screen.dart';
 import 'package:bh_finder/Screen/SignUp/waiting.screen.dart';
 import 'package:bh_finder/Screen/guest/home.guest.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
+import '../Screen/BHouse/room.cache.dart';
 import '../Screen/Home/nav.home.dart';
 import '../Screen/Owner/new/new.nav.owner.dart';
 import '../Screen/Owner/owner.home.screen.dart';
 import '../Screen/SignUp/guest.screen.dart';
 import '../cons.dart';
 
-class Wrapper extends StatelessWidget {
-  const Wrapper({Key? key}) : super(key: key);
+class Wrapper extends StatefulWidget {
+  final String datas;
+  const Wrapper({Key? key, required this.datas}) : super(key: key,);
+
+  @override
+  State<Wrapper> createState() => _WrapperState();
+}
+
+class _WrapperState extends State<Wrapper> {
 
   @override
   Widget build(BuildContext context) {
@@ -62,8 +74,7 @@ class Wrapper extends StatelessWidget {
               if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Owner")) {
                 return NewOwnerNav();
-              } else if (
-                  (userData.data!['role'] == "Owner") &&
+              } else if ((userData.data!['role'] == "Owner") &&
                   (userData.data!['deleted'] == true)) {
                 return ScreenDeleted();
               } else if ((userData.data!['verified'] == true) &&
@@ -72,7 +83,13 @@ class Wrapper extends StatelessWidget {
                 return WaitEmailVerify();
               } else if ((userData.data!['verified'] == true) &&
                   (userData.data!['role'] == "Boarder") &&
-                  (user != null && user.emailVerified)) {
+                  (user != null && user.emailVerified) &&
+                  widget.datas != '') {
+                return RoomCache();
+              }else if ((userData.data!['verified'] == true) &&
+                  (userData.data!['role'] == "Boarder") &&
+                  (user != null && user.emailVerified) &&
+                  widget.datas == '') {
                 bUuId = userData.data!['UuId'];
                 fName = userData.data!['FirstName'];
                 mName = userData.data!['MiddleName'];

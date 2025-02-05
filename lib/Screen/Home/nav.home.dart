@@ -1,4 +1,5 @@
 import 'package:bh_finder/Auth/auth.wrapper.dart';
+import 'package:bh_finder/Screen/BHouse/room.cache.dart';
 import 'package:bh_finder/Screen/Chat/chat.list.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/PrivacyPolicy/privacy.policy.dart';
@@ -16,6 +17,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:http/http.dart' as http;
@@ -32,7 +34,9 @@ class NavHome extends StatefulWidget {
 }
 
 class _NavHomeState extends State<NavHome> {
+  String? roomCache;
   int _selectedIndex = 0;
+  bool _isRefreshed = false;
   String? userEmail = FirebaseAuth.instance.currentUser?.email;
   late AndroidNotificationChannel channel;
   late FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin;
@@ -47,6 +51,8 @@ class _NavHomeState extends State<NavHome> {
 
   @override
   void initState() {
+    loadSharedPrefs();
+    print('room cache $roomCache');
     fetchBoarderData(setState);
     Navigator.of(context).popUntil((route) => route.isFirst);
     if (userEmail != null) {
@@ -65,6 +71,14 @@ class _NavHomeState extends State<NavHome> {
     FirebaseMessaging.instance.subscribeToTopic("Users");
 
     super.initState();
+
+  }
+
+  Future<void> loadSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      roomCache = prefs.getString('roomCache') ?? ''; // Handle null case
+    });
   }
 
   void getToken() async {
@@ -168,7 +182,9 @@ class _NavHomeState extends State<NavHome> {
   @override
   Widget build(BuildContext context) {
     Brightness brightness = MediaQuery.of(context).platformBrightness;
-    return Scaffold(
+    return
+      roomCache != '' ? RoomCache() :
+    Scaffold(
       backgroundColor: Colors.transparent,
       // drawer: Drawer(
       //   backgroundColor: Colors.white,

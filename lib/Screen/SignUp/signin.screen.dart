@@ -17,6 +17,7 @@ import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -31,6 +32,7 @@ class SignInScreen extends StatefulWidget {
 }
 
 class _SignInScreenState extends State<SignInScreen> {
+  String? roomCache;
   TextEditingController _password = TextEditingController();
   TextEditingController _emailPhonenumber = TextEditingController();
   bool _isPasswordVisible = false;
@@ -38,11 +40,26 @@ class _SignInScreenState extends State<SignInScreen> {
   String? errors;
 
   @override
+  void initState() {
+    loadSharedPrefs();
+    // TODO: implement initState
+    print('room Cache: $roomCache');
+    super.initState();
+  }
+  Future<void> loadSharedPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    setState(() {
+      roomCache = prefs.getString('roomCache') ?? ''; // Handle null case
+    });
+    print('room Cache: $roomCache');
+  }
+
+  @override
   void dispose() {
     // Dispose of the controllers when the widget is removed from the widget tree
     _password.dispose();
     _emailPhonenumber.dispose();
-    super.dispose(); // Call the super dispose method
+    super.dispose();
   }
 
   @override

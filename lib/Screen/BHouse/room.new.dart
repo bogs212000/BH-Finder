@@ -13,6 +13,7 @@ import 'package:get/get_core/src/get_main.dart';
 import 'package:pull_to_refresh/pull_to_refresh.dart';
 import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -303,9 +304,12 @@ class _RoomNewState extends State<RoomNew> {
                                         text: 'Sign in first to continue',
                                         context: context,
                                         type: QuickAlertType.info,
-                                        onConfirmBtnTap: () {
-                                          Get.to(()=>SignInScreen());
-                                          Navigator.pop(context);
+                                        onConfirmBtnTap: () async {
+                                          final prefs = await SharedPreferences.getInstance();
+                                            prefs.setString('roomCache', data['roomDocId']);
+                                          Get.to(() => SignInScreen());
+
+                                          // Navigator.pushNamed(context, '/SignInScreen');
                                         });
                                   }
                                   else {
@@ -391,7 +395,9 @@ class _RoomNewState extends State<RoomNew> {
                                             onCancelBtnTap: () {
                                               Navigator.pop(context);
                                             },
-                                            onConfirmBtnTap: () {
+                                            onConfirmBtnTap: () async {
+                                              final prefs = await SharedPreferences.getInstance();
+                                              prefs.setString('roomCache', data['roomDocId']);
                                               Navigator.pushNamed(
                                                   context, '/SignInScreen');
                                             },

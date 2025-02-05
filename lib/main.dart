@@ -14,6 +14,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_smart_dialog/flutter_smart_dialog.dart';
 import 'package:get/get_navigation/src/root/get_material_app.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'Auth/auth.wrapper.dart';
 import 'Screen/BHouse/bh.screen.dart';
 import 'Screen/BHouse/room.screen.dart';
@@ -76,11 +77,15 @@ void main() async {
   );
   FirebaseStorage storage = FirebaseStorage.instance;
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
-  runApp(const MyApp());
+  final prefs = await SharedPreferences.getInstance();
+  final roomCache = prefs.getString('roomCache');
+
+  runApp(MyApp(roomCache: roomCache));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final String? roomCache;
+  MyApp({Key ? key,  required this.roomCache});
 
   // This widget is the root of your application.
   @override

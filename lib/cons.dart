@@ -83,3 +83,6 @@ String? fetchGcashEmail;
 
 //
 String? rerentOwnerId;
+
+//
+String? roomCaches ='';

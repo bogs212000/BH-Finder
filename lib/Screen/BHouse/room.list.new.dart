@@ -1,6 +1,7 @@
 import 'package:bh_finder/Screen/BHouse/room.new.dart';
 import 'package:bh_finder/Screen/BHouse/room.screen.dart';
 import 'package:bh_finder/assets/images.dart';
+import 'package:bh_finder/cons.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';

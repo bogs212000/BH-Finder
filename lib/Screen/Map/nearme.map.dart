@@ -96,23 +96,4 @@ class _NearMeMapScreenState extends State<NearMeMapScreen> {
       ),
     );
   }
-  Route _toHomeScreen() {
-    return PageRouteBuilder(
-      pageBuilder: (context, animation, anotherAnimation) => Wrapper(),
-      transitionDuration: Duration(milliseconds: 1000),
-      reverseTransitionDuration: Duration(milliseconds: 200),
-      transitionsBuilder: (context, animation, anotherAnimation, child) {
-        animation = CurvedAnimation(
-            parent: animation,
-            reverseCurve: Curves.fastOutSlowIn,
-            curve: Curves.fastLinearToSlowEaseIn);
-
-        return SlideTransition(
-            position: Tween(begin: Offset(1.0, 0.0), end: Offset(0.0, 0.0))
-                .animate(animation),
-            textDirection: TextDirection.rtl,
-            child: Wrapper());
-      },
-    );
-  }
 }
