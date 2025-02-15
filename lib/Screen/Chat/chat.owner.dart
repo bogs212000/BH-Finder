@@ -60,7 +60,7 @@ class _ChatOwnerState extends State<ChatOwner> {
         },
         body: jsonEncode({
           'message': {
-            'token': btoken,
+            'token': widget.token,
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,
@@ -321,7 +321,7 @@ class _ChatOwnerState extends State<ChatOwner> {
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: Icon(Icons.send),
+                  child: Icon(Icons.send, size: 15,),
                 ),
               ),
             ],

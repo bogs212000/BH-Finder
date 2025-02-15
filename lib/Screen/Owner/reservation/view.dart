@@ -384,13 +384,13 @@ class _OwnerViewReservationScreenState extends State<OwnerViewReservationScreen>
                                     .set({
                                   'createdAt': DateTime.now(),
                                   'message':
-                                  "Hi ${data['boardersName']}, Your reservation for room ${data['roomNumber']} has been rejected. - ${widget.bName}",
+                                  "Hi ${data['boardersName']}, Your reservation for room ${data['roomNumber']} has been rejected. - $bhName",
                                   'boarderID': data['boarderUuId'],
                                   'status': false,
                                 });
                                 String title = '$BhouseName';
                                 String body =
-                                    "Hi ${data['boardersName']}, Your reservation for room ${data['roomNumber']} has been rejected. - ${widget.bName}";
+                                    "Hi ${data['boardersName']}, Your reservation for room ${data['roomNumber']} has been rejected. - $bhName";
                                 sendPushMessage(body, title);
                                 // Update the 'read' field for all reservations where boarderUuId is not equal to the given ID
                                 // QuerySnapshot querySnapshot =

@@ -306,6 +306,8 @@ class _SearchScreenState extends State<SearchScreen> {
                                 String averageOneDecimal = average.toStringAsFixed(1);
                                 double star = average;
                                 double clampedRating = star.clamp(0.0, 5.0);
+                                int numberOfReviews =
+                                ratings.length > 1 ? ratings.length - 1 : 0;
                                 return GestureDetector(
                                   onTap: () {
                                     setState(() {
@@ -319,126 +321,81 @@ class _SearchScreenState extends State<SearchScreen> {
                                     ]);
                                   },
                                   child: Container(
-                                    width: 150,
-                                    height: 225,
-                                    margin:
-                                    EdgeInsets.all(5),
-                                    // Add margin for spacing
+                                    width: 150, // Width for horizontal scrolling
+                                    margin: const EdgeInsets.all(5),
                                     decoration: BoxDecoration(
-                                        borderRadius:
-                                        BorderRadius
-                                            .circular(
-                                            2),
-                                        color:
-                                        Colors.white),
+                                      borderRadius: BorderRadius.circular(5),
+                                      color: Colors.white,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.grey.withOpacity(0.2),
+                                          spreadRadius: 1,
+                                          blurRadius: 3,
+                                        ),
+                                      ],
+                                    ),
                                     child: Column(
                                       children: [
-                                        Stack(
-                                          children: [
-                                            Stack(
-                                              children: [
-                                                Container(
-                                                  width: double
-                                                      .infinity,
-                                                  height:
-                                                  220,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors
-                                                          .white,
-                                                      borderRadius:
-                                                      BorderRadius.circular(5),
-                                                      boxShadow: [
-                                                        BoxShadow(
-                                                          color: Colors.grey.withOpacity(0.2),
-                                                          spreadRadius: 1,
-                                                          blurRadius: 3,
-                                                          offset: Offset(0, 0.5),
-                                                        ),
-                                                      ]),
-                                                  child:
-                                                  Column(
-                                                    children: [
-                                                      Container(
-                                                        width:
-                                                        double.infinity,
-                                                        height:
-                                                        150,
-                                                        decoration:
-                                                        BoxDecoration(
-                                                          borderRadius: const BorderRadius.only(
-                                                            topLeft: Radius.circular(5),
-                                                            topRight: Radius.circular(5),
-                                                          ),
-                                                          image: DecorationImage(
-                                                            image: CachedNetworkImageProvider(data['Image']),
-                                                            fit: BoxFit.cover,
-                                                          ),
-                                                        ),
-                                                      ),
-                                                      Container(
-                                                        padding:
-                                                        EdgeInsets.all(5),
-                                                        width:
-                                                        double.infinity,
-                                                        height:
-                                                        70,
-                                                        decoration:
-                                                        BoxDecoration(
-                                                          borderRadius: const BorderRadius.only(
-                                                            bottomLeft: Radius.circular(5),
-                                                            bottomRight: Radius.circular(5),
-                                                          ),
-                                                        ),
-                                                        child:
-                                                        Column(
-                                                          children: [
-                                                            Row(
-                                                              children: [
-                                                                Flexible(child: '${data['BoardingHouseName']}'.text.overflow(TextOverflow.ellipsis).light.make())
-                                                              ],
-                                                            ),
-                                                            Row(
-                                                              children: [
-                                                                Flexible(child: '${data['address']}'.text.overflow(TextOverflow.ellipsis).size(10).color(Colors.grey).make())
-                                                              ],
-                                                            ),
-                                                            Spacer(),
-                                                            Row(
-                                                              mainAxisAlignment: MainAxisAlignment.end,
-                                                              children: [
-                                                                GestureDetector( onTap: (){
-                                                                },
-                                                                  child: Row(
-                                                                    mainAxisAlignment: MainAxisAlignment.end,
-                                                                    children: List.generate(5, (index) {
-                                                                      if (index < clampedRating.toInt()) {
-                                                                        // Filled star
-                                                                        return const Icon(Icons.star, color: Colors.amber, size: 15,);
-                                                                      } else if (index < clampedRating) {
-                                                                        // Half star
-                                                                        return const Icon(Icons.star_half, color: Colors.amber, size: 15);
-                                                                      } else {
-                                                                        // Empty star
-                                                                        return const Icon(Icons.star_border, color: Colors.amber, size: 15);
-                                                                      }
-                                                                    }),
-                                                                  ),
-                                                                ), ' - $averageOneDecimal'.text.size(10).light.make(),
-                                                              ],
-                                                            ),
-                                                          ],
-                                                        ),
-                                                      ),
-                                                    ],
-                                                  ),
-                                                ),
-                                              ],
+                                        Container(
+                                          height: 150,
+                                          decoration: BoxDecoration(
+                                            borderRadius: const BorderRadius.only(
+                                              topLeft: Radius.circular(5),
+                                              topRight: Radius.circular(5),
                                             ),
-                                            SizedBox(
-                                                height: 5),
-                                          ],
+                                            image: DecorationImage(
+                                              image: CachedNetworkImageProvider(
+                                                  data['Image']),
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
                                         ),
-                                        SizedBox(height: 5),
+                                        Padding(
+                                          padding: const EdgeInsets.all(5),
+                                          child: Column(
+                                            crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                            children: [
+                                              Text(
+                                                data['BoardingHouseName'],
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontWeight: FontWeight.bold),
+                                              ),
+                                              Text(
+                                                data['address'],
+                                                maxLines: 1,
+                                                overflow: TextOverflow.ellipsis,
+                                                style: const TextStyle(
+                                                    fontSize: 10, color: Colors.grey),
+                                              ),
+                                              Row(
+                                                children: [
+                                                  Row(
+                                                    children: List.generate(5, (index) {
+                                                      if (index < clampedRating.toInt()) {
+                                                        return const Icon(Icons.star,
+                                                            color: Colors.amber, size: 15);
+                                                      } else if (index < clampedRating) {
+                                                        return const Icon(Icons.star_half,
+                                                            color: Colors.amber, size: 15);
+                                                      } else {
+                                                        return const Icon(Icons.star_border,
+                                                            color: Colors.amber, size: 15);
+                                                      }
+                                                    }),
+                                                  ),
+                                                  ' $averageOneDecimal'.text.bold.size(10).make()
+                                                ],
+                                              ),
+                                              Text(
+                                                '  ${numberOfReviews.toString()} reviews',
+                                                style: const TextStyle(fontSize: 10),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ],
                                     ),
                                   ),

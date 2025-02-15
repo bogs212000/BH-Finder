@@ -215,6 +215,7 @@ Future<void> fetchBhouseData(Function setState) async {
     if (snapshot.docs.isNotEmpty) {
       final doc = snapshot.docs.first;
       setState(() {
+        ownerEmail = doc['Email'];
         BhouseName = doc['BoardingHouseName'];
         bHouseRules = doc['Rules'];
         bUuId = doc['OwnerUId'];

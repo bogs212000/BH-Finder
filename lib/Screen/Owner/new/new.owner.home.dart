@@ -1,5 +1,6 @@
 import 'package:bh_finder/Screen/Owner/list.rooms.screen.dart';
 import 'package:bh_finder/Screen/Owner/new/reservations.list.dart';
+import 'package:bh_finder/Screen/Review/review.section.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -14,6 +15,7 @@ import '../../../assets/fonts.dart';
 import '../../../assets/images.dart';
 import '../../../cons.dart';
 import '../../Search/search.screen.dart';
+import '../list.reviews.dart';
 
 class NewOwnerHome extends StatefulWidget {
   const NewOwnerHome({super.key});
@@ -276,6 +278,56 @@ class _NewOwnerHomeState extends State<NewOwnerHome> {
                               ),
                               onPressed: () {
                                 Get.to(() => ReservationListOwner());
+                              }),
+                        )
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+              10.heightBox,
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  children: [
+                    Flexible(
+                        child:
+                        'BH Reviews'.text.size(20).blue900.bold.make()),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 20, right: 20),
+                child: Row(
+                  children: [
+                    Expanded(
+                        child: VxBox(
+                            child: Image.asset(
+                              AppImages.lost,
+                              height: 200,
+                            )).white.make()),
+                    Row(
+                      children: [
+                        SizedBox(
+                          width: 120,
+                          child: GlowButton(
+                              borderRadius: BorderRadius.circular(20),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                                children: [
+                                  'View '.text.white.make(),
+                                  const Icon(
+                                    Icons.star_border,
+                                    color: Colors.white,
+                                  ),
+                                  const Icon(
+                                    Icons.star_border,
+                                    color: Colors.white,
+                                  ),
+                                ],
+                              ),
+                              onPressed: () {
+                                Get.to(() => ListReviews());
                               }),
                         )
                       ],

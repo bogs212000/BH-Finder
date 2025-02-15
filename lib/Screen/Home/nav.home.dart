@@ -34,7 +34,6 @@ class NavHome extends StatefulWidget {
 }
 
 class _NavHomeState extends State<NavHome> {
-  String? roomCache;
   int _selectedIndex = 0;
   bool _isRefreshed = false;
   String? userEmail = FirebaseAuth.instance.currentUser?.email;
@@ -580,6 +579,8 @@ class _NavHomeState extends State<NavHome> {
               ),
               title: 'Sign out'.text.size(15).make(),
               onTap: () async {
+                final prefs = await SharedPreferences.getInstance();
+                prefs.setString('roomCache', '');
                 await FirebaseAuth.instance.signOut();
                 Get.offAll(AuthWrapper());
               },

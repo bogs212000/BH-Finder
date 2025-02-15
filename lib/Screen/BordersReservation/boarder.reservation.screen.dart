@@ -445,6 +445,9 @@ class _BoarderReservationScreenState extends State<BoarderReservationScreen> {
                                                       'read': false,
                                                       'token': myToken,
                                                     });
+                                                    await FirebaseFirestore.instance.collection('BoardingHouses').doc(ownerEmail).update({
+                                                      'notification': FieldValue.increment(1),
+                                                    });
                                                     await FirebaseFirestore
                                                         .instance
                                                         .collection(

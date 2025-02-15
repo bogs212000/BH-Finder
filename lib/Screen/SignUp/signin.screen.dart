@@ -21,7 +21,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:velocity_x/velocity_x.dart';
 import 'package:velocity_x/velocity_x.dart';
 
+import '../../Auth/AuthWrapperCache.dart';
 import '../../Auth/wrapper.dart';
+import '../../cons.dart';
 import '../Loading/loading.screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -39,19 +41,12 @@ class _SignInScreenState extends State<SignInScreen> {
   bool loadingLogin = false;
   String? errors;
 
-  @override
-  void initState() {
-    loadSharedPrefs();
-    // TODO: implement initState
-    print('room Cache: $roomCache');
-    super.initState();
-  }
   Future<void> loadSharedPrefs() async {
     final prefs = await SharedPreferences.getInstance();
     setState(() {
-      roomCache = prefs.getString('roomCache') ?? ''; // Handle null case
+      roomCaches = prefs.getString('roomCache'); // Handle null case
     });
-    print('room Cache: $roomCache');
+    print('room Cache: $roomCaches');
   }
 
   @override
@@ -92,7 +87,8 @@ class _SignInScreenState extends State<SignInScreen> {
                               Expanded(
                                 child: Image.asset(
                                   AppImages.sign_in,
-                                ).animate()
+                                )
+                                    .animate()
                                     .fade(duration: 200.ms)
                                     .scale(delay: 200.ms),
                               ),
@@ -131,7 +127,7 @@ class _SignInScreenState extends State<SignInScreen> {
                           children: [
                             'Sign in to continue'
                                 .text
-                            .fontFamily(AppFonts.quicksand)
+                                .fontFamily(AppFonts.quicksand)
                                 .size(15)
                                 .make(),
                           ],
@@ -228,26 +224,25 @@ class _SignInScreenState extends State<SignInScreen> {
                           ),
                         ),
                         Padding(
-                          padding: const EdgeInsets.only(left: 10, right: 10, bottom: 20),
+                          padding: const EdgeInsets.only(
+                              left: 10, right: 10, bottom: 20),
                           child: SizedBox(
                             height: 50,
                             width: double.infinity,
                             child: GlowButton(
                                 borderRadius: BorderRadius.circular(20),
                                 child: Row(
-                                  mainAxisAlignment:
-                                  MainAxisAlignment.center,
+                                  mainAxisAlignment: MainAxisAlignment.center,
                                   children: [
                                     'Log in'.text.white.size(15).make(),
                                   ],
                                 ),
                                 onPressed: () async {
-
                                   if (_password.text.isEmpty &&
                                       _emailPhonenumber.text.isEmpty) {
                                     setState(() {
                                       errors =
-                                      'Please input your email and password';
+                                          'Please input your email and password';
                                     });
                                     QuickAlert.show(
                                       context: context,
@@ -275,7 +270,7 @@ class _SignInScreenState extends State<SignInScreen> {
                                       title: 'Error',
                                       text: '$errors',
                                     );
-                                  } else {
+                                  } else if(roomCache == null || roomCache == '') {
                                     QuickAlert.show(
                                       barrierDismissible: false,
                                       context: context,
@@ -295,7 +290,50 @@ class _SignInScreenState extends State<SignInScreen> {
                                         context,
                                         MaterialPageRoute(
                                             builder: (context) =>
-                                                AuthWrapper()), // Replace with your HomeScreen
+                                                AuthWrapperCache()), // Replace with your HomeScreen
+                                      );
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.success,
+                                        title: 'Hello!',
+                                        text: 'Welcome to BH Finder app!',
+                                      );
+                                    } on FirebaseAuthException catch (e) {
+                                      Navigator.pop(context);
+                                      setState(() {
+                                        errors = e
+                                            .message; // Show a user-friendly error message
+                                      });
+                                      QuickAlert.show(
+                                        context: context,
+                                        type: QuickAlertType.error,
+                                        title: 'Error',
+                                        text: '$errors',
+                                      );
+                                      print('Error: $e');
+                                    }
+                                  } else {
+                                    QuickAlert.show(
+                                      barrierDismissible: false,
+                                      context: context,
+                                      type: QuickAlertType.loading,
+                                      title: 'Signing in...',
+                                      text: 'Please Wait',
+                                    );
+                                    try {
+                                      await loadSharedPrefs();
+                                      await FirebaseAuth.instance
+                                          .signInWithEmailAndPassword(
+                                        email: _emailPhonenumber.text.trim(),
+                                        password: _password.text.trim(),
+                                      );
+                                      Navigator.pop(context);
+                                      // Navigate to HomeScreen after closing pop-ups
+                                      Navigator.pushReplacement(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) =>
+                                                AuthWrapper(roomCaches: roomCache)), // Replace with your HomeScreen
                                       );
                                       QuickAlert.show(
                                         context: context,
@@ -361,14 +399,14 @@ class _SignInScreenState extends State<SignInScreen> {
                                 Get.to(() => AboutScreen());
                               },
                               child:
-                                  'About'.text.light.color(Colors.black).make(),
+                                  'About app'.text.light.color(Colors.black).make(),
                             ),
                           ],
                         ),
                         Spacer(),
                         GestureDetector(
                           onTap: () {
-                           Get.to(()=> OwnerSignupFirst());
+                            Get.to(() => OwnerSignupFirst());
                           },
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.center,

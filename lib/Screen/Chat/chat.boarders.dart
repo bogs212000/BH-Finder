@@ -55,7 +55,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         },
         body: jsonEncode({
           'message': {
-            'token': btoken,
+            'token': myToken,
             // Send notification to all users subscribed to this topic
             'notification': {
               'body': body,
@@ -316,7 +316,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
                       borderRadius: BorderRadius.circular(25),
                     ),
                   ),
-                  child: Icon(Icons.send),
+                  child: Icon(Icons.send, size: 15,),
                 ),
               ),
             ],
@@ -340,7 +340,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
           'name': chatName,
           'role': 'boarder',
           'createdAt': DateTime.now(),
-          'myToken': Get.arguments[1],
+          'myToken': myToken,
           'ownerToken': btoken,
           'seenBorder?': true,
           'seenOwner?': false,
@@ -360,7 +360,7 @@ class _ChatBoardersState extends State<ChatBoarders> {
         });
         print('Success!');
         String body = _messageController.text;
-        String title = Get.arguments[5].toString();
+        String title = bHouse!;
         _messageController.clear();
         sendPushMessage(body, title);
       } catch(e){print(e);}

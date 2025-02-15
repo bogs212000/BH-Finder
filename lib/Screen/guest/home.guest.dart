@@ -11,6 +11,7 @@ import 'package:flutter_glow/flutter_glow.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:get/get.dart';
 import 'package:get/get_core/src/get_main.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:shimmer/shimmer.dart';
 import 'package:velocity_x/velocity_x.dart';
 
@@ -26,6 +27,12 @@ class HomeGuest extends StatefulWidget {
 }
 
 class _HomeGuestState extends State<HomeGuest> {
+  //
+  // Future<void> clearCache() async {
+  //   final prefs = await SharedPreferences.getInstance();
+  //   prefs.clear();
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

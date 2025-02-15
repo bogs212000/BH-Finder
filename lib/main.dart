@@ -1,5 +1,6 @@
 // ignore_for_file: prefer_const_constructors
 
+import 'package:bh_finder/Auth/AuthWrapperCache.dart';
 import 'package:bh_finder/Screen/ForgotPass/forgotpass.screen.dart';
 import 'package:bh_finder/Screen/Home/home.screen.dart';
 import 'package:bh_finder/Screen/Owner/BHouseProfile/bhouse.profile.dart';
@@ -78,6 +79,7 @@ void main() async {
   FirebaseStorage storage = FirebaseStorage.instance;
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   final prefs = await SharedPreferences.getInstance();
+  prefs.setString('roomCache', '');
   final roomCache = prefs.getString('roomCache');
 
   runApp(MyApp(roomCache: roomCache));
@@ -98,6 +100,7 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       routes: {
         '/HomeScreen': (context) => HomeScreen(),
+        '/AuthWrapper': (context) => AuthWrapperCache(),
         '/UserProfile': (context) => UserProfile(),
         '/ViewRoom': (context) => ViewRoom(),
         '/BHouseProfile': (context) => BHouseProfile(),

@@ -226,7 +226,7 @@ class _ViewCurrentRoomState extends State<ViewCurrentRoom> {
                                           children: [
                                             Row(
                                               children: [
-                                                '${data['roomNameNumber']}'
+                                                'Room ${data['roomNameNumber']}'
                                                     .text
                                                     .bold
                                                     .size(18)

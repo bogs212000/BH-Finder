@@ -30,7 +30,12 @@ class _MyReservationsState extends State<MyReservations> {
       body: VxBox(
               child: Column(
         children: [
-          SizedBox(child: Image.asset(AppImages.calendar, height: 150,),),
+          SizedBox(
+            child: Image.asset(
+              AppImages.calendar,
+              height: 150,
+            ),
+          ),
           Expanded(
               child: VxBox(
             child: StreamBuilder(
@@ -123,13 +128,12 @@ class _MyReservationsState extends State<MyReservations> {
                           owner = data['OwnerId'];
                         });
                         print(rBHouseDocId);
-                       Get.to(()=>ViewReservationScreen());
+                        Get.to(() => ViewReservationScreen());
                       },
                       child: Padding(
-                        padding:
-                            const EdgeInsets.only( right: 20, left: 20),
+                        padding: const EdgeInsets.only(right: 20, left: 20),
                         child: Container(
-                          height: 90,
+                          height: 100,
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(10),
@@ -143,8 +147,91 @@ class _MyReservationsState extends State<MyReservations> {
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
+                                      SizedBox(
+                                        height: 20,
+                                        child: StreamBuilder<QuerySnapshot>(
+                                          stream: FirebaseFirestore.instance
+                                              .collection('BoardingHouses')
+                                              .where('OwnerUId',
+                                                  isEqualTo:
+                                                      owner) // Replace 'fieldName' and 'specificText' accordingly
+                                              .snapshots(),
+                                          builder: (BuildContext context,
+                                              AsyncSnapshot<QuerySnapshot>
+                                                  snapshot) {
+                                            if (snapshot.connectionState ==
+                                                ConnectionState.waiting) {
+                                              return Shimmer.fromColors(
+                                                baseColor: Colors.grey.shade200,
+                                                highlightColor: Colors.white,
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 20, right: 20),
+                                                  child: Container(
+                                                    height: 35,
+                                                    width: double.infinity,
+                                                    decoration: BoxDecoration(
+                                                      color: Colors.grey,
+                                                      borderRadius:
+                                                          BorderRadius.circular(
+                                                              10),
+                                                    ),
+                                                  ),
+                                                ),
+                                              );
+                                            }
+                                            if (snapshot.hasError) {
+                                              return const Center(
+                                                  child: Text(
+                                                      'Error fetching data'));
+                                            }
+                                            if (!snapshot.hasData ||
+                                                snapshot.data!.docs.isEmpty) {
+                                              return const Center(
+                                                  child: Text(
+                                                      'No Reservation found'));
+                                            }
+
+                                            // Extracting and displaying the filtered data
+                                            return ListView.builder(
+                                              itemCount:
+                                                  snapshot.data!.docs.length,
+                                              itemBuilder: (context, index) {
+                                                Map<String, dynamic> data =
+                                                    snapshot.data!.docs[index]
+                                                            .data()
+                                                        as Map<String, dynamic>;
+                                                return Row(
+                                                  children: [
+                                                    'BH :'
+                                                        .text
+                                                        .size(15)
+                                                        .color(Colors.grey)
+                                                        .make(),
+                                                    Spacer(),
+                                                    Text(
+                                                      data['BoardingHouseName'] ??
+                                                          'No name',
+                                                      style: TextStyle(
+                                                          fontWeight:
+                                                              FontWeight.w500,
+                                                          fontSize: 15),
+                                                    ),
+                                                  ],
+                                                ); // Replace 'name' with your field key
+                                              },
+                                            );
+                                          },
+                                        ),
+                                      ),
                                       Row(
                                         children: [
+                                          'Room # :'
+                                              .text
+                                              .color(Colors.grey)
+                                              .size(15)
+                                              .make(),
+                                          Spacer(),
                                           '${data['roomNumber']}'
                                               .text
                                               .bold
@@ -195,7 +282,7 @@ class _MyReservationsState extends State<MyReservations> {
                                                 .make(),
                                         ],
                                       ),
-                                      Divider(),  
+                                      Divider(),
                                     ],
                                   ),
                                 ),

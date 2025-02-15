@@ -131,6 +131,7 @@ class _OwnerChatListState extends State<OwnerChatList> {
                       child: GestureDetector(
                         onTap: () async {
                           setState(() {
+                            myToken = data['myToken'];
                             boardersEmail = data['email'].toString();
                             bHouse = data['bHouse'];
                             chatName = data['name'];

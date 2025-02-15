@@ -128,6 +128,7 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
 
   @override
   Widget build(BuildContext context) {
+    User? user = FirebaseAuth.instance.currentUser;
     return Scaffold(
       extendBodyBehindAppBar: true,
       backgroundColor: Colors.white,
@@ -169,7 +170,7 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
                         height: 450,
                         initialPage: 0,
                         indicatorColor: Colors.blue,
-                        autoPlayInterval: 4000,
+                        autoPlayInterval: 6000,
                         isLoop: true,
                         children: images.map((imageUrl) {
                           return CachedNetworkImage(
@@ -462,7 +463,7 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
                                       ),
                                     ),
                                   ),
-                                  Container(
+                                  user == null ? SizedBox() : Container(
                                     width: 35,
                                     child: GestureDetector(
                                       onTap: () {
@@ -497,7 +498,7 @@ class _BhouseScreenNewState extends State<BhouseScreenNew> {
                                     ),
                                   ),
                                   5.widthBox,
-                                  Container(
+                                 user == null ? SizedBox() : Container(
                                     width: 35,
                                     child: GestureDetector(
                                       onTap: () {

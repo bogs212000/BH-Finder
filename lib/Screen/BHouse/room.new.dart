@@ -128,7 +128,7 @@ class _RoomNewState extends State<RoomNew> {
                       initialPage: 0,
                       indicatorColor: Colors.blue,
                       // You can customize the indicator color
-                      autoPlayInterval: 4000,
+                      autoPlayInterval: 6000,
                       // Time for auto-sliding in milliseconds (3 seconds)
                       isLoop: true,
                       // Enable looping of the slideshow

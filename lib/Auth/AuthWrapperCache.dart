@@ -15,23 +15,17 @@ import '../Screen/Home/home.screen.dart';
 import '../Screen/SignUp/waiting.screen.dart';
 import '../cons.dart';
 
-class AuthWrapper extends StatefulWidget {
-  final String? roomCaches;
-  const AuthWrapper({super.key, this.roomCaches});
+class AuthWrapperCache extends StatelessWidget {
+  const AuthWrapperCache({super.key});
 
   @override
-  State<AuthWrapper> createState() => _AuthWrapperState();
-}
-
-class _AuthWrapperState extends State<AuthWrapper> {
-  @override
-  initState() {
-    setState(() {
-      roomCaches = widget.roomCaches;
-    });
-    print('#### room cache - ${widget.roomCaches} Auth Wrapper ####');
-    super.initState();
-  }
+  // initState() {
+  //   setState(() {
+  //     roomCaches = widget.roomCaches;
+  //   });
+  //   print('#### room cache - ${widget.roomCaches} Auth Wrapper ####');
+  //   super.initState();
+  // }
   // Future<void> loadSharedPrefs() async {
   //   final prefs = await SharedPreferences.getInstance();
   //   setState(() {
