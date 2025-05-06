@@ -1,5 +1,6 @@
 import 'dart:async';
 import 'dart:io';
+import 'package:bh_finder/Screen/about/help.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:path_provider/path_provider.dart';
@@ -186,6 +187,12 @@ class _BHouseEditProfileState extends State<BHouseEditProfile> {
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
+          actions: [IconButton(onPressed: (){
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => HelpScreen()),
+            );
+          }, icon: Icon(Icons.help))],
         ),
         body: Padding(
           padding: const EdgeInsets.only(left: 10, right: 10),

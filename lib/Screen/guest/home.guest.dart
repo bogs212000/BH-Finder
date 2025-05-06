@@ -32,6 +32,13 @@ class _HomeGuestState extends State<HomeGuest> {
   //   final prefs = await SharedPreferences.getInstance();
   //   prefs.clear();
   // }
+  // @override
+  // Future<void> initState() async {
+  //   // TODO: implement initState
+  //   final prefs = await SharedPreferences.getInstance();
+  //   prefs.setString('roomCache', '');
+  //   super.initState();
+  // }
 
   @override
   Widget build(BuildContext context) {
@@ -101,7 +108,9 @@ class _HomeGuestState extends State<HomeGuest> {
                                           'Sign in'.text.white.make(),
                                         ],
                                       ),
-                                      onPressed: () {
+                                      onPressed: () async {
+                                        final prefs = await SharedPreferences.getInstance();
+                                        prefs.setString('roomCache', '');
                                         Get.to(() => SignInScreen());
                                       }),
                                 )
@@ -175,6 +184,8 @@ class _HomeGuestState extends State<HomeGuest> {
                             ratings.reduce((a, b) => a + b) / ratings.length;
                         String averageOneDecimal = average.toStringAsFixed(1);
                         double clampedRating = average.clamp(0.0, 5.0);
+                        int numberOfReviews =
+                        ratings.length > 1 ? ratings.length - 1 : 0;
 
                         return GestureDetector(
                           onTap: () {
@@ -239,22 +250,27 @@ class _HomeGuestState extends State<HomeGuest> {
                                             fontSize: 10, color: Colors.grey),
                                       ),
                                       Row(
-                                        children: List.generate(5, (index) {
-                                          if (index < clampedRating.toInt()) {
-                                            return Icon(Icons.star,
-                                                color: Colors.amber, size: 15);
-                                          } else if (index < clampedRating) {
-                                            return Icon(Icons.star_half,
-                                                color: Colors.amber, size: 15);
-                                          } else {
-                                            return Icon(Icons.star_border,
-                                                color: Colors.amber, size: 15);
-                                          }
-                                        }),
+                                        children: [
+                                          Row(
+                                            children: List.generate(5, (index) {
+                                              if (index < clampedRating.toInt()) {
+                                                return Icon(Icons.star,
+                                                    color: Colors.amber, size: 15);
+                                              } else if (index < clampedRating) {
+                                                return Icon(Icons.star_half,
+                                                    color: Colors.amber, size: 15);
+                                              } else {
+                                                return Icon(Icons.star_border,
+                                                    color: Colors.amber, size: 15);
+                                              }
+                                            }),
+                                          ),
+                                          ' $averageOneDecimal'.text.bold.size(10).make()
+                                        ],
                                       ),
                                       Text(
-                                        ' - $averageOneDecimal',
-                                        style: TextStyle(fontSize: 10),
+                                        '  ${numberOfReviews.toString()} reviews',
+                                        style: const TextStyle(fontSize: 10),
                                       ),
                                     ],
                                   ),

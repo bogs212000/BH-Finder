@@ -9,6 +9,7 @@ import 'package:quickalert/models/quickalert_type.dart';
 import 'package:quickalert/widgets/quickalert_dialog.dart';
 
 import '../../../cons.dart';
+import '../new/new.nav.owner.dart';
 
 class BHouseAddress extends StatefulWidget {
   const BHouseAddress({super.key});
@@ -57,7 +58,7 @@ class _BHouseAddressState extends State<BHouseAddress> {
     );
     Future.delayed(Duration(seconds: 2),(){ Navigator.pushAndRemoveUntil(
       context,
-      MaterialPageRoute(builder: (context) => OwnerHomeScreen()),
+      MaterialPageRoute(builder: (context) => NewOwnerNav()),
       // Define your CheckoutPage widget here
           (Route<dynamic> route) =>
       false, // This condition removes all the previous routes
